@@ -6,6 +6,8 @@ from typing import Dict, List, Union, Optional, Text, Any
 import numpy as np
 import pandas.core.dtypes.common
 from pandas import DataFrame
+from pandas._libs import lib
+
 import utilities.constants as const
 from utilities.exceptions import *
 import regex as re
@@ -72,6 +74,7 @@ class NumPandasTraj(DataFrame):
             data_set.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
             super(NumPandasTraj, self).__init__(data_set)
 
+    # ------------------------------ General Utilities ----------------------------- #
     def rename_df_col_headers(self, data: DataFrame) -> DataFrame:
         """
             Change the column headers of the columns when the user given data is in the
@@ -216,24 +219,102 @@ class NumPandasTraj(DataFrame):
         raise NotAllowedError("Changing of index is not allowed.\n"
                               "The index must be DateTime at all times.")
 
-    def reset_index(self, drop=False):
+    def __reset_default_index(self):
         """
-            Reset the index of the DataFrame i.e. remove the index.
-            !!!!                                                            !!!!
-                WARNING:
-                -------
-                    REMOVAL OF THE INDEX IS NOT ALLOWED IN DaskTrajectoryDF.
-                    BY MANDATORY CONSTRAINTS, THE INDEX NEEDS TO BE DateTime.
-            !!!!                                                            !!!!
+            Set the Index of the dataframe back to DateTime and traj_id.
+
+            WARNING
+            -------
+                This must be used everytime after the reset_index is called
+                in order to set the index back to library default values as
+                it is necessary to perform various other functionalities.
+        """
+        try:
+            self.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+        except KeyError:
+            raise MissingColumnsException(f"Either of {const.DateTime} or {const.TRAJECTORY_ID} columns are missing.")
+
+    # ------------------------------- Properties ---------------------------------- #
+    @property
+    def latitude(self):
+        """
+            Accessor method for the latitude column of the DaskTrajectoryDF.
+
+            Returns
+            -------
+                dask.dataframe.core.Series
+                    The Series containing all the latitude values from the DataFrame.
 
             Raises
             ------
-                NotAllowedError
-                    The change of index is not alloed in DaskTrajectoryDF.
-
+                KeyError/ IndexError
+                    Latitude column is missing from the data.
         """
-        raise NotAllowedError("Resetting of index is not allowed.\n"
-                              "The index must be DateTime at all times.")
+        try:
+            return self[const.LAT]
+        except KeyError or IndexError:
+            raise MissingColumnsException("The Latitude column is not present in the DataFrame, please verify again.")
+
+    @property
+    def longitude(self):
+        """
+            Accessor method for the longitude column of the DaskTrajectoryDF.
+
+            Returns
+            -------
+                dask.dataframe.core.Series
+                    The Series containing all the longitude values from the DataFrame.
+
+            Raises
+            ------
+                MissingColumnsException
+                    Longitude column is missing from the data
+        """
+        try:
+            return self[const.LONG]
+        except KeyError or IndexError:
+            raise MissingColumnsException("The Longitude column is not present in the DataFrame, please verify again.")
+
+    @property
+    def datetime(self):
+        """
+            Accessor method for the DateTime column of the DaskTrajectoryDF.
+
+            Returns
+            -------
+                dask.dataframe.core.Series
+                    The Series containing all the DateTime values from the DataFrame.
+
+            Raises
+            ------
+                KeyError/ValueError
+                    DateTime column is missing from the data.
+        """
+        try:
+            return self.index.get_level_values(const.DateTime).to_series()
+        except KeyError or IndexError:
+            raise MissingColumnsException("The DateTime column is not present in the DataFrame, please verify again.")
+
+    @property
+    def traj_id(self):
+        """
+            Accessor method for the Trajectory_ID column of the DaskTrajectoryDF.
+
+            Returns
+            -------
+                dask.dataframe.core.Series
+                    The Series containing all the Trajectory_ID values from the DataFrame.
+
+            Raises
+            ------
+                KeyError/ValueError
+                    traj_id column is missing from the data.
+        """
+        try:
+            return self.index.get_level_values(const.TRAJECTORY_ID).to_series()
+        except KeyError or IndexError:
+            raise MissingColumnsException("The Trajectory_ID column is not present in the DataFrame, please verify "
+                                          "again.")
 
     # ------------------------------- File and DF Operations ----------------------------- #
     @classmethod
@@ -262,3 +343,24 @@ class NumPandasTraj(DataFrame):
                                  datetime=const.DateTime, traj_id=const.TRAJECTORY_ID)
         except FileNotFoundError:
             raise FileNotFoundError(f"Could not open the %s, please try again." % str(filename))
+
+    def to_numpy(self, dtype=None, copy: bool = False, na_value=lib.no_default) -> np.ndarray:
+        """
+            Convert the DataFrame to a NumPy array.By default, the dtype of the returned array will
+            be the common dtype of all types in the DataFrame. For example, if the dtypes are float16
+            and float32, the results dtype will be float32. This may require copying data and coercing
+            values, which may be expensive
+
+            Params
+            ------
+                dtype:
+                    The dtype to pass to :meth:`numpy.asarray`.
+                copy:
+                    Whether to ensure that the returned value is not a view on another array.
+                    Note that ``copy=False`` does not *ensure* that ``to_numpy()`` is no-copy.
+                    Rather, ``copy=True`` ensure that a copy is made, even if not strictly necessary.
+                na_value:
+                    The value to use for missing values. The default value depends on `dtype` and the
+                    dtypes of the DataFrame columns.
+        """
+        return self.reset_index(drop=False).to_numpy()
