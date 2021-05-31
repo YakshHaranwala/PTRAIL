@@ -5,9 +5,10 @@ from typing import Dict, List, Union, Optional, Text, Any
 
 import numpy as np
 import pandas.core.dtypes.common
-from pandas import DataFrame, read_csv
+from pandas import DataFrame
 import utilities.constants as const
 from utilities.exceptions import *
+import regex as re
 
 
 class NumPandasTraj(DataFrame):
@@ -53,13 +54,11 @@ class NumPandasTraj(DataFrame):
         # pandas DataFrame first.
         elif isinstance(data_set, list) or isinstance(data_set, np.ndarray):
             data_set = DataFrame(data_set, columns=column_list)
-            print("Finished this")
 
         # Case-3: The data is from a pandas DF.
         # Here, all we have to do is to rename the column names from the data to default names.
         elif isinstance(data_set, DataFrame):
             data_set = self.rename_df_col_headers(data_set)
-            print(data_set.head())
 
         # Now, renaming the default column names to library default column names.
         column_names = self.get_default_column_names(DateTime=datetime, traj_id=traj_id,
@@ -68,26 +67,50 @@ class NumPandasTraj(DataFrame):
 
         # Now checking whether all the columns are present in the data and then verifying the data types
         # of all the columns abd then calling the super() to create and return the dataframe.
-        #if self.validate_columns(data_set):
-        #self.validate_data_types(data_set)
-        data_set.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
-        super(NumPandasTraj, self).__init__(data_set)
+        if self.validate_columns(data_set):
+            self.validate_data_types(data_set)
+            data_set.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+            super(NumPandasTraj, self).__init__(data_set)
 
-    def rename_df_col_headers(self, data: DataFrame):
-        cols = data.columns.to_list()
-        print(cols)
+    def rename_df_col_headers(self, data: DataFrame) -> DataFrame:
+        """
+            Change the column headers of the columns when the user given data is in the
+            form of a pandas DF while creating the NumPandasTraj. This method is mainly
+            used when the user reads in data from a csv because the CSV file might
+            contain different names for the columns.
+
+            Parameters
+            ----------
+                data: the dataframe whose column names are to be changed.
+
+            Returns
+            -------
+                pandas.DataFrame
+                    The pandas dataframe containing the library default column headers.
+        """
+        cols = data.columns.to_list()                           # List of all column names
+        # Iterate over the list of column names and check for keywords in the header to help renaming with appropriate
+        # terms.
         for i in range(len(cols)):
-            if 'lat' in cols[i].lower().strip():
+            if 'lati' in cols[i].lower().strip():               # if 'lati' is in header change the header with latitude
                 cols[i] = const.LAT
-            if 'long' in cols[i].lower().strip():
+            if 'longi' in cols[i].lower().strip():            # if 'longi' is in header change the header with longitude
                 cols[i] = const.LONG
             if 'datetime' in cols[i].lower().strip():
                 cols[i] = const.DateTime
-            if '%id' in cols[i].lower().strip():
-                cols[i] = const.TRAJECTORY_ID
+            # If the keyword 'id' is in a header it checks if it starts with 'traj' then replace the header
+            # with const.TRAJECTORY_ID. If it starts with 'obj' then replace it with 'const.OBJECT_ID'. Else if
+            # it is just 'id' then it is renamed as 'const.TRAJECTORY_ID'
+            if re.search('id', cols[i]):
+                if re.search('^traj', cols[i].lower().strip()):
+                    cols[i] = const.TRAJECTORY_ID
+                elif re.search('^obj', cols[i].lower().strip()):
+                    cols[i] = const.OBJECT_ID
+                else:
+                    cols[i] = const.TRAJECTORY_ID
 
-        data = data.set_axis(cols, axis=1)
-        return data
+        data = data.set_axis(cols, axis=1)  # Set the column names to the library default names here.
+        return data                         # Return the DF with new names.
 
     def validate_data_types(self, data: DataFrame):
         """
@@ -187,7 +210,7 @@ class NumPandasTraj(DataFrame):
             Raises
             ------
                 NotAllowedError
-                    The change of index is not alloed in DaskTrajectoryDF.
+                    The change of index is not allowed in DaskTrajectoryDF.
 
         """
         raise NotAllowedError("Changing of index is not allowed.\n"
@@ -234,7 +257,7 @@ class NumPandasTraj(DataFrame):
                     The file requested could not be found.
         """
         try:
-            dataframe = read_csv(filename)
+            dataframe = pandas.read_csv(filename, index_col=False)
             return cls(data_set=dataframe, latitude=const.LAT, longitude=const.LONG,
                                  datetime=const.DateTime, traj_id=const.TRAJECTORY_ID)
         except FileNotFoundError:
