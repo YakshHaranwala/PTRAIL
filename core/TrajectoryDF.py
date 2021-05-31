@@ -140,8 +140,7 @@ class NumPandasTraj(DataFrame):
                 data[const.LONG] = data[const.LONG].astype('float64')
             if data.dtypes[const.DateTime] != 'datetime64[ns]':
                 data[const.DateTime] = data[const.DateTime].astype('datetime64[ns]')
-            if data.dtypes[const.TRAJECTORY_ID] == 'float64':
-                data[const.TRAJECTORY_ID] = data[const.TRAJECTORY_ID].astype('float64')
+
 
         except KeyError:
             raise KeyError('dataframe missing one of lat, lon, datetime columns.')
@@ -327,6 +326,20 @@ class NumPandasTraj(DataFrame):
                 2. Longitude
                 3. DateTime
                 4. traj_id
+
+            WARNING:
+            -------
+                Only use this function when the dataset meets the following conditions:
+                    1. Latitude is of the float format and does not contain directions like N, S.
+                       if it does, please first convert it to float direction with + and - signs.
+                    2. Longitude is of the float format and does not contain directions like N, S.
+                       if it does, please first convert it to float direction with + and - signs.
+                    3. DateTime are combined together.
+                    4. traj_id is present.
+
+                The above restrictions are in place because the library indexes the trajectory
+                by DateTime and Traj_ID. As a result, it needs to have the following 2 columns
+                proper.
 
             Parameters
             ----------
