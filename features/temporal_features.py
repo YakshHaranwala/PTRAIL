@@ -105,16 +105,17 @@ class TemporalFeatures:
 
             Parameters
             ----------
-                dataframe: DaskTrajectoryDF
+                dataframe: NumPandasTraj
                     The DaskTrajectoryDF on which the creation of the date column is to be done.
                 inplace: bool
                     Whether to apply changes to the given dataframe or just return a new pandas DF.
 
             Returns
             -------
-                core.DaskTraj.DaskTrajectoryDF / dask.core.dataframe.DataFrame
+                core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the date column.
-                    Dask Pandas DF is returned if the value of inplace parameter is False.
+                pandas.core.dataframe.DataFrame
+                    returned if the value of inplace parameter is False.
 
         """
         time = "%Y-%m-%d"  # Format of the date.
