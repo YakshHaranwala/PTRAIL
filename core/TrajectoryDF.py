@@ -1,12 +1,13 @@
 from parser import ParserError
 
 import pandas as pd
-from typing import Dict, List, Union, Optional, Text, Any
+from typing import Dict, List, Union, Optional, Text, Any, Hashable, Sequence
 
 import numpy as np
 import pandas.core.dtypes.common
 from pandas import DataFrame
 from pandas._libs import lib
+from pandas._typing import Label
 
 import utilities.constants as const
 from utilities.exceptions import *
@@ -308,46 +309,46 @@ class NumPandasTraj(DataFrame):
                                           "again.")
 
     # ------------------------------- File and DF Operations ----------------------------- #
-    @classmethod
-    def read_csv(cls, filename):
-        """
-            Read the data from a csv file and then store the data in a DaskTrajectoryDF.
-            It is to be noted that the csv file provided must have the 4 mandatory columns
-            which are:
-                1. Latitude
-                2. Longitude
-                3. DateTime
-                4. traj_id
-
-            WARNING:
-            -------
-                Only use this function when the dataset meets the following conditions:
-                    1. Latitude is of the float format and does not contain directions like N, S.
-                       if it does, please first convert it to float direction with + and - signs.
-                    2. Longitude is of the float format and does not contain directions like N, S.
-                       if it does, please first convert it to float direction with + and - signs.
-                    3. DateTime are combined together.
-                    4. traj_id is present.
-
-                The above restrictions are in place because the library indexes the trajectory
-                by DateTime and Traj_ID. As a result, it needs to have the following 2 columns
-                proper.
-
-            Parameters
-            ----------
-                filename: The name of the csv file (provide full path).
-
-            Raises
-            ------
-                FileNotFoundError
-                    The file requested could not be found.
-        """
-        try:
-            dataframe = pandas.read_csv(filename, index_col=False)
-            return cls(data_set=dataframe, latitude=const.LAT, longitude=const.LONG,
-                                 datetime=const.DateTime, traj_id=const.TRAJECTORY_ID)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Could not open the %s, please try again." % str(filename))
+    # @classmethod
+    # def read_csv(cls, filename):
+    #     """
+    #         Read the data from a csv file and then store the data in a DaskTrajectoryDF.
+    #         It is to be noted that the csv file provided must have the 4 mandatory columns
+    #         which are:
+    #             1. Latitude
+    #             2. Longitude
+    #             3. DateTime
+    #             4. traj_id
+    #
+    #         WARNING:
+    #         -------
+    #             Only use this function when the dataset meets the following conditions:
+    #                 1. Latitude is of the float format and does not contain directions like N, S.
+    #                    if it does, please first convert it to float direction with + and - signs.
+    #                 2. Longitude is of the float format and does not contain directions like N, S.
+    #                    if it does, please first convert it to float direction with + and - signs.
+    #                 3. DateTime are combined together.
+    #                 4. traj_id is present.
+    #
+    #             The above restrictions are in place because the library indexes the trajectory
+    #             by DateTime and Traj_ID. As a result, it needs to have the following 2 columns
+    #             proper.
+    #
+    #         Parameters
+    #         ----------
+    #             filename: The name of the csv file (provide full path).
+    #
+    #         Raises
+    #         ------
+    #             FileNotFoundError
+    #                 The file requested could not be found.
+    #     """
+    #     try:
+    #         dataframe = pandas.read_csv(filename, index_col=False)
+    #         return cls(data_set=dataframe, latitude=const.LAT, longitude=const.LONG,
+    #                              datetime=const.DateTime, traj_id=const.TRAJECTORY_ID)
+    #     except FileNotFoundError:
+    #         raise FileNotFoundError(f"Could not open the %s, please try again." % str(filename))
 
     def to_numpy(self, dtype=None, copy: bool = False, na_value=lib.no_default) -> np.ndarray:
         """
