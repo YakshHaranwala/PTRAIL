@@ -21,6 +21,7 @@ from utilities import constants as const
 import multiprocessing
 
 from threading import Thread
+import psutil
 
 
 class TemporalFeatures:
@@ -44,7 +45,7 @@ class TemporalFeatures:
                     Dask Pandas DF is returned if the value of inplace parameter is False.
 
         """
-        def date_extractor(id_:int, dictionary):
+        def date_extractor(id_:int, dictionary, sema):
             """
                 Based on the Trajectory ID given, extract the datetime of the Trajectory point
                 and the just extract the date from that point.
@@ -61,9 +62,10 @@ class TemporalFeatures:
                     numpy.array
                         The numpy array containing dates.
             """
-            time = "%Y-%m-%d"
+            sema.acquire()
             matches = data.loc[data[const.TRAJECTORY_ID] == id_, [const.DateTime]]
             dictionary[id_] = matches[const.DateTime].dt.date
+            sema.release()
 
         # If inplace is true, then continue with the original dataframe.
         # Otherwise, make a copy of the dataframe and then return it.
@@ -83,9 +85,12 @@ class TemporalFeatures:
         dictionary = manager.dict()
         process_list = []
 
+        cpu_count = psutil.cpu_count()
+        sema = multiprocessing.Semaphore(cpu_count)
+
         # Create as many processes as there are number of unique trajectory ids.
         for i in range(len(ids)):
-            process = multiprocessing.Process(target=date_extractor, args=(ids[i], dictionary))
+            process = multiprocessing.Process(target=date_extractor, args=(ids[i], dictionary, sema))
             process_list.append(process)
 
         # Run and the processes parallel and then join all of them once they are done
@@ -104,6 +109,6 @@ class TemporalFeatures:
         for val in dictionary.values():
             dates.extend(val)
         data['Date'] = dates
-        data.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=False)
+        data.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
 
         return data

@@ -364,8 +364,8 @@ class NumPandasTraj(DataFrame):
             and float32, the results dtype will be float32. This may require copying data and coercing
             values, which may be expensive
 
-            Params
-            ------
+            Parameters
+            ----------
                 dtype:
                     The dtype to pass to :meth:`numpy.asarray`.
                 copy:
