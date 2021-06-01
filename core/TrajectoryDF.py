@@ -60,7 +60,7 @@ class NumPandasTraj(DataFrame):
         # Case-3: The data is from a pandas DF.
         # Here, all we have to do is to rename the column names from the data to default names.
         elif isinstance(data_set, DataFrame):
-            data_set = self.rename_df_col_headers(data_set)
+            data_set = self.rename_df_col_headers(data_set, latitude, longitude, datetime, traj_id)
 
         # Now, renaming the default column names to library default column names.
         column_names = self.get_default_column_names(DateTime=datetime, traj_id=traj_id,
@@ -71,11 +71,11 @@ class NumPandasTraj(DataFrame):
         # of all the columns abd then calling the super() to create and return the dataframe.
         if self.validate_columns(data_set):
             self.validate_data_types(data_set)
-            data_set.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+            data_set.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
             super(NumPandasTraj, self).__init__(data_set)
 
     # ------------------------------ General Utilities ----------------------------- #
-    def rename_df_col_headers(self, data: DataFrame) -> DataFrame:
+    def rename_df_col_headers(self, data: DataFrame, lat, lon, datetime, traj_id) -> DataFrame:
         """
             Change the column headers of the columns when the user given data is in the
             form of a pandas DF while creating the NumPandasTraj. This method is mainly
@@ -95,25 +95,17 @@ class NumPandasTraj(DataFrame):
         # Iterate over the list of column names and check for keywords in the header to help renaming with appropriate
         # terms.
         for i in range(len(cols)):
-            if 'lati' in cols[i].lower().strip():               # if 'lati' is in header change the header with latitude
+            if lat in cols[i]:               # if 'lati' is in header change the header with latitude
                 cols[i] = const.LAT
-            if 'longi' in cols[i].lower().strip():            # if 'longi' is in header change the header with longitude
+            if lon in cols[i]:            # if 'longi' is in header change the header with longitude
                 cols[i] = const.LONG
-            if 'datetime' in cols[i].lower().strip():
+            if datetime in cols[i]:
                 cols[i] = const.DateTime
-            # If the keyword 'id' is in a header it checks if it starts with 'traj' then replace the header
-            # with const.TRAJECTORY_ID. If it starts with 'obj' then replace it with 'const.OBJECT_ID'. Else if
-            # it is just 'id' then it is renamed as 'const.TRAJECTORY_ID'
-            if re.search('id', cols[i]):
-                if re.search('^traj', cols[i].lower().strip()):
-                    cols[i] = const.TRAJECTORY_ID
-                elif re.search('^obj', cols[i].lower().strip()):
-                    cols[i] = const.OBJECT_ID
-                else:
-                    cols[i] = const.TRAJECTORY_ID
+            if traj_id in cols[i]:
+                cols[i] = const.TRAJECTORY_ID
 
-        data = data.set_axis(cols, axis=1)  # Set the column names to the library default names here.
-        return data                         # Return the DF with new names.
+        data = data.set_axis(cols, axis=1)
+        return data
 
     def validate_data_types(self, data: DataFrame):
         """
