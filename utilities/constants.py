@@ -16,6 +16,7 @@ MANDATORY_COLUMNS = [LAT, LONG, DateTime, TRAJECTORY_ID]
 
 # ----------------------------------- Temporal Constants ---------------------------------------#
 WEEKEND = ['Saturday', 'Sunday']
+
 TIME_OF_DAY = {
     0: 'Night',
     1: 'Late Night',

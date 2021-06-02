@@ -13,7 +13,7 @@ import utilities.constants as const
 
 class DistanceFormulaLog:
     @staticmethod
-    def haversine_distance(lat1, lon1, lat2, lon2, metres):
+    def haversine_distance(lat1, lon1, lat2, lon2):
         """
             The haversine formula calculates the great-circle distance between 2 points.
             The great-circle distance is the shortest distance over the earth's surface.
@@ -43,7 +43,4 @@ class DistanceFormulaLog:
 
         crow_distance = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-        if metres:
-            return const.RADIUS_OF_EARTH * crow_distance * 1000
-        else:
-            return const.RADIUS_OF_EARTH * crow_distance
+        return const.RADIUS_OF_EARTH * crow_distance

@@ -130,8 +130,8 @@ class NumPandasTraj(DataFrame):
                 data[const.LONG] = data[const.LONG].astype('float64')
             if data.dtypes[const.DateTime] != 'datetime64[ns]':
                 data[const.DateTime] = data[const.DateTime].astype('datetime64[ns]')
-
-
+            if data.dtypes[const.TRAJECTORY_ID] != 'str':
+                data[const.TRAJECTORY_ID] = data[const.TRAJECTORY_ID].astype('str')
         except KeyError:
             raise KeyError('dataframe missing one of lat, lon, datetime columns.')
         except ParserError:

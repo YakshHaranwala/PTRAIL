@@ -13,6 +13,7 @@
     @credits PyMove creators
 """
 import multiprocessing
+from typing import Optional, Text
 
 import pandas as pd
 
@@ -230,3 +231,33 @@ class TemporalFeatures:
             return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
             return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+
+    @staticmethod
+    def get_traj_duration(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
+        """
+            Accessor method for the duration of a trajectory specified by the user.
+            Note: If no trajectory ID is given by the user, then the duration of the entire
+                  data set is given i.e., the difference between the max time in the dataset
+                  and the min time in the dataset.
+
+            Parameters
+            ----------
+                dataframe: core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                traj_id: Optional[Text]
+                    The trajectory id for which the duration is required.
+
+            Returns
+            -------
+                pandas.TimeDelta
+                    The trajectory duration.
+        """
+        if traj_id is None:
+            return dataframe.reset_index()['DateTime'].max() - dataframe.reset_index()['DateTime'].min()
+        else:
+            small = dataframe.reset_index().loc[
+                dataframe.reset_index()[const.TRAJECTORY_ID] == traj_id, [const.DateTime]]
+            if len(small) == 0:
+                return f"No {traj_id} exists in the given data. Please try again."
+            else:
+                return small.max() - small.min()

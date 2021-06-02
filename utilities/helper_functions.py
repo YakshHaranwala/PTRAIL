@@ -6,7 +6,10 @@
              only as helpers. For calculation of features, use the ones in the
              features package.
 """
+import numpy as np
+
 import utilities.constants as const
+from utilities.DistanceCalculator import DistanceFormulaLog as calc
 
 
 class Helpers:
@@ -172,4 +175,37 @@ class Helpers:
 
         # Now append the new column to the dataframe and return the dataframe.
         dataframe['Time_Of_Day'] = timestamps
+        return dataframe
+
+    @staticmethod
+    def consecutive_distance_helper(dataframe):
+        """
+            This function is the helper function of the create_distance_between_consecutive_column() function.
+            The create_distance_between_consecutive_column() function delegates the actual task of calculating
+            the distance between 2 consecutive points. This function does the calculation and creates a column
+            called Distance_prev_to_curr and places it in the dataframe and returns it.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which calculation is to be performed.
+
+                Returns
+                -------
+                    pandas.core.dataframe
+                        The dataframe containing the resultant Distance_prev_to_curr column.
+        """
+        # First, lets fetch the latitude and longitude columns from the dataset and store it
+        # in a numpy array.
+        latitudes = np.array(dataframe[const.LAT])
+        longitudes = np.array(dataframe[const.LONG])
+        distances = np.zeros(len(latitudes))
+
+        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
+        # each of the values in the distance numpy array.
+        for i in range(len(latitudes) - 1):
+            distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i + 1], longitudes[i + 1])
+
+        # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
+        dataframe['Distance_prev_to_curr'] = distances
         return dataframe
