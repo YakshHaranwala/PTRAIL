@@ -1,17 +1,14 @@
 from parser import ParserError
-
-import pandas as pd
-from typing import Dict, List, Union, Optional, Text, Any, Hashable, Sequence
+from typing import Dict, List, Union, Optional, Text
 
 import numpy as np
+import pandas as pd
 import pandas.core.dtypes.common
 from pandas import DataFrame
 from pandas._libs import lib
-from pandas._typing import Label
 
 import utilities.constants as const
 from utilities.exceptions import *
-import regex as re
 
 
 class NumPandasTraj(DataFrame):
@@ -92,13 +89,13 @@ class NumPandasTraj(DataFrame):
                 pandas.DataFrame
                     The pandas dataframe containing the library default column headers.
         """
-        cols = data.columns.to_list()                           # List of all column names
+        cols = data.columns.to_list()  # List of all column names
         # Iterate over the list of column names and check for keywords in the header to help renaming with appropriate
         # terms.
         for i in range(len(cols)):
-            if lat in cols[i]:               # if 'lati' is in header change the header with latitude
+            if lat in cols[i]:  # if 'lati' is in header change the header with latitude
                 cols[i] = const.LAT
-            if lon in cols[i]:            # if 'longi' is in header change the header with longitude
+            if lon in cols[i]:  # if 'longi' is in header change the header with longitude
                 cols[i] = const.LONG
             if datetime in cols[i]:
                 cols[i] = const.DateTime

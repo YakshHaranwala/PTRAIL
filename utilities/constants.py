@@ -15,7 +15,7 @@ OBJECT_ID = 'object_id'
 MANDATORY_COLUMNS = [LAT, LONG, DateTime, TRAJECTORY_ID]
 
 # ----------------------------------- Temporal Constants ---------------------------------------#
-WEEKEND = ['SATURDAY', 'SUNDAY']
+WEEKEND = ['Saturday', 'Sunday']
 TIME_OF_DAY = {
     0: 'Night',
     1: 'Late Night',
@@ -43,4 +43,4 @@ TIME_OF_DAY = {
     23: 'Night'
 }
 # ---------------------------------- Spatial Constants -------------------------------------------#
-RADIUS_OF_EARTH = 6371 #KM
+RADIUS_OF_EARTH = 6371  # KM

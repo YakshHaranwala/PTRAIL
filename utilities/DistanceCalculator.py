@@ -6,8 +6,9 @@
     @Date: 28th May, 2021
     @Version 1.0
 """
-import utilities.constants as const
 import math
+
+import utilities.constants as const
 
 
 class DistanceFormulaLog:
@@ -35,15 +36,14 @@ class DistanceFormulaLog:
                 float
                     The great-circle distance between the 2 points.
         """
-        dLat = math.radians(lat2-lat1)
+        dLat = math.radians(lat2 - lat1)
         dLon = math.radians(lon2 - lon1)
-        a = ((math.sin(dLat/2))**2) + \
-            (math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * (math.sin(dLon/2))**2)
+        a = ((math.sin(dLat / 2)) ** 2) + \
+            (math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * (math.sin(dLon / 2)) ** 2)
 
-        crow_distance = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        crow_distance = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
         if metres:
             return const.RADIUS_OF_EARTH * crow_distance * 1000
         else:
             return const.RADIUS_OF_EARTH * crow_distance
-

@@ -1,6 +1,7 @@
-from utilities import constants as const
-from core.TrajectoryDF import NumPandasTraj
 import multiprocessing
+
+from core.TrajectoryDF import NumPandasTraj
+from utilities import constants as const
 
 
 class Helpers:
@@ -94,4 +95,3 @@ class Helpers:
 
         data.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
         return data
-

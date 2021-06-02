@@ -12,110 +12,16 @@
     @version 1.0
     @credits PyMove creators
 """
-import numpy
-import numpy as np
-import pandas as pd
 import multiprocessing
+
+import pandas as pd
 
 from core.TrajectoryDF import NumPandasTraj
 from utilities import constants as const
+from utilities.helper_functions import Helpers
 
 
 class TemporalFeatures:
-    @staticmethod
-    def date_helper(dataframe):
-        """
-            This function is a helper method for the create_date_column(). The create_date_helper()
-            methods delegates the actual task of creating the date to date_helper() function. What
-            this function does is that it extracts the date from the DateTime column present in the
-            DF and then adds a column to the DF itself, containing the date.
-
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The DaskTrajectoryDF on which the creation of the date column is to be done.
-
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the date column.
-
-        """
-        date_format = "%Y-%m-%d"  # Format of the date.
-
-        # Reset the index of the DF in order to access the date time column and then generate
-        # an iterable list of the items inside the column.
-        gen = dataframe.reset_index(drop=False)['DateTime'].iteritems()
-        gen = list(gen)
-
-        # Now, we extract the Date from all the time values.
-        for i in range(len(gen)):
-            gen[i] = gen[i][1].strftime(date_format)
-
-        dataframe['Date'] = gen  # Assign the date column to the dataframe.
-        return dataframe    # Return the dataframe with the date column inside it.
-
-    @staticmethod
-    def time_helper(dataframe):
-        """
-            This function is a helper method for the create_time_column(). The create_time_helper()
-            methods delegates the actual task of creating the time to time_helper() function. What
-            this function does is that it extracts the time from the DateTime column present in the
-            DF and then adds a column to the DF itself, containing the time.
-
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The DaskTrajectoryDF on which the creation of the time column is to be done.
-
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant time column.
-
-        """
-        time_format = "%H:%M:%S"
-
-        # Reset the index of the DF in order to access the date time column and then generate
-        # an iterable list of the items inside the column.
-        datetime = dataframe.reset_index(drop=False)['DateTime'].iteritems()
-        datetime = list(datetime)
-
-        # Now lets extract the time from the DateTime column.
-        for i in range(len(datetime)):
-            datetime[i] = datetime[i][1].strftime(time_format)
-
-        dataframe['Time'] = datetime
-        return dataframe
-
-    @staticmethod
-    def day_of_week_helper(dataframe):
-        """
-            This function is the helper function of the create_day_of_week() function. The day_of_week()
-            function delegates the actual task of calculating the day of the week based on the datetime
-            on this function. This function does the calculation and creates a column called Day_Of_week
-            and places it in the dataframe and returns in.
-
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which calculation is to be performed.
-
-            Returns
-            -------
-                pandas.core.dataframe
-                    The dataframe containing the resultant Day_Of_Week column.
-        """
-        datetime = dataframe.reset_index(drop=False)['DateTime'].iteritems()
-        datetime = list(datetime)
-
-        for i in range(len(datetime)):
-            datetime[i] = datetime[i][1].day_name()
-
-        dataframe['Day_Of_Week'] = datetime
-
-        return dataframe
-
     @staticmethod
     def create_date_column(dataframe: NumPandasTraj, inplace=False):
         """
@@ -126,14 +32,14 @@ class TemporalFeatures:
                 dataframe: core.TrajectoryDF.NumPandasTraj
                     The NumPandasTraj on which the creation of date column is to be done
                 inplace: bool
-                    Whether to apply the results to the original dataframe or not.
-
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    When the inplace parameter is True.
+                    The dataframe containing the resultant column if inplace is True.
                 pandas.core.dataframe.DataFrame
-                    When the inplace parameter is False.
+                    The dataframe containing the resultant column if inplace is False.
         """
         # Split the entire data set into chunks of 33000 rows each
         # so that we can work on each separate part in parallel.
@@ -141,13 +47,13 @@ class TemporalFeatures:
         for i in range(0, len(dataframe), 33000):
             split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 33000])
 
-        method_pool = multiprocessing.Pool(len(split_list))     # Create a pool of processes.
+        method_pool = multiprocessing.Pool(len(split_list))  # Create a pool of processes.
 
         # Now run the date helper method in parallel with the dataframes in split_list
         # and the new dataframes with date columns are stored in the variable result which is of type Mapper.
-        result = method_pool.map(TemporalFeatures.date_helper, split_list)
+        result = method_pool.map(Helpers.date_helper, split_list)
 
-        ans = pd.concat(result)     # Merge all the smaller chunks together.
+        ans = pd.concat(result)  # Merge all the smaller chunks together.
 
         # Now depending on the value of inplace, return the required data structure.
         if inplace:
@@ -165,12 +71,15 @@ class TemporalFeatures:
                 dataframe: NumPandasTraj
                     The DaskTrajectoryDF on which the creation of the time column is to be done.
                 inplace: bool
-                    Whether to apply changes to the given dataframe or just return a new pandas DF.
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
+
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj / pandas.core.dataframe.DataFrame
-                    The dataframe containing the time column.
-                    Pandas DF is returned if the value of inplace parameter is False.
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column if inplace is False.
         """
         df_split_list = []  # A list for storing the split dataframes.
 
@@ -184,8 +93,8 @@ class TemporalFeatures:
         # equal to the number of smaller chunks of the original dataframe.
         # Then, calculate the result on each separate part in parallel and store it in
         # the result variable which is of type Mapper.
-        pool = multiprocessing.Pool()
-        result = pool.map(TemporalFeatures.time_helper, df_split_list)
+        pool = multiprocessing.Pool(len(df_split_list))
+        result = pool.map(Helpers.time_helper, df_split_list)
 
         time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
 
@@ -209,17 +118,17 @@ class TemporalFeatures:
                 dataframe: NumPandasTraj
                     The dataframe containing the entire data on which the operation is to be performed
                 inplace: bool
-                    Indication of whether the results are to be applied to original DF or a new
-                    one is to be returned with the calculated results.
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF..
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column if inplace is True.
                 pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False
+                    The dataframe containing the resultant column if inplace is False.
         """
-        chunk_list = []     # A list for storing the split dataframes.
+        chunk_list = []  # A list for storing the split dataframes.
 
         # Now lets split the entire dataframe into chunks of 33000 row each so that
         # we can run the calculations on each smaller chunk in parallel.
@@ -229,11 +138,95 @@ class TemporalFeatures:
         # Now lets create a pool of processes which will then create processes equal to
         # the number of smaller chunks of the original dataframe and will calculate
         # the result on each of the smaller chunk.
-        pool_of_processes = multiprocessing.Pool()
-        results = pool_of_processes.map(TemporalFeatures.day_of_week_helper, chunk_list)
+        pool_of_processes = multiprocessing.Pool(len(chunk_list))
+        results = pool_of_processes.map(Helpers.day_of_week_helper, chunk_list)
 
         final_df = pd.concat(results)
         if inplace:
-            return NumPandasTraj(final_df,  const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        else:
+            return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+
+    @staticmethod
+    def create_weekend_indicator_column(dataframe: NumPandasTraj, inplace=False):
+        """
+            Create a column called Weekend which indicates whether the point data is collected
+            on either a Saturday or a Sunday.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the operation is to be performed.
+                inplace: bool
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column if inplace is False.
+        """
+        parts = []
+
+        # Now lets split the entire dataframe into chunks of 33000 row each so that
+        # we can run the calculations on each smaller chunk in parallel.
+        for i in range(0, len(dataframe), 33000):
+            parts.append(dataframe.reset_index(drop=False).loc[i:i + 33000])
+
+        # Now lets create a pool of processes and run the weekend calculator function
+        # on all the smaller parts of the original dataframe and store their results.
+        mp_pool = multiprocessing.Pool(len(parts))
+        results = mp_pool.map(Helpers.weekend_helper, parts)
+
+        # Now, lets merge all the smaller parts together and then return the results based on
+        # the value of the inplace parameter.
+        final_df = pd.concat(results)
+        if inplace:
+            return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        else:
+            return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+
+    @staticmethod
+    def create_time_of_day_column(dataframe: NumPandasTraj, inplace=False):
+        """
+            Create a Time_Of_Day column in the dataframe which indicates at what time of the
+            day was the point data captured.
+            Note: The divisions of the day based on the time are provided in the utilities.constants module.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation is to be done.
+                inplace: bool
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column if inplace is False.
+        """
+        divisions = []
+
+        # Now lets split the entire dataframe into chunks of 33000 row each so that
+        # we can run the calculations on each smaller chunk in parallel.
+        for i in range(0, len(dataframe), 33000):
+            divisions.append(dataframe.reset_index(drop=False).loc[i:i + 33000])
+
+        # Now lets create a pool of processes and run the weekend calculator function
+        # on all the smaller parts of the original dataframe and store their results.
+        multi_pool = multiprocessing.Pool(len(divisions))
+        results = multi_pool.map(Helpers.time_of_day_helper, divisions)
+
+        # Now, lets merge all the smaller parts together and then return the results based on
+        # the value of the inplace parameter.
+        final_df = pd.concat(results)
+
+        if inplace:
+            return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
             return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
