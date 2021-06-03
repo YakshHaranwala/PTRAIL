@@ -102,7 +102,7 @@ class TemporalFeatures:
         # Now check whether the user wants the result applied to the original dataframe or
         # wants a separate new dataframe. If the user wants a separate new dataframe, then
         # a pandas dataframe is returned instead of NumTrajectoryDF.
-        if inplace:
+        if maintain_type:
             return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
             return time_containing_df.set_index([const.DateTime, const.TRAJECTORY_ID])
@@ -143,7 +143,7 @@ class TemporalFeatures:
         results = pool_of_processes.map(Helpers.day_of_week_helper, chunk_list)
 
         final_df = pd.concat(results)
-        if inplace:
+        if maintain_type:
             return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
             return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
@@ -184,7 +184,7 @@ class TemporalFeatures:
         # Now, lets merge all the smaller parts together and then return the results based on
         # the value of the inplace parameter.
         final_df = pd.concat(results)
-        if inplace:
+        if maintain_type:
             return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
             return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
@@ -227,7 +227,7 @@ class TemporalFeatures:
         # the value of the inplace parameter.
         final_df = pd.concat(results)
 
-        if inplace:
+        if maintain_type:
             return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
             return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
