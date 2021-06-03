@@ -6,15 +6,17 @@
              only as helpers. For calculation of features, use the ones in the
              features package.
 """
+import numpy
 import numpy as np
 
 import utilities.constants as const
 from utilities.DistanceCalculator import DistanceFormulaLog as calc
+import utilities.exceptions as exc
 
 
 class Helpers:
     @staticmethod
-    def date_helper(dataframe):
+    def _date_helper(dataframe):
         """
             This function is a helper method for the create_date_column(). The create_date_helper()
             methods delegates the actual task of creating the date to date_helper() function. What
@@ -47,7 +49,7 @@ class Helpers:
         return dataframe  # Return the dataframe with the date column inside it.
 
     @staticmethod
-    def time_helper(dataframe):
+    def _time_helper(dataframe):
         """
             This function is a helper method for the create_time_column(). The create_time_helper()
             methods delegates the actual task of creating the time to time_helper() function. What
@@ -80,7 +82,7 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def day_of_week_helper(dataframe):
+    def _day_of_week_helper(dataframe):
         """
             This function is the helper function of the create_day_of_week() function. The day_of_week()
             function delegates the actual task of calculating the day of the week based on the datetime
@@ -112,7 +114,7 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def weekend_helper(dataframe):
+    def _weekend_helper(dataframe):
         """
              This function is the helper function of the create_weekend_indicator_week() function.
              The create_weekend_indicator() function delegates the actual task of checking whether
@@ -145,7 +147,7 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def time_of_day_helper(dataframe):
+    def _time_of_day_helper(dataframe):
         """
              This function is the helper function of the create_time_of_day() function.
              The create_time_of_day() function delegates the actual task of calculating the time
@@ -178,7 +180,7 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def consecutive_distance_helper(dataframe):
+    def _consecutive_distance_helper(dataframe):
         """
             This function is the helper function of the create_distance_between_consecutive_column() function.
             The create_distance_between_consecutive_column() function delegates the actual task of calculating
@@ -197,15 +199,173 @@ class Helpers:
         """
         # First, lets fetch the latitude and longitude columns from the dataset and store it
         # in a numpy array.
+        traj_ids = np.array(dataframe.reset_index()[const.TRAJECTORY_ID])
         latitudes = np.array(dataframe[const.LAT])
         longitudes = np.array(dataframe[const.LONG])
         distances = np.zeros(len(latitudes))
 
         # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
         # each of the values in the distance numpy array.
+
         for i in range(len(latitudes) - 1):
-            distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i + 1], longitudes[i + 1])
+            # If the traj_id is same it calculates its distance from the above mentioned formula.
+            if traj_ids[i] == traj_ids[i + 1]:
+                distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i],
+                                                           latitudes[i + 1], longitudes[i + 1])
+            # The point at which a new trajectory starts, its distance is set to zero and the calculation
+            # for that trajectory id starts from that point.
+            else:
+                distances[i + 1] = 0
 
         # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
         dataframe['Distance_prev_to_curr'] = distances
         return dataframe
+
+    @staticmethod
+    def _start_distance_helper(dataframe):
+        """
+            This function is the helper function of the create_distance_from_start_column() function.
+            The create_distance_from_start_column() function delegates the actual task of calculating
+            the distance between 2 the start point of the trajectory to the current point.This function
+            does the calculation and creates a column called Distance_start_to_curr and places it in the
+            dataframe and returns it.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which calculation is to be performed.
+
+                Returns
+                -------
+                    pandas.core.dataframe
+                        The dataframe containing the resultant Distance_start_to_curr column.
+        """
+        # First, lets create some numpy arrays containing the trajectory ID, latitude,
+        # longitudes and distances.
+        traj_ids = numpy.array(dataframe.reset_index()[const.TRAJECTORY_ID])
+        latitudes = numpy.array(dataframe[const.LAT])
+        longitudes = numpy.array(dataframe[const.LONG])
+        distances = numpy.zeros(len(traj_ids))
+
+        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
+        # each of the values in the distance numpy array.
+        start = 0  # The index of the starting point.
+        for i in range(len(distances) - 1):
+            # Check if the 2 points between which the distance is being calculated are
+            # of the same trajectory ID, and if so continue with the calculation.
+            if traj_ids[i] == traj_ids[i + 1]:
+                distances[i + 1] = calc.haversine_distance(latitudes[start], longitudes[start],
+                                                           latitudes[i + 1], longitudes[i + 1])
+            # Otherwise, when the trajectory ID changes, then assign the distance 0 to the first
+            # point and change the start index to that point so that calculation yields correct
+            # results
+            else:
+                distances[i + 1] = 0
+                start = i + 1
+
+        # Now, assign the new column to the dataframe and return it.
+        dataframe['Distance_start_to_curr'] = distances
+        return dataframe
+
+    @staticmethod
+    def _given_point_distance_helper(dataframe, coordinates):
+        """
+            This function is the helper function of the create_distance_from_point() function. The
+            create_distance_from_point() function delegates the actual task of calculating distance
+            between the given point to all the points in the dataframe to this function. This function
+            calculates the distance and creates another column called 'Distance_to_specified_point'.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which calculation is to be done.
+                coordinates: tuple
+                    The coordinates from which the distance is to be calculated.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column.
+        """
+        # First, lets fetch the latitude and longitude columns from the dataset and store it
+        # in a numpy array.
+        latitudes = np.array(dataframe[const.LAT])
+        longitudes = np.array(dataframe[const.LONG])
+        distances = np.zeros(len(latitudes))
+
+        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
+        # each of the values in the distance numpy array.
+        for i in range(len(latitudes)):
+            distances[i] = calc.haversine_distance(coordinates[0], coordinates[1],
+                                                   latitudes[i], longitudes[i])
+
+        dataframe[f'Distance_to_{coordinates}'] = distances
+        return dataframe
+
+    @staticmethod
+    def _point_within_range_helper(dataframe, coordinates, dist_range):
+        """
+            This is the helper function for create_point_within_range() function. The
+            create_point_within_range_column()
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the operation is to be performed.
+                coordinates: tuple
+                    The coordinates from which the distance is to be checked.
+                dist_range:
+                    The range within which the distance from the coordinates should lie.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    The datframe containing the resultant column.
+        """
+        # First, lets fetch the latitude and longitude columns from the dataset and store it
+        # in a numpy array.
+        latitudes = np.array(dataframe[const.LAT])
+        longitudes = np.array(dataframe[const.LONG])
+        distances = []
+
+        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and then check
+        # whether the distance is within the user spevified range and store each of the values in the \
+        # distance numpy array.
+        for i in range(len(latitudes)):
+            distances.append(calc.haversine_distance(coordinates[0], coordinates[1],
+                                                     latitudes[i], longitudes[i]) <= dist_range)
+
+        # Now, assign the column containing the results calculated above and
+        # return the dataframe.
+        dataframe[f'Within_{dist_range}_km_from_{coordinates}'] = distances
+        return dataframe
+
+    @staticmethod
+    def _speed_from_prev_helper(dataframe):
+        """
+            This function is the helper function of the create_speed_from_prev_column() function.
+            The create_speed_from_prev_column() function delegates the actual task of calculating the speed
+            from starting point to current point to this function which does the calculation and creates
+            a column called Speed_from_start_to_curr column and places it in the dataframe and returns it.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the speed calculation is to be done.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    The dataframe with the resultant column inside it.
+        """
+        # Extracting just the times from DateTime column.
+        try:
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds.div(3600).astype('float64')
+            dataframe['Speed_from_prev'] = dataframe['Distance_prev_to_curr'] / time_deltas
+
+            return dataframe
+
+        except KeyError:
+            raise exc.MissingColumnsException("The column Distance Start to Current is Missing in the dataframe.\n"
+                                              "Please run the function create_distance_from_start_column() first"
+                                              "before running this function.")

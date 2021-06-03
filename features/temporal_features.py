@@ -19,12 +19,12 @@ import pandas as pd
 
 from core.TrajectoryDF import NumPandasTraj
 from utilities import constants as const
-from utilities.helper_functions import Helpers
+from features.helper_functions import Helpers
 
 
 class TemporalFeatures:
     @staticmethod
-    def create_date_column(dataframe: NumPandasTraj, inplace=False):
+    def create_date_column(dataframe: NumPandasTraj, maintain_type=False):
         """
             Create a Date column in the dataframe given.
 
@@ -32,7 +32,7 @@ class TemporalFeatures:
             ----------
                 dataframe: core.TrajectoryDF.NumPandasTraj
                     The NumPandasTraj on which the creation of date column is to be done
-                inplace: bool
+                maintain_type: bool
                     Indication on whether the answer is to be returned as a NumPandasTraj DF
                     or a pandas DF.
             Returns
@@ -42,28 +42,28 @@ class TemporalFeatures:
                 pandas.core.dataframe.DataFrame
                     The dataframe containing the resultant column if inplace is False.
         """
-        # Split the entire data set into chunks of 33000 rows each
+        # Split the entire data set into chunks of 75000 rows each
         # so that we can work on each separate part in parallel.
         split_list = []
-        for i in range(0, len(dataframe), 33000):
-            split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 33000])
+        for i in range(0, len(dataframe), 75000):
+            split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 75000])
 
         method_pool = multiprocessing.Pool(len(split_list))  # Create a pool of processes.
 
         # Now run the date helper method in parallel with the dataframes in split_list
         # and the new dataframes with date columns are stored in the variable result which is of type Mapper.
-        result = method_pool.map(Helpers.date_helper, split_list)
+        result = method_pool.map(Helpers._date_helper, split_list)
 
         ans = pd.concat(result)  # Merge all the smaller chunks together.
 
         # Now depending on the value of inplace, return the required data structure.
-        if inplace:
+        if maintain_type:
             return NumPandasTraj(ans, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
             return ans.set_index([const.DateTime, const.TRAJECTORY_ID])
 
     @staticmethod
-    def create_time_column(dataframe: NumPandasTraj, inplace=False):
+    def create_time_column(dataframe: NumPandasTraj, maintain_type=False):
         """
             From the DateTime column already present in the data, extract only the time
             and then add another column containing just the time.
@@ -71,7 +71,7 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The DaskTrajectoryDF on which the creation of the time column is to be done.
-                inplace: bool
+                maintain_type: bool
                     Indication on whether the answer is to be returned as a NumPandasTraj DF
                     or a pandas DF.
 
@@ -84,18 +84,18 @@ class TemporalFeatures:
         """
         df_split_list = []  # A list for storing the split dataframes.
 
-        # Now, we are going to split the dataframes into chunks of 33000 rows each.
+        # Now, we are going to split the dataframes into chunks of 75000 rows each.
         # This is done in order to create processes later and then feed each process
         # a separate dataframe and calculate the results in parallel.
-        for i in range(0, len(dataframe), 33000):
-            df_split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 33000])
+        for i in range(0, len(dataframe), 75000):
+            df_split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 75000])
 
         # Now, create a pool of processes which has a number of processes
         # equal to the number of smaller chunks of the original dataframe.
         # Then, calculate the result on each separate part in parallel and store it in
         # the result variable which is of type Mapper.
         pool = multiprocessing.Pool(len(df_split_list))
-        result = pool.map(Helpers.time_helper, df_split_list)
+        result = pool.map(Helpers._time_helper, df_split_list)
 
         time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
 
@@ -108,7 +108,7 @@ class TemporalFeatures:
             return time_containing_df.set_index([const.DateTime, const.TRAJECTORY_ID])
 
     @staticmethod
-    def create_day_of_week_column(dataframe: NumPandasTraj, inplace=False):
+    def create_day_of_week_column(dataframe: NumPandasTraj, maintain_type=False):
         """
             Create a column called Day_Of_Week which contains the day of the week
             on which the trajectory point is recorded. This is calculated on the basis
@@ -118,7 +118,7 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The dataframe containing the entire data on which the operation is to be performed
-                inplace: bool
+                maintain_type: bool
                     Indication on whether the answer is to be returned as a NumPandasTraj DF
                     or a pandas DF..
 
@@ -131,16 +131,16 @@ class TemporalFeatures:
         """
         chunk_list = []  # A list for storing the split dataframes.
 
-        # Now lets split the entire dataframe into chunks of 33000 row each so that
+        # Now lets split the entire dataframe into chunks of 75000 row each so that
         # we can run the calculations on each smaller chunk in parallel.
-        for i in range(0, len(dataframe), 33000):
-            chunk_list.append(dataframe.reset_index(drop=False).loc[i:i + 33000])
+        for i in range(0, len(dataframe), 75000):
+            chunk_list.append(dataframe.reset_index(drop=False).loc[i:i + 75000])
 
         # Now lets create a pool of processes which will then create processes equal to
         # the number of smaller chunks of the original dataframe and will calculate
         # the result on each of the smaller chunk.
         pool_of_processes = multiprocessing.Pool(len(chunk_list))
-        results = pool_of_processes.map(Helpers.day_of_week_helper, chunk_list)
+        results = pool_of_processes.map(Helpers._day_of_week_helper, chunk_list)
 
         final_df = pd.concat(results)
         if maintain_type:
@@ -149,7 +149,7 @@ class TemporalFeatures:
             return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
 
     @staticmethod
-    def create_weekend_indicator_column(dataframe: NumPandasTraj, inplace=False):
+    def create_weekend_indicator_column(dataframe: NumPandasTraj, maintain_type=False):
         """
             Create a column called Weekend which indicates whether the point data is collected
             on either a Saturday or a Sunday.
@@ -158,7 +158,7 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The dataframe on which the operation is to be performed.
-                inplace: bool
+                maintain_type: bool
                     Indication on whether the answer is to be returned as a NumPandasTraj DF
                     or a pandas DF.
 
@@ -171,15 +171,15 @@ class TemporalFeatures:
         """
         parts = []
 
-        # Now lets split the entire dataframe into chunks of 33000 row each so that
+        # Now lets split the entire dataframe into chunks of 75000 row each so that
         # we can run the calculations on each smaller chunk in parallel.
-        for i in range(0, len(dataframe), 33000):
-            parts.append(dataframe.reset_index(drop=False).loc[i:i + 33000])
+        for i in range(0, len(dataframe), 75000):
+            parts.append(dataframe.reset_index(drop=False).loc[i:i + 75000])
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.
         mp_pool = multiprocessing.Pool(len(parts))
-        results = mp_pool.map(Helpers.weekend_helper, parts)
+        results = mp_pool.map(Helpers._weekend_helper, parts)
 
         # Now, lets merge all the smaller parts together and then return the results based on
         # the value of the inplace parameter.
@@ -190,7 +190,7 @@ class TemporalFeatures:
             return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
 
     @staticmethod
-    def create_time_of_day_column(dataframe: NumPandasTraj, inplace=False):
+    def create_time_of_day_column(dataframe: NumPandasTraj, maintain_type=False):
         """
             Create a Time_Of_Day column in the dataframe which indicates at what time of the
             day was the point data captured.
@@ -200,7 +200,7 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The dataframe on which the calculation is to be done.
-                inplace: bool
+                maintain_type: bool
                     Indication on whether the answer is to be returned as a NumPandasTraj DF
                     or a pandas DF.
 
@@ -213,15 +213,15 @@ class TemporalFeatures:
         """
         divisions = []
 
-        # Now lets split the entire dataframe into chunks of 33000 row each so that
+        # Now lets split the entire dataframe into chunks of 75000 row each so that
         # we can run the calculations on each smaller chunk in parallel.
-        for i in range(0, len(dataframe), 33000):
-            divisions.append(dataframe.reset_index(drop=False).loc[i:i + 33000])
+        for i in range(0, len(dataframe), 75000):
+            divisions.append(dataframe.reset_index(drop=False).loc[i:i + 75000])
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.
         multi_pool = multiprocessing.Pool(len(divisions))
-        results = multi_pool.map(Helpers.time_of_day_helper, divisions)
+        results = multi_pool.map(Helpers._time_of_day_helper, divisions)
 
         # Now, lets merge all the smaller parts together and then return the results based on
         # the value of the inplace parameter.

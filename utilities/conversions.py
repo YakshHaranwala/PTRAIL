@@ -14,7 +14,6 @@ class Conversions:
         """
             Cite: PyMove
         """
-
         def decimal_degree_to_decimal(col):
             if col[latitude][-1:] == 'N':
                 col[latitude] = float(col[latitude][:-1])

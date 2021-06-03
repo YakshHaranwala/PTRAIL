@@ -28,8 +28,6 @@ class DistanceFormulaLog:
                     The latitude value of point 2.
                 lon2: float
                     The longitude value of point 2.
-                metres: bool
-                    Indicate whether to return the distance in metres or kilometres.
 
             Returns
             -------

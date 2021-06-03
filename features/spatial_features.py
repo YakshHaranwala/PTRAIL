@@ -11,15 +11,17 @@
     @version 1.0
     @credits PyMove creators
 """
-
+import itertools
 import multiprocessing
 from typing import Optional, Text
 
 import pandas as pd
+import numpy as np
 
 from core.TrajectoryDF import NumPandasTraj
 from utilities import constants as const
-from utilities.helper_functions import Helpers as helpers
+from features.helper_functions import Helpers as helpers
+from utilities.DistanceCalculator import DistanceFormulaLog as calc
 
 
 class SpatialFeatures:
@@ -119,15 +121,19 @@ class SpatialFeatures:
                 return start_loc[const.LAT][0], start_loc[const.LONG][0]
 
     @staticmethod
-    def create_distance_between_consecutive_column(dataframe: NumPandasTraj, inplace=False, metres=False):
+    def create_distance_between_consecutive_column(dataframe: NumPandasTraj, maintain_type=False):
         """
             Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
+            The distance calculated is the Great-Circle distance.
+            NOTE: When the trajectory ID changes in the data, then the distance calculation again starts
+                  from the first point of the new trajectory ID and the first point of the new trajectory
+                  ID will be set to 0.
 
             Parameters
             ----------
                 dataframe: NumPandasTraj
                     The data where speed is to be calculated.
-               inplace: bool
+                maintain_type: bool
                     Indication on whether the answer is to be returned as a NumPandasTraj DF
                     or a pandas DF.
                 metres: bool
@@ -142,27 +148,268 @@ class SpatialFeatures:
         """
         chunks = []  # list for storing the smaller parts of the original dataframe.
 
-        # Now, lets split the given dataframe into smaller pieces of 33000 rows each
+        # Now, lets split the given dataframe into smaller pieces of 75000 rows each
         # so that we can run parallel tasks on each smaller piece.
-        for i in range(0, len(dataframe), 33000):
-            chunks.append(dataframe.reset_index().loc[i: i + 33000])
+        for i in range(0, len(dataframe), 75000):
+            chunks.append(dataframe.reset_index().loc[i: i + 75000])
 
         # Now, lets create a pool of processes which contains processes equal to the number
         # of smaller chunks and then run them in parallel so that we can calculate
         # the distance for each smaller chunk and then merge all of them together.
         multi_pool = multiprocessing.Pool(len(chunks))
-        result = multi_pool.map(helpers.consecutive_distance_helper, chunks)
+        result = multi_pool.map(helpers._consecutive_distance_helper, chunks)
 
         # Now lets, merge the smaller pieces and then return the dataframe based on the value
         # of the inplace parameter.
-        final_result = pd.concat(result)
+        result = pd.concat(result)
 
-        # Also note  that if the metres parameter is true, then we have to return the answers in metres.
-        # To convert to metres, we will just multiply the column by 1000.
-        final_result['Distance_prev_to_curr'] = final_result['Distance_prev_to_curr'] * 1000 if metres \
-            else final_result['Distance_prev_to_curr']
-
-        if inplace:
-            return NumPandasTraj(final_result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        if maintain_type:
+            return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         else:
-            return final_result.set_index([const.LAT, const.LONG], inplace=True)
+            return result.set_index([const.LAT, const.LONG], inplace=True)
+
+    @staticmethod
+    def create_distance_from_start_column(dataframe: NumPandasTraj, maintain_type=False):
+        """
+            Create a column containing distance between the start location and the rest of the
+            points using Haversine formula. The distance calculated is the Great-Circle distance.
+            NOTE: When the trajectory ID changes in the data, then the distance calculation again
+                  starts from the first point of the new trajectory ID and the first point of the
+                  new trajectory ID will be set to 0.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The data where speed is to be calculated.
+                maintain_type: bool
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
+                metres: bool
+                    Indicate whether to return the distances in metres or kilometres.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column if inplace is False.
+        """
+        partitions = []     # List for storing the smaller partitions.
+
+        # Now, lets partition the dataframe into smaller sets of 75000 rows each
+        # so that we can perform parallel calculations on it.
+        for i in range(0, len(dataframe), 75000):
+            partitions.append(dataframe.reset_index().loc[i:i + 75000])
+
+        # Now, lets create a multiprocessing pool of processes and then create as many
+        # number of processes as there are number of partitions and run each process in parallel.
+        pool = multiprocessing.Pool(len(partitions))
+        answer = pool.map(helpers._start_distance_helper, partitions)
+
+        answer = pd.concat(answer)
+        if maintain_type:
+            return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        else:
+            return answer.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+
+    @staticmethod
+    def get_distance_by_date_and_traj_id(dataframe: NumPandasTraj, date, traj_id=None):
+        """
+            Given a date and trajectory ID, this function calculates the total distance
+            covered in the trajectory on that particular date and returns it.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe in which teh actual data is stored.
+                date: Text
+                    The Date on which the distance covered is to be calculated.
+                traj_id: Text
+                    The trajectory ID for which the distance covered is to be calculated.
+
+            Returns
+            -------
+                float
+                    The total distance covered on that date by that trajectory ID.
+        """
+        # First, reset the index of the dataframe.
+        # Then, filter the dataframe based on Date and Trajectory ID if given by user.
+        data = dataframe.reset_index()
+        filt = data.loc[data[const.DateTime].dt.date == pd.to_datetime(date)]
+        small = filt.loc[filt[const.TRAJECTORY_ID] == traj_id] if traj_id is not None else filt
+
+        # First, lets fetch the latitude and longitude columns from the dataset and store it
+        # in a numpy array.
+        traj_ids = np.array(small.reset_index()[const.TRAJECTORY_ID])
+        latitudes = np.array(small[const.LAT])
+        longitudes = np.array(small[const.LONG])
+        distances = np.zeros(len(traj_ids))
+
+        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
+        # each of the values in the distance numpy array.
+        for i in range(len(latitudes)-1):
+            distances[i+1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i+1], longitudes[i+1])
+
+        return np.sum(distances)    # Sum all the distances and return the total path length.
+
+    @staticmethod
+    def create_point_within_range_column(dataframe: NumPandasTraj, coordinates: tuple,
+                                         dist_range: float, maintain_type=True):
+        """
+            Checks how many points are within the range of the given coordinate. By first making a column
+            containing the distance between the given coordinate and rest of the points in dataframe by calling
+            create_distance_from_point(). And then comparing each point using the condition if it's within the
+            range and appending the values in a column and attaching it to the dataframe.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the point within range calculation is to be done.
+                coordinates: tuple
+                    The coordinates from which the distance is to be calculated.
+                dist_range: float
+                    The range within which the resultant distance from the coordinates should lie.
+                maintain_type: bool
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column if inplace is False.
+        """
+        dataframe_list = []     # List for storing the smaller partitions.
+
+        # Now, lets partition the dataframe into smaller sets of 75000 rows each
+        # so that we can perform parallel calculations on it.
+        for i in range(0, len(dataframe), 75000):
+            dataframe_list.append(dataframe.reset_index().loc[i: i+75000])
+
+        # Now, lets create a multiprocessing pool of processes and then create as many
+        # number of processes as there are number of partitions and run each process in parallel.
+        pool = multiprocessing.Pool(len(dataframe_list))
+        args = zip(dataframe_list, itertools.repeat(coordinates), itertools.repeat(dist_range))
+        result = pool.starmap(helpers._point_within_range_helper, args)
+
+        # Now lets join all the smaller partitions and return the resultant dataframe based
+        # on the maintain_value parameter.
+        result = pd.concat(result)
+        if maintain_type:
+            return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        else:
+            return result.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+
+    @staticmethod
+    def create_distance_from_given_point_column(dataframe: NumPandasTraj, coordinates: tuple, maintain_type=False):
+        """
+            Given a point, this function calculates the distance between that point and all the
+            points present in the dataframe and adds that column into the dataframe.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which calculation is to be done.
+                coordinates: tuple
+                    The coordinates from which the distance is to be calculated.
+                maintain_type: bool
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
+
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column if inplace is False.
+        """
+        part_list = []  # List for storing the smaller partitions.
+
+        # Now, lets partition the dataframe into smaller sets of 75000 rows each
+        # so that we can perform parallel calculations on it.
+        for i in range(0, len(dataframe), 75000):
+            part_list.append(dataframe.reset_index().loc[i:i + 75000])
+
+        # Now, lets create a multiprocessing pool of processes and then create as many
+        # number of processes as there are number of partitions and run each process in parallel.
+        pool = multiprocessing.Pool(len(part_list))
+        answer = pool.starmap(helpers._given_point_distance_helper, zip(part_list, itertools.repeat(coordinates)))
+
+        # Now lets join all the smaller partitions and then add the Distance to the
+        # specific point column.
+        answer = pd.concat(answer)
+
+        # Based on the value of maintain_type variable, return the answer dataframe.
+        if maintain_type:
+            return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        else:
+            return answer.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+
+    @staticmethod
+    def create_speed_from_prev_column(dataframe: NumPandasTraj, maintain_type=False):
+        """
+            Create a column containing speed of the object from the start to the current
+            point.
+
+            WARNING: In order to run this function, it is necessary that the dataframe has
+                     "Distance_prev_to_curr" column present. Therefore, if the dataframe
+                     does not have it already, please run the create_distance_from_prev_column()
+                     first.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation of speed is to be done.
+                maintain_type: bool
+                    Indication on whether the answer is to be returned as a NumPandasTraj DF
+                    or a pandas DF.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column if inplace is True.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the resultant column if inplace is False.
+        """
+        dataframe_list = []  # List for storing the smaller partitions.
+
+        # Now, lets partition the dataframe into smaller sets of 75000 rows each
+        # so that we can perform parallel calculations on it.
+        for i in range(0, len(dataframe), 75000):
+            dataframe_list.append(dataframe.reset_index().loc[i: i + 75000])
+
+        # Now, lets create a multiprocessing pool of processes and then create as many
+        # number of processes as there are number of partitions and run each process in parallel.
+        pool = multiprocessing.Pool(len(dataframe_list))
+        result = pool.map(helpers._speed_from_prev_helper, dataframe_list)
+
+        # Now lets join all the smaller partitions and return the resultant dataframe based
+        # on the maintain_value parameter.
+        result = pd.concat(result)
+
+        if maintain_type:
+            return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        else:
+            return result.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+
+    @staticmethod
+    def create_acceleration_column(dataframe: NumPandasTraj):
+        pass
+
+    @staticmethod
+    def create_bearing_column(dataframe: NumPandasTraj):
+        pass
+
+    @staticmethod
+    def create_jerk_column(dataframe: NumPandasTraj):
+        pass
+
+    @staticmethod
+    def create_bearing_rate_column(dataframe: NumPandasTraj):
+        pass
+
+    @staticmethod
+    def create_rate_of_bearing_rate_column(dataframe: NumPandasTraj):
+        pass
