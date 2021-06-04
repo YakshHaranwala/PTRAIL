@@ -41,4 +41,4 @@ class DistanceFormulaLog:
 
         crow_distance = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-        return const.RADIUS_OF_EARTH * crow_distance
+        return const.RADIUS_OF_EARTH * crow_distance * 1000

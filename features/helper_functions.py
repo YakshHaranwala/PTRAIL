@@ -337,7 +337,7 @@ class Helpers:
 
         # Now, assign the column containing the results calculated above and
         # return the dataframe.
-        dataframe[f'Within_{dist_range}_km_from_{coordinates}'] = distances
+        dataframe[f'Within_{dist_range}_m_from_{coordinates}'] = distances
         return dataframe
 
     @staticmethod

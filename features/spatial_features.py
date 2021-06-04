@@ -142,15 +142,13 @@ class SpatialFeatures:
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
         """
         chunks = []  # list for storing the smaller parts of the original dataframe.
 
         # Now, lets split the given dataframe into smaller pieces of 75000 rows each
         # so that we can run parallel tasks on each smaller piece.
-        for i in range(0, len(dataframe), 75000):
+        for i in range(0, len(dataframe), 75001):
             chunks.append(dataframe.reset_index().loc[i: i + 75000])
 
         # Now, lets create a pool of processes which contains processes equal to the number
@@ -159,8 +157,7 @@ class SpatialFeatures:
         multi_pool = multiprocessing.Pool(len(chunks))
         result = multi_pool.map(helpers._consecutive_distance_helper, chunks)
 
-        # Now lets, merge the smaller pieces and then return the dataframe based on the value
-        # of the inplace parameter.
+        # Now lets, merge the smaller pieces and then return the dataframe
         result = pd.concat(result)
 
         if maintain_type:
@@ -198,7 +195,7 @@ class SpatialFeatures:
 
         # Now, lets partition the dataframe into smaller sets of 75000 rows each
         # so that we can perform parallel calculations on it.
-        for i in range(0, len(dataframe), 75000):
+        for i in range(0, len(dataframe), 75001):
             partitions.append(dataframe.reset_index().loc[i:i + 75000])
 
         # Now, lets create a multiprocessing pool of processes and then create as many
@@ -329,7 +326,7 @@ class SpatialFeatures:
 
         # Now, lets partition the dataframe into smaller sets of 75000 rows each
         # so that we can perform parallel calculations on it.
-        for i in range(0, len(dataframe), 75000):
+        for i in range(0, len(dataframe), 75001):
             part_list.append(dataframe.reset_index().loc[i:i + 75000])
 
         # Now, lets create a multiprocessing pool of processes and then create as many
@@ -395,8 +392,41 @@ class SpatialFeatures:
             return result.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
 
     @staticmethod
-    def create_acceleration_column(dataframe: NumPandasTraj):
-        pass
+    def create_acceleration_from_prev_column(dataframe: NumPandasTraj):
+        """
+            Create a column containing acceleration of the object from the start to the current
+            point.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation of acceleration is to be done.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column.
+        """
+        # Try catch is used to check if speed column is present or not
+        try:
+            # When Speed column is present extract the data from there and then take calculate the time delta
+            # And use that to calculate acceleration by dividing speed by time delta and then add the column to
+            # the dataframe
+            speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['Acceleration_prev_to_curr'] = (speed_deltas/time_deltas).to_numpy()
+            return dataframe
+
+        except KeyError:
+            # When Speed column is not present then first call create_speed_from_prev_column() function to make
+            # the speed column and then follow the steps mentioned above
+            dataframe = SpatialFeatures.create_speed_from_prev_column(dataframe)
+            speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['Acceleration_prev_to_curr'] = (speed_deltas / time_deltas).to_numpy()
+            return dataframe
 
     @staticmethod
     def create_bearing_column(dataframe: NumPandasTraj):
