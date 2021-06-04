@@ -335,7 +335,7 @@ class SpatialFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
             # Assign the new column and return the NumPandasTrajDF.
-            dataframe['Speed_prev_to_curr'] = (distances/time_deltas).to_numpy()
+            dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy()
             return dataframe
 
         except KeyError:
@@ -349,7 +349,7 @@ class SpatialFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
             # Assign the column and return the NumPandasTrajDF.
-            dataframe['Speed_prev_to_curr'] = (distances/time_deltas).to_numpy()
+            dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy()
             return dataframe
 
     @staticmethod
@@ -376,7 +376,7 @@ class SpatialFeatures:
             speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
-            dataframe['Acceleration_prev_to_curr'] = (speed_deltas/time_deltas).to_numpy()
+            dataframe['Acceleration_prev_to_curr'] = (speed_deltas / time_deltas).to_numpy()
             return dataframe
 
         except KeyError:
@@ -413,7 +413,7 @@ class SpatialFeatures:
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
-            dataframe['jerk_prev_to_curr'] = (acceleration_deltas/time_deltas).to_numpy()
+            dataframe['jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
             return dataframe
 
         except KeyError:
@@ -428,7 +428,40 @@ class SpatialFeatures:
 
     @staticmethod
     def create_bearing_column(dataframe: NumPandasTraj):
-        pass
+        """
+            Create a column containing bearing between 2 consecutive points. Bearing is also
+            referred as "Forward Azimuth" sometimes. Bearing/Forward Azimuth is defined as
+            follows:
+                Bearing is the horizontal angle between the direction of an object and another
+                object, or between the object and the True North.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the bearing is to be calculated.
+
+            Returns
+            -------
+                NumPandasTraj
+                    The dataframe containing the resultant column.
+        """
+        dataframe_split_list = []  # A list for storing dataframe partitions.
+
+        # Now, lets spilt the dataframe into smaller pieces of 75000 lines each.
+        # By doing so, we will be able to run calculation on all the smaller chunks
+        # in parallel.
+        for i in range(0, len(dataframe), 75001):
+            dataframe_split_list.append(dataframe.reset_index().loc[i:i + 75000])
+
+        # Now lets create a Pool of processes which has number of processes equal
+        # to the number of smaller pieces of data and then lets run them all in
+        # parallel.
+        multi_pool = multiprocessing.Pool(len(dataframe_split_list))
+        result = multi_pool.map(helpers._bearing_helper, dataframe_split_list)
+
+        # Now, lets concat the results and then return the dataframe.
+        result = pd.concat(result)
+        return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_bearing_rate_column(dataframe: NumPandasTraj):
@@ -467,4 +500,35 @@ class SpatialFeatures:
 
     @staticmethod
     def create_rate_of_bearing_rate_column(dataframe: NumPandasTraj):
-        pass
+        """
+            Calculates the rate of bearing rate of the consecutive points.
+            Add adding that column into the dataframe
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the rate of bearing rate is to be calculated
+
+            Returns
+            -------
+                NumPandasTraj
+                    The dataframe containing the rate of Bearing rate column
+        """
+        # Try catch to check for Bearing Rate column
+        try:
+            # If Bearing from previous column is present, extract that and then calculate time_deltas
+            # Using these calculate Bearing_rate_from_prev by dividing bearing_deltas with time_deltas
+            # And then adding the column to the dataframe
+            bearing_rate_deltas = dataframe.reset_index()['Bearing_rate_from_prev'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
+            return dataframe
+        except KeyError:
+            # Similar to the step above but just makes the Bearing column first
+            dataframe = SpatialFeatures.create_bearing_column(dataframe)
+            bearing_rate_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
+            return dataframe

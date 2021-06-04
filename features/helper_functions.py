@@ -341,3 +341,46 @@ class Helpers:
         dataframe[f'Within_{dist_range}_m_from_{coordinates}'] = distances
         return dataframe
 
+    @staticmethod
+    def _bearing_helper(dataframe):
+        """
+            This function is the helper function of the create_bearing_column(). The create_bearing_column()
+            delegates the task of calculation of bearing between 2 points to this function because the original
+            functions runs multiple instances of this function in parallel. This function does the calculation
+            of bearing between 2 consecutive points in the entire DF and then creates a column in the dataframe
+            and returns it.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation is to be done.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe containing the Bearing column.
+        """
+        # First, lets create 3 numpy arrays containing latitude, longitude and
+        # trajectory ids of the data.
+        latitude = np.array(dataframe[const.LAT])
+        longitude = np.array(dataframe[const.LONG])
+        traj_ids = np.array(dataframe.reset_index()[const.TRAJECTORY_ID])
+        bearings = np.zeros(len(latitude))
+
+        # Now, lets loop over the data and calculate the bearing between
+        # 2 consecutive points.
+        bearings[0] = np.NaN
+        for i in range(len(bearings) - 1):
+            # Check if the 2 points between which the distance is being calculated are
+            # of the same trajectory ID, and if so continue with the calculation.
+            if traj_ids[i] == traj_ids[i + 1]:
+                bearings[i + 1] = calc.bearing_calculation(latitude[i], longitude[i],
+                                                           latitude[i + 1], longitude[i + 1])
+            # Otherwise, when the trajectory ID changes, then assign the distance 0 to the first
+            # point and change the start index to that point so that calculation yields correct
+            # results
+            else:
+                bearings[i + 1] = np.NaN
+
+        dataframe['Bearing_between_consecutive'] = bearings
+        return dataframe
