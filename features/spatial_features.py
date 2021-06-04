@@ -432,7 +432,38 @@ class SpatialFeatures:
 
     @staticmethod
     def create_bearing_rate_column(dataframe: NumPandasTraj):
-        pass
+        """
+            Calculates the bearing rate of the consecutive points. And adding that column into
+            the dataframe
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the bearing rate is to be calculated
+
+            Returns
+            -------
+                NumPandasTraj
+                    The dataframe containing the Bearing rate column
+        """
+        # Try catch to check for Bearing column
+        try:
+            # If Bearing from previous column is present, extract that and then calculate time_deltas
+            # Using these calculate Bearing_rate_from_prev by dividing bearing_deltas with time_deltas
+            # And then adding the column to the dataframe
+            bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['Bearing_rate_from_prev'] = (bearing_deltas / time_deltas).to_numpy()
+            return dataframe
+        except KeyError:
+            # Similar to the step above but just makes the Bearing column first
+            dataframe = SpatialFeatures.create_bearing_column(dataframe)
+            bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['Bearing_rate_from_prev'] = (bearing_deltas / time_deltas).to_numpy()
+            return dataframe
 
     @staticmethod
     def create_rate_of_bearing_rate_column(dataframe: NumPandasTraj):

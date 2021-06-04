@@ -206,7 +206,7 @@ class Helpers:
 
         # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
         # each of the values in the distance numpy array.
-
+        distances[0] = np.NAN
         for i in range(len(latitudes) - 1):
             # If the traj_id is same it calculates its distance from the above mentioned formula.
             if traj_ids[i] == traj_ids[i + 1]:
@@ -215,7 +215,7 @@ class Helpers:
             # The point at which a new trajectory starts, its distance is set to zero and the calculation
             # for that trajectory id starts from that point.
             else:
-                distances[i + 1] = 0
+                distances[i + 1] = np.NAN
 
         # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
         dataframe['Distance_prev_to_curr'] = distances
@@ -250,6 +250,7 @@ class Helpers:
         # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
         # each of the values in the distance numpy array.
         start = 0  # The index of the starting point.
+        distances[0] = np.NAN
         for i in range(len(distances) - 1):
             # Check if the 2 points between which the distance is being calculated are
             # of the same trajectory ID, and if so continue with the calculation.
@@ -260,7 +261,7 @@ class Helpers:
             # point and change the start index to that point so that calculation yields correct
             # results
             else:
-                distances[i + 1] = 0
+                distances[i + 1] = np.NAN
                 start = i + 1
 
         # Now, assign the new column to the dataframe and return it.
