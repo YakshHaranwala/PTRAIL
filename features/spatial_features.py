@@ -15,12 +15,12 @@ import itertools
 import multiprocessing
 from typing import Optional, Text
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from core.TrajectoryDF import NumPandasTraj
-from utilities import constants as const
 from features.helper_functions import Helpers as helpers
+from utilities import constants as const
 from utilities.DistanceCalculator import DistanceFormulaLog as calc
 
 
@@ -121,7 +121,7 @@ class SpatialFeatures:
                 return start_loc[const.LAT][0], start_loc[const.LONG][0]
 
     @staticmethod
-    def create_distance_between_consecutive_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_distance_between_consecutive_column(dataframe: NumPandasTraj):
         """
             Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
             The distance calculated is the Great-Circle distance.
@@ -133,11 +133,6 @@ class SpatialFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The data where speed is to be calculated.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
-                metres: bool
-                    Indicate whether to return the distances in metres or kilometres.
 
             Returns
             -------
@@ -159,14 +154,10 @@ class SpatialFeatures:
 
         # Now lets, merge the smaller pieces and then return the dataframe
         result = pd.concat(result)
-
-        if maintain_type:
-            return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return result.set_index([const.LAT, const.LONG], inplace=True)
+        return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_distance_from_start_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_distance_from_start_column(dataframe: NumPandasTraj):
         """
             Create a column containing distance between the start location and the rest of the
             points using Haversine formula. The distance calculated is the Great-Circle distance.
@@ -178,20 +169,13 @@ class SpatialFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The data where speed is to be calculated.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
-                metres: bool
-                    Indicate whether to return the distances in metres or kilometres.
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
         """
-        partitions = []     # List for storing the smaller partitions.
+        partitions = []  # List for storing the smaller partitions.
 
         # Now, lets partition the dataframe into smaller sets of 75000 rows each
         # so that we can perform parallel calculations on it.
@@ -204,10 +188,7 @@ class SpatialFeatures:
         answer = pool.map(helpers._start_distance_helper, partitions)
 
         answer = pd.concat(answer)
-        if maintain_type:
-            return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return answer.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+        return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def get_distance_by_date_and_traj_id(dataframe: NumPandasTraj, date, traj_id=None):
@@ -244,14 +225,14 @@ class SpatialFeatures:
 
         # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
         # each of the values in the distance numpy array.
-        for i in range(len(latitudes)-1):
-            distances[i+1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i+1], longitudes[i+1])
+        for i in range(len(latitudes) - 1):
+            distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i + 1], longitudes[i + 1])
 
-        return np.sum(distances)    # Sum all the distances and return the total path length.
+        return np.sum(distances)  # Sum all the distances and return the total path length.
 
     @staticmethod
     def create_point_within_range_column(dataframe: NumPandasTraj, coordinates: tuple,
-                                         dist_range: float, maintain_type=True):
+                                         dist_range: float):
         """
             Checks how many points are within the range of the given coordinate. By first making a column
             containing the distance between the given coordinate and rest of the points in dataframe by calling
@@ -266,23 +247,19 @@ class SpatialFeatures:
                     The coordinates from which the distance is to be calculated.
                 dist_range: float
                     The range within which the resultant distance from the coordinates should lie.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
+
         """
-        dataframe_list = []     # List for storing the smaller partitions.
+        dataframe_list = []  # List for storing the smaller partitions.
 
         # Now, lets partition the dataframe into smaller sets of 75000 rows each
         # so that we can perform parallel calculations on it.
-        for i in range(0, len(dataframe), 75000):
-            dataframe_list.append(dataframe.reset_index().loc[i: i+75000])
+        for i in range(0, len(dataframe), 75001):
+            dataframe_list.append(dataframe.reset_index().loc[i: i + 75000])
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
@@ -290,16 +267,12 @@ class SpatialFeatures:
         args = zip(dataframe_list, itertools.repeat(coordinates), itertools.repeat(dist_range))
         result = pool.starmap(helpers._point_within_range_helper, args)
 
-        # Now lets join all the smaller partitions and return the resultant dataframe based
-        # on the maintain_value parameter.
+        # Now lets join all the smaller partitions and return the resultant dataframe
         result = pd.concat(result)
-        if maintain_type:
-            return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return result.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+        return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_distance_from_given_point_column(dataframe: NumPandasTraj, coordinates: tuple, maintain_type=False):
+    def create_distance_from_given_point_column(dataframe: NumPandasTraj, coordinates: tuple):
         """
             Given a point, this function calculates the distance between that point and all the
             points present in the dataframe and adds that column into the dataframe.
@@ -310,17 +283,11 @@ class SpatialFeatures:
                     The dataframe on which calculation is to be done.
                 coordinates: tuple
                     The coordinates from which the distance is to be calculated.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
-
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
         """
         part_list = []  # List for storing the smaller partitions.
 
@@ -338,58 +305,52 @@ class SpatialFeatures:
         # specific point column.
         answer = pd.concat(answer)
 
-        # Based on the value of maintain_type variable, return the answer dataframe.
-        if maintain_type:
-            return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return answer.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+        # return the answer dataframe converted to NumPandasTraj.
+        return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_speed_from_prev_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_speed_from_prev_column(dataframe: NumPandasTraj):
         """
             Create a column containing speed of the object from the start to the current
             point.
-
-            WARNING: In order to run this function, it is necessary that the dataframe has
-                     "Distance_prev_to_curr" column present. Therefore, if the dataframe
-                     does not have it already, please run the create_distance_from_prev_column()
-                     first.
 
             Parameters
             ----------
                 dataframe: NumPandasTraj
                     The dataframe on which the calculation of speed is to be done.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
         """
-        dataframe_list = []  # List for storing the smaller partitions.
+        # Here, we are using try and catch blocks to check whether the DataFrame has the
+        # Distance_prev_to_curr column.
+        try:
+            # If the Distance_prev_to_curr column is already present in the dataframe,
+            # then extract it, calculate the time differences between the consecutive
+            # rows in the dataframe and then calculate distances/time_deltas in order to
+            # calculate the speed.
+            distances = dataframe.reset_index()['Distance_prev_to_curr']
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
-        # Now, lets partition the dataframe into smaller sets of 75000 rows each
-        # so that we can perform parallel calculations on it.
-        for i in range(0, len(dataframe), 75000):
-            dataframe_list.append(dataframe.reset_index().loc[i: i + 75000])
+            # Assign the new column and return the NumPandasTrajDF.
+            dataframe['Speed_prev_to_curr'] = (distances/time_deltas).to_numpy()
+            return dataframe
 
-        # Now, lets create a multiprocessing pool of processes and then create as many
-        # number of processes as there are number of partitions and run each process in parallel.
-        pool = multiprocessing.Pool(len(dataframe_list))
-        result = pool.map(helpers._speed_from_prev_helper, dataframe_list)
+        except KeyError:
+            # If the Distance_prev_to_curr column is not present in the Dataframe and a KeyError
+            # is thrown, then catch it and the overridden behaviour is as follows:
+            #   1. Calculate the distance by calling the create_distance_between_consecutive_column() function.
+            #   2. Calculate the time deltas.
+            #   3. Divide the 2 values to calculate the speed.
+            dataframe = SpatialFeatures.create_distance_between_consecutive_column(dataframe)
+            distances = dataframe.reset_index()['Distance_prev_to_curr']
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
-        # Now lets join all the smaller partitions and return the resultant dataframe based
-        # on the maintain_value parameter.
-        result = pd.concat(result)
-
-        if maintain_type:
-            return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return result.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+            # Assign the column and return the NumPandasTrajDF.
+            dataframe['Speed_prev_to_curr'] = (distances/time_deltas).to_numpy()
+            return dataframe
 
     @staticmethod
     def create_acceleration_from_prev_column(dataframe: NumPandasTraj):
@@ -429,11 +390,44 @@ class SpatialFeatures:
             return dataframe
 
     @staticmethod
-    def create_bearing_column(dataframe: NumPandasTraj):
-        pass
+    def create_jerk_from_prev_column(dataframe: NumPandasTraj):
+        """
+            Create a column containing jerk of the object from the start to the current
+            point.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation of jerk is to be done.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column.
+        """
+        # Try catch is used to check if acceleration column is present or not
+        try:
+            # When acceleration column is present extract the data from there and then take calculate the time delta
+            # And use that to calculate acceleration by dividing speed_delta by time delta and then add the column to
+            # the dataframe
+            acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['jerk_prev_to_curr'] = (acceleration_deltas/time_deltas).to_numpy()
+            return dataframe
+
+        except KeyError:
+            # When Speed column is not present then first call create_speed_from_prev_column() function to make
+            # the speed column and then follow the steps mentioned above
+            dataframe = SpatialFeatures.create_acceleration_from_prev_column(dataframe)
+            acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+
+            dataframe['jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
+            return dataframe
 
     @staticmethod
-    def create_jerk_column(dataframe: NumPandasTraj):
+    def create_bearing_column(dataframe: NumPandasTraj):
         pass
 
     @staticmethod

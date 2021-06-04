@@ -18,29 +18,25 @@ from typing import Optional, Text
 import pandas as pd
 
 from core.TrajectoryDF import NumPandasTraj
-from utilities import constants as const
 from features.helper_functions import Helpers
+from utilities import constants as const
 
 
 class TemporalFeatures:
     @staticmethod
-    def create_date_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_date_column(dataframe: NumPandasTraj):
         """
             Create a Date column in the dataframe given.
 
             Parameters
             ----------
                 dataframe: core.TrajectoryDF.NumPandasTraj
-                    The NumPandasTraj on which the creation of date column is to be done
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
+                    The NumPandasTraj on which the creation of date column is to be done.
+
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
         """
         # Split the entire data set into chunks of 75000 rows each
         # so that we can work on each separate part in parallel.
@@ -57,13 +53,10 @@ class TemporalFeatures:
         ans = pd.concat(result)  # Merge all the smaller chunks together.
 
         # Now depending on the value of inplace, return the required data structure.
-        if maintain_type:
-            return NumPandasTraj(ans, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return ans.set_index([const.DateTime, const.TRAJECTORY_ID])
+        return NumPandasTraj(ans, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_time_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_time_column(dataframe: NumPandasTraj):
         """
             From the DateTime column already present in the data, extract only the time
             and then add another column containing just the time.
@@ -71,16 +64,12 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The DaskTrajectoryDF on which the creation of the time column is to be done.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
+
         """
         df_split_list = []  # A list for storing the split dataframes.
 
@@ -102,13 +91,10 @@ class TemporalFeatures:
         # Now check whether the user wants the result applied to the original dataframe or
         # wants a separate new dataframe. If the user wants a separate new dataframe, then
         # a pandas dataframe is returned instead of NumTrajectoryDF.
-        if maintain_type:
-            return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return time_containing_df.set_index([const.DateTime, const.TRAJECTORY_ID])
+        return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_day_of_week_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_day_of_week_column(dataframe: NumPandasTraj):
         """
             Create a column called Day_Of_Week which contains the day of the week
             on which the trajectory point is recorded. This is calculated on the basis
@@ -118,16 +104,11 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The dataframe containing the entire data on which the operation is to be performed
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF..
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
         """
         chunk_list = []  # A list for storing the split dataframes.
 
@@ -143,13 +124,10 @@ class TemporalFeatures:
         results = pool_of_processes.map(Helpers._day_of_week_helper, chunk_list)
 
         final_df = pd.concat(results)
-        if maintain_type:
-            return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+        return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_weekend_indicator_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_weekend_indicator_column(dataframe: NumPandasTraj):
         """
             Create a column called Weekend which indicates whether the point data is collected
             on either a Saturday or a Sunday.
@@ -158,16 +136,12 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The dataframe on which the operation is to be performed.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column if inplace.
+
         """
         parts = []
 
@@ -184,13 +158,10 @@ class TemporalFeatures:
         # Now, lets merge all the smaller parts together and then return the results based on
         # the value of the inplace parameter.
         final_df = pd.concat(results)
-        if maintain_type:
-            return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+        return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_time_of_day_column(dataframe: NumPandasTraj, maintain_type=False):
+    def create_time_of_day_column(dataframe: NumPandasTraj):
         """
             Create a Time_Of_Day column in the dataframe which indicates at what time of the
             day was the point data captured.
@@ -200,16 +171,12 @@ class TemporalFeatures:
             ----------
                 dataframe: NumPandasTraj
                     The dataframe on which the calculation is to be done.
-                maintain_type: bool
-                    Indication on whether the answer is to be returned as a NumPandasTraj DF
-                    or a pandas DF.
 
             Returns
             -------
                 core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column if inplace is True.
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column if inplace is False.
+                    The dataframe containing the resultant column.
+
         """
         divisions = []
 
@@ -226,11 +193,7 @@ class TemporalFeatures:
         # Now, lets merge all the smaller parts together and then return the results based on
         # the value of the inplace parameter.
         final_df = pd.concat(results)
-
-        if maintain_type:
-            return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        else:
-            return final_df.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True, drop=True)
+        return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def get_traj_duration(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):

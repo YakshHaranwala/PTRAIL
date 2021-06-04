@@ -10,8 +10,8 @@ import numpy
 import numpy as np
 
 import utilities.constants as const
-from utilities.DistanceCalculator import DistanceFormulaLog as calc
 import utilities.exceptions as exc
+from utilities.DistanceCalculator import DistanceFormulaLog as calc
 
 
 class Helpers:
@@ -329,7 +329,7 @@ class Helpers:
         distances = []
 
         # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and then check
-        # whether the distance is within the user spevified range and store each of the values in the \
+        # whether the distance is within the user specified range and store each of the values in the \
         # distance numpy array.
         for i in range(len(latitudes)):
             distances.append(calc.haversine_distance(coordinates[0], coordinates[1],
@@ -340,32 +340,3 @@ class Helpers:
         dataframe[f'Within_{dist_range}_m_from_{coordinates}'] = distances
         return dataframe
 
-    @staticmethod
-    def _speed_from_prev_helper(dataframe):
-        """
-            This function is the helper function of the create_speed_from_prev_column() function.
-            The create_speed_from_prev_column() function delegates the actual task of calculating the speed
-            from starting point to current point to this function which does the calculation and creates
-            a column called Speed_from_start_to_curr column and places it in the dataframe and returns it.
-
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which the speed calculation is to be done.
-
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    The dataframe with the resultant column inside it.
-        """
-        # Extracting just the times from DateTime column.
-        try:
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds.div(3600).astype('float64')
-            dataframe['Speed_from_prev'] = dataframe['Distance_prev_to_curr'] / time_deltas
-
-            return dataframe
-
-        except KeyError:
-            raise exc.MissingColumnsException("The column Distance Start to Current is Missing in the dataframe.\n"
-                                              "Please run the function create_distance_from_start_column() first"
-                                              "before running this function.")
