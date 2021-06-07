@@ -1,4 +1,5 @@
 from parser import ParserError
+from parser import ParserError
 from typing import Dict, List, Union, Optional, Text
 
 import numpy as np
@@ -367,3 +368,24 @@ class NumPandasTraj(DataFrame):
                     dtypes of the DataFrame columns.
         """
         return self.reset_index(drop=False).to_numpy()
+
+    def remove_duplicates(self):
+        """
+            Drop duplicates based on the four following columns:
+                1. Trajectory ID
+                2. DateTime
+                3. Latitude
+                4. Longitude
+            Duplicates will be dropped only when all the values in the above mentioned
+            four columns are the same.
+
+            Returns
+            -------
+                NumPandasTraj
+                    The dataframe with dropped duplicates.
+        """
+        return self.reset_index().drop_duplicates(subset=[const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG],
+                                                  keep='first')
+
+    def sort_by_traj_id_and_datetime(self):
+        pass

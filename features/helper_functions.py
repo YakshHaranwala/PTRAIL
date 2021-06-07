@@ -321,7 +321,7 @@ class Helpers:
             Returns
             -------
                 pandas.core.dataframe.DataFrame
-                    The datframe containing the resultant column.
+                    The dataframe containing the resultant column.
         """
         # First, lets fetch the latitude and longitude columns from the dataset and store it
         # in a numpy array.
