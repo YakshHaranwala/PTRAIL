@@ -8,6 +8,7 @@
 """
 import numpy
 import numpy as np
+import pandas
 
 import utilities.constants as const
 import utilities.exceptions as exc
@@ -384,3 +385,79 @@ class Helpers:
 
         dataframe['Bearing_between_consecutive'] = bearings
         return dataframe
+
+    @staticmethod
+    def _start_location_helper(dataframe, ids_):
+        """
+            Helper function for get_start_location(). It filters out the earliest(start) location of
+            every trajectory present in the list.
+
+            Parameter
+            ---------
+                dataframe: NumPandasTraj
+                    The dataframe of which the locations are to be found.dataframe
+                ids_: list
+                    List of trajectory ids for which the start locations are to be calculated
+
+            Returns
+            -------
+                pandas.core.dataframe.Dataframe
+                    New dataframe containing Trajectory as index and latitude and longitude
+        """
+        results = []
+
+        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
+        # and then further filter that dataframe according to the earliest(minimum) time.
+        # And then append the start location of that earliest time into a list
+        for i in range(len(ids_)):
+            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
+                                  [const.DateTime, const.LAT, const.LONG]])
+            start_loc = (filt.loc[filt[const.DateTime] == filt[const.DateTime].min(),
+                                  [const.LAT, const.LONG]]).reset_index()
+            results.append([start_loc[const.LAT][0], start_loc[const.LONG][0], ids_[i]])
+
+        # Make a new dataframe containing Latitude Longitude and Trajectory id
+        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.LAT,
+                                                                              1: const.LONG,
+                                                                              2: const.TRAJECTORY_ID})
+
+        # Return the dataframe by setting Trajectory id as index
+        return df.set_index(const.TRAJECTORY_ID)
+
+    @staticmethod
+    def _end_location_helper(dataframe, ids_):
+        """
+            Helper function for get_end_location(). It filters out the last(end) location of
+            every trajectory present in the list.
+
+            Parameter
+            ---------
+                dataframe: NumPandasTraj
+                    The dataframe of which the locations are to be found.dataframe
+                ids_: list
+                    List of trajectory ids for which the end locations are to be calculated
+
+            Returns
+            -------
+                pandas.core.dataframe.Dataframe
+                    New dataframe containing Trajectory ID as index and latitude and longitude
+                    as other 2 columns.
+        """
+        results = []
+
+        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
+        # and then further filter that dataframe according to the latest(maximum) time.
+        # And then append the end location of that latest time into a list.
+        for i in range(len(ids_)):
+            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
+                                  [const.DateTime, const.LAT, const.LONG]])
+            start_loc = (filt.loc[filt[const.DateTime] == filt[const.DateTime].max(),
+                                  [const.LAT, const.LONG]]).reset_index()
+            results.append([start_loc[const.LAT][0], start_loc[const.LONG][0], ids_[i]])
+
+        # Make a new dataframe containing Latitude Longitude and Trajectory id
+        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.LAT,
+                                                                              1: const.LONG,
+                                                                              2: const.TRAJECTORY_ID})
+        # Return the dataframe by setting Trajectory id as index
+        return df.set_index(const.TRAJECTORY_ID)

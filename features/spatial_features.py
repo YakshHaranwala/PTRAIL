@@ -53,8 +53,10 @@ class SpatialFeatures:
     def get_start_location(dataframe: NumPandasTraj, traj_id=None):
         """
             Get the starting location of an object's trajectory in the data.
-            Note that if the data does not have an Object ID column and does not have unique objects,
-            then the entire dataset's starting location is returned.
+
+            NOTE: If the user does not give in any traj_id, then the library,
+                  by default gives out the start locations of all the unique trajectory ids
+                  present in the data.
 
             Parameters
             ----------
@@ -67,16 +69,28 @@ class SpatialFeatures:
             -------
                 tuple
                     The (lat, longitude) tuple containing the start location.
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing start locations of all trajectory IDs.
         """
-        # If traj_id is None, filter out a dataframe with the earliest time and then return the first 
-        # latitude and longitude at that time.
-        # Else first filter out a dataframe containing the given traj_id and then perform the same steps as
-        # mentioned above
+        # If traj_id is None, find the start times of all the unique trajectories present in the data.
+        # Else first filter out a dataframe containing the given traj_id and then return the start
+        # location of that point.
         dataframe = dataframe.copy().reset_index()
         if traj_id is None:
-            start_loc = (dataframe.loc[dataframe[const.DateTime] == dataframe[const.DateTime].min(),
-                                       [const.LAT, const.LONG]]).reset_index()
-            return start_loc[const.LAT][0], start_loc[const.LONG][0]
+            # First, create a list containing all the ids of the data and then further divide that
+            # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+            ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
+            ids_ = [ids_[i: i+100] for i in range(0, len(ids_), 100)]
+
+            # Now, create a multiprocessing pool and then run processes in parallel
+            # which calculate the start locations for a smaller set of IDs only.
+            mp_pool = multiprocessing.Pool(len(ids_))
+            results = mp_pool.starmap(helpers._start_location_helper, zip(itertools.repeat(dataframe), ids_))
+
+            # Concatenate all the smaller dataframes and return the answer.
+            results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
+            return results
+
         else:
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id, [const.DateTime, const.LAT, const.LONG]])
             start_loc = (filt.loc[filt[const.DateTime] == filt[const.DateTime].min(),
@@ -102,15 +116,24 @@ class SpatialFeatures:
                 tuple
                     The (lat, longitude) tuple containing the end location.
         """
-        # If traj_id is None, filter out a dataframe with the latest time and then return the last
-        # latitude and longitude at that time.
-        # Else first filter out a dataframe containing the given traj_id and then perform the same steps as
-        # mentioned above
+        # If traj_id is None, find the end times of all the unique trajectories present in the data.
+        # Else first filter out a dataframe containing the given traj_id and then return the end
+        # location of that point.
         dataframe = dataframe.copy().reset_index()
         if traj_id is None:
-            start_loc = (dataframe.loc[dataframe[const.DateTime] == dataframe[const.DateTime].max(),
-                                       [const.LAT, const.LONG]]).reset_index()
-            return start_loc[const.LAT][0], start_loc[const.LONG][0]
+            # First, create a list containing all the ids of the data and then further divide that
+            # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+            ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
+            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
+
+            # Now, create a multiprocessing pool and then run processes in parallel
+            # which calculate the end locations for a smaller set of IDs only.
+            mp_pool = multiprocessing.Pool(len(ids_))
+            results = mp_pool.starmap(helpers._end_location_helper, zip(itertools.repeat(dataframe), ids_))
+
+            # Concatenate all the smaller dataframes and return the answer.
+            results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
+            return results
         else:
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id, [const.DateTime, const.LAT, const.LONG]])
             start_loc = (filt.loc[filt[const.DateTime] == filt[const.DateTime].max(),
@@ -191,7 +214,7 @@ class SpatialFeatures:
         return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def get_distance_by_date_and_traj_id(dataframe: NumPandasTraj, date, traj_id=None):
+    def get_distance_travelled_by_date_and_traj_id(dataframe: NumPandasTraj, date, traj_id=None):
         """
             Given a date and trajectory ID, this function calculates the total distance
             covered in the trajectory on that particular date and returns it.
@@ -532,3 +555,19 @@ class SpatialFeatures:
 
             dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
             return dataframe
+
+    @staticmethod
+    def get_trajectory_by_traj_id(dataframe: NumPandasTraj, traj_id: Text):
+        pass
+
+    @staticmethod
+    def get_distance_travelled_by_traj_id(dataframe: NumPandasTraj, traj_id: Text):
+        pass
+
+    @staticmethod
+    def get_radius_of_gyration(dataframe: NumPandasTraj):
+        pass
+
+    @staticmethod
+    def get_number_of_locations(dataframe: NumPandasTraj):
+        pass

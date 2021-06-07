@@ -306,6 +306,10 @@ class NumPandasTraj(DataFrame):
             raise MissingColumnsException("The Trajectory_ID column is not present in the DataFrame, please verify "
                                           "again.")
 
+    def __str__(self):
+        # TODO: Complete the trajectory information accessor when possible.
+        pass
+
     # ------------------------------- File and DF Operations ----------------------------- #
     # @classmethod
     # def read_csv(cls, filename):

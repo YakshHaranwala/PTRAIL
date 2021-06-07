@@ -224,3 +224,15 @@ class TemporalFeatures:
                 return f"No {traj_id} exists in the given data. Please try again."
             else:
                 return small.max() - small.min()
+
+    @staticmethod
+    def get_start_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
+        pass
+
+    @staticmethod
+    def get_end_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
+        pass
+
+    @staticmethod
+    def convert_timezone(dataframe: NumPandasTraj, from_timezone, target_timezone):
+        pass
