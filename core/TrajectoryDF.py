@@ -391,5 +391,21 @@ class NumPandasTraj(DataFrame):
         return self.reset_index().drop_duplicates(subset=[const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG],
                                                   keep='first')
 
-    def sort_by_traj_id_and_datetime(self):
-        pass
+    def sort_by_traj_id_and_datetime(self, ascending=True):
+        """
+            Sort the trajectory in Ascending or descending order based on the following 2
+            columns in order:
+                1. Trajectory ID
+                2. DateTime
+
+            Parameters
+            ----------
+                ascending: bool
+                    Whether to sort the values in ascending order or descending order.
+
+            Returns
+            -------
+                NumPandasTraj
+                    The sorted dataframe.
+        """
+        return self.sort_values([const.TRAJECTORY_ID, const.DateTime], ascending=ascending)

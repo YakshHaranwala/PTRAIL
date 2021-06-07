@@ -12,6 +12,7 @@
     @version 1.0
     @credits PyMove creators
 """
+import itertools
 import multiprocessing
 from typing import Optional, Text
 
@@ -227,7 +228,47 @@ class TemporalFeatures:
 
     @staticmethod
     def get_start_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
-        pass
+        """
+            Get the starting time of the trajectory.
+            NOTE: If the trajectory ID is not specified by the user, then by default,
+                  the starting times of all the trajectory IDs in the data are
+                  returned.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the operations are to be performed.
+                traj_id: Optional[Text]
+                    The trajectory for which the start time is required.
+
+            Returns
+            -------
+                pandas.DateTime:
+                    The start time of a single trajectory.
+                pandas.core.dataframe.DataFrame
+                    Pandas dataframe containing the start time of all the trajectories
+                    present in the data when the user hasn't asked for a particular
+                    trajectory's start time.
+        """
+        dataframe = dataframe.reset_index()
+        if traj_id is None:
+            # First, create a list containing all the ids of the data and then further divide that
+            # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+            ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
+            ids_ = [ids_[i: i+100] for i in range(0, len(ids_), 100)]
+
+            # Now, create a multiprocessing pool and then run processes in parallel
+            # which calculate the start times for a smaller set of IDs only.
+            mp_pool = multiprocessing.Pool(len(ids_))
+            results = mp_pool.starmap(Helpers._start_time_helper, zip(itertools.repeat(dataframe), ids_))
+
+            # Concatenate all the smaller dataframes and return the answer.
+            results = pd.concat(results).sort_values(const.DateTime)
+            return results
+        else:
+            filt = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
+            filt_two = filt.loc[filt[const.DateTime] == filt[const.DateTime].min()]
+            return filt_two[const.LAT].iloc[0], filt_two[const.LONG].iloc[0]
 
     @staticmethod
     def get_end_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):

@@ -389,8 +389,12 @@ class Helpers:
     @staticmethod
     def _start_location_helper(dataframe, ids_):
         """
-            Helper function for get_start_location(). It filters out the earliest(start) location of
-            every trajectory present in the list.
+            This function is the helper function of the get_start_location(). The get_start_location() function
+            delegates the task of calculating the start location of the trajectories in the dataframe because the
+            original functions runs multiple instances of this function in parallel. This function finds the start
+            location of the specified trajectory IDs the DF and then another returns dataframe containing start
+            latitude, start longitude and trajectory ID for each trajectory
+
 
             Parameter
             ---------
@@ -427,8 +431,11 @@ class Helpers:
     @staticmethod
     def _end_location_helper(dataframe, ids_):
         """
-            Helper function for get_end_location(). It filters out the last(end) location of
-            every trajectory present in the list.
+            This function is the helper function of the get_end_location(). The get_end_location() function
+            delegates the task of calculating the end location of the trajectories in the dataframe because the
+            original functions runs multiple instances of this function in parallel. This function finds the end
+            location of the specified trajectory IDs the DF and then another returns dataframe containing
+            end latitude, end longitude and trajectory ID for each trajectory
 
             Parameter
             ---------
@@ -461,3 +468,65 @@ class Helpers:
                                                                               2: const.TRAJECTORY_ID})
         # Return the dataframe by setting Trajectory id as index
         return df.set_index(const.TRAJECTORY_ID)
+
+    @staticmethod
+    def _start_time_helper(dataframe, ids_):
+        """
+            This function is the helper function of the get_start_time(). The get_start_time() function
+            delegates the task of calculating the end location of the trajectories in the dataframe because the
+            original functions runs multiple instances of this function in parallel. This function finds the start
+            time of the specified trajectory IDs the DF and then another returns dataframe containing
+            end latitude, end longitude, DateTime and trajectory ID for each trajectory
+
+            Parameter
+            ---------
+                dataframe: NumPandasTraj
+                    The dataframe of which the locations are to be found.dataframe
+                ids_: list
+                    List of trajectory ids for which the end locations are to be calculated
+
+            Returns
+            -------
+                pandas.core.dataframe.Dataframe
+                    New dataframe containing Trajectory ID as index and latitude and longitude
+                    as other 2 columns.
+        """
+        results = []
+
+        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
+        # and then further filter that dataframe according to the earliest(minimum) time.
+        # And then append the data of that latest time into a list.
+        for i in range(len(ids_)):
+            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
+                                  [const.DateTime, const.LAT, const.LONG]])
+            start_time = (filt.loc[filt[const.DateTime] == filt[const.DateTime].min()]).reset_index()
+            results.append([start_time[const.DateTime][0],  ids_[i]])
+
+        # Make a new dataframe containing Latitude Longitude and Trajectory id
+        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.DateTime,
+                                                                              1: const.TRAJECTORY_ID})
+        # Return the dataframe by setting Trajectory id as index
+        return df.set_index(const.DateTime)
+
+    @staticmethod
+    def _end_time_helper(dataframe, ids_):
+        """
+            This function is the helper function of the get_start_time(). The get_start_time() function
+            delegates the task of calculating the end location of the trajectories in the dataframe because the
+            original functions runs multiple instances of this function in parallel. This function finds the start
+            time of the specified trajectory IDs the DF and then another returns dataframe containing
+            end latitude, end longitude, DateTime and trajectory ID for each trajectory
+
+            Parameter
+            ---------
+                dataframe: NumPandasTraj
+                    The dataframe of which the locations are to be found.dataframe
+                ids_: list
+                    List of trajectory ids for which the end locations are to be calculated
+
+            Returns
+            -------
+                pandas.core.dataframe.Dataframe
+                    New dataframe containing Trajectory ID as index and latitude and longitude
+                    as other 2 columns.
+        """
