@@ -338,35 +338,6 @@ class NumPandasTraj(DataFrame):
             raise MissingColumnsException("The Trajectory_ID column is not present in the DataFrame, please verify "
                                           "again.")
 
-    def get_trajectory_by_traj_id(self, traj_id: Text):
-        """
-            Extract all the trajectory points of a particular trajectory specified
-            by the trajectory's ID.
-
-            Parameters
-            ----------
-                traj_id: Text
-                    The ID of the trajectory which is to be extracted.
-
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing all the trajectory points of the specified trajectory.
-
-            Raises
-            ------
-                MissingTrajIDException:
-                    This exception is raised when the Trajectory ID given by the user does not exist
-                    in the dataset.
-
-        """
-        to_return = self.reset_index().loc[self.reset_index()[const.TRAJECTORY_ID] == traj_id]
-        if len(to_return) > 0:
-            return to_return
-        else:
-            raise MissingTrajIDException(f"{traj_id} is not present in the dataset. "
-                                         f"Please check Trajectory ID and try again.")
-
     def __str__(self):
         return f"------------------------ Dataset Facts ------------------------------\n\n" \
                f"Number of unique Trajectories in the data: {self.traj_id.nunique()}\n" \
@@ -398,24 +369,6 @@ class NumPandasTraj(DataFrame):
                     dtypes of the DataFrame columns.
         """
         return self.reset_index(drop=False).to_numpy()
-
-    def remove_duplicates(self):
-        """
-            Drop duplicates based on the four following columns:
-                1. Trajectory ID
-                2. DateTime
-                3. Latitude
-                4. Longitude
-            Duplicates will be dropped only when all the values in the above mentioned
-            four columns are the same.
-
-            Returns
-            -------
-                NumPandasTraj
-                    The dataframe with dropped duplicates.
-        """
-        return self.reset_index().drop_duplicates(subset=[const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG],
-                                                  keep='first')
 
     def sort_by_traj_id_and_datetime(self, ascending=True):
         """
