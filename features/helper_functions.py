@@ -495,7 +495,7 @@ class Helpers:
 
         # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
         # and then further filter that dataframe according to the earliest(minimum) time.
-        # And then append the data of that latest time into a list.
+        # And then append the data of that earliest time into a list.
         for i in range(len(ids_)):
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
                                   [const.DateTime, const.LAT, const.LONG]])
@@ -530,3 +530,31 @@ class Helpers:
                     New dataframe containing Trajectory ID as index and latitude and longitude
                     as other 2 columns.
         """
+        results = []
+
+        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
+        # and then further filter that dataframe according to the latest(maximum) time.
+        # And then append the data of that latest time into a list.
+        for i in range(len(ids_)):
+            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
+                                  [const.DateTime, const.LAT, const.LONG]])
+            start_time = (filt.loc[filt[const.DateTime] == filt[const.DateTime].max()]).reset_index()
+            results.append([start_time[const.DateTime][0], ids_[i]])
+
+        # Make a new dataframe containing Latitude Longitude and Trajectory id
+        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.DateTime,
+                                                                              1: const.TRAJECTORY_ID})
+        # Return the dataframe by setting Trajectory id as index
+        return df.set_index(const.TRAJECTORY_ID)
+
+    @staticmethod
+    def _number_of_location_helper(dataframe, ids_):
+        results = []
+        for i in range(len(ids_)):
+            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
+                                  [const.DateTime, const.LAT, const.LONG]])
+            results.append([filt.groupby([const.LAT, const.LONG]).ngroups, ids_[i]])
+            
+        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: "Number of Unique Coordinates",
+                                                                              1: const.TRAJECTORY_ID})
+        return df.set_index(const.TRAJECTORY_ID)

@@ -306,51 +306,40 @@ class NumPandasTraj(DataFrame):
             raise MissingColumnsException("The Trajectory_ID column is not present in the DataFrame, please verify "
                                           "again.")
 
+    def get_trajectory_by_traj_id(self, traj_id: Text):
+        """
+            Extract all the trajectory points of a particular trajectory specified
+            by the trajectory's ID.
+
+            Parameters
+            ----------
+                traj_id: Text
+                    The ID of the trajectory which is to be extracted.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing all the trajectory points of the specified trajectory.
+
+            Raises
+            ------
+                MissingTrajIDException:
+                    This exception is raised when the Trajectory ID given by the user does not exist
+                    in the dataset.
+
+        """
+        to_return = self.reset_index().loc[self.reset_index()[const.TRAJECTORY_ID] == traj_id]
+        if len(to_return) > 0:
+            return to_return
+        else:
+            raise MissingTrajIDException(f"{traj_id} is not present in the dataset. "
+                                         f"Please check Trajectory ID and try again.")
+
     def __str__(self):
         # TODO: Complete the trajectory information accessor when possible.
         pass
 
     # ------------------------------- File and DF Operations ----------------------------- #
-    # @classmethod
-    # def read_csv(cls, filename):
-    #     """
-    #         Read the data from a csv file and then store the data in a DaskTrajectoryDF.
-    #         It is to be noted that the csv file provided must have the 4 mandatory columns
-    #         which are:
-    #             1. Latitude
-    #             2. Longitude
-    #             3. DateTime
-    #             4. traj_id
-    #
-    #         WARNING:
-    #         -------
-    #             Only use this function when the dataset meets the following conditions:
-    #                 1. Latitude is of the float format and does not contain directions like N, S.
-    #                    if it does, please first convert it to float direction with + and - signs.
-    #                 2. Longitude is of the float format and does not contain directions like N, S.
-    #                    if it does, please first convert it to float direction with + and - signs.
-    #                 3. DateTime are combined together.
-    #                 4. traj_id is present.
-    #
-    #             The above restrictions are in place because the library indexes the trajectory
-    #             by DateTime and Traj_ID. As a result, it needs to have the following 2 columns
-    #             proper.
-    #
-    #         Parameters
-    #         ----------
-    #             filename: The name of the csv file (provide full path).
-    #
-    #         Raises
-    #         ------
-    #             FileNotFoundError
-    #                 The file requested could not be found.
-    #     """
-    #     try:
-    #         dataframe = pandas.read_csv(filename, index_col=False)
-    #         return cls(data_set=dataframe, latitude=const.LAT, longitude=const.LONG,
-    #                              datetime=const.DateTime, traj_id=const.TRAJECTORY_ID)
-    #     except FileNotFoundError:
-    #         raise FileNotFoundError(f"Could not open the %s, please try again." % str(filename))
 
     def to_numpy(self, dtype=None, copy: bool = False, na_value=lib.no_default) -> np.ndarray:
         """
