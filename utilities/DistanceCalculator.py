@@ -69,7 +69,8 @@ class DistanceFormulaLog:
         y = math.cos(math.radians(lat2)) * math.sin(math.radians(lon2) - math.radians(lon1))
 
         x = (math.cos(math.radians(lat1)) * math.sin(math.radians(lat2))) - \
-            (math.sin(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.cos(math.radians(lon2) - math.radians(lon1)))
+            (math.sin(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.cos(
+                math.radians(lon2) - math.radians(lon1)))
 
         bearing = math.atan2(y, x)
 

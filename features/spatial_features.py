@@ -22,6 +22,7 @@ from core.TrajectoryDF import NumPandasTraj
 from features.helper_functions import Helpers as helpers
 from utilities import constants as const
 from utilities.DistanceCalculator import DistanceFormulaLog as calc
+from utilities.exceptions import *
 
 
 class SpatialFeatures:
@@ -80,7 +81,7 @@ class SpatialFeatures:
             # First, create a list containing all the ids of the data and then further divide that
             # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-            ids_ = [ids_[i: i+100] for i in range(0, len(ids_), 100)]
+            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
 
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the start locations for a smaller set of IDs only.
@@ -557,17 +558,84 @@ class SpatialFeatures:
             return dataframe
 
     @staticmethod
-    def get_trajectory_by_traj_id(dataframe: NumPandasTraj, traj_id: Text):
-        pass
+    def get_distance_travelled_by_traj_id(dataframe: NumPandasTraj, traj_id: Text):
+        """
+            Given a trajectory ID, calculate the total distance covered by the trajectory.
+            NOTE: The distance calculated is in metres.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe containing the entire dataset.
+                traj_id: Text
+                    The trajectory ID for which the distance covered is to be calculated.
+
+            Returns
+            -------
+                float
+                    The distance covered by the trajectory
+
+            Raises
+            ------
+                MissingTrajIDException
+                    The Trajectory ID given by the user is not present in the dataset.
+        """
+        # First, filter the dataframe and create a smaller dataframe containing only the
+        # trajectory points of the specified trajectory ID.
+        dataframe = dataframe.reset_index()
+        filtered_df = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
+
+        # Now, check if the smaller dataframe actually has anything because if the user-given
+        # trajectory ID is not present in the dataset, then an empty dataframe is returned and
+        # if so raise an exception.
+        if len(filtered_df) > 0:
+            # First, calculate the distance by calling the distance_between_consecutive_column() function
+            # and convert it into a numpy array and then sum the array using nansum() to make sure that
+            # NaN values are considered as zeros.
+            distances = SpatialFeatures.create_distance_between_consecutive_column(filtered_df)['Distance_prev_to_curr'].to_numpy()
+            return np.nansum(distances)
+        else:
+            raise MissingTrajIDException(f"The Trajectory ID '{traj_id}' is not present in the data."
+                                         f"Please check the Trajectory ID and try again.")
 
     @staticmethod
-    def get_distance_travelled_by_traj_id(dataframe: NumPandasTraj, traj_id: Text):
-        pass
+    def get_number_of_locations(dataframe: NumPandasTraj, traj_id: Text = None):
+        """
+            Get the number of unique coordinates in the dataframe specific to a trajectory ID.
+            NOTE: If no Trajectory ID is specified, then the number of unique locations in the
+                  entire dataset is calculated.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe of which the number of locations are to be computed
+                traj_id: Text
+                    The trajectory id for which the number of unique locations are to be found
+
+            Returns
+            -------
+                integer
+                    The number of unique locations in the dataframe/trajectory id.
+        """
+        dataframe = dataframe.reset_index()
+        if traj_id is None:
+            ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
+            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
+
+            # Now, create a multiprocessing pool and then run processes in parallel
+            # which calculate the end times for a smaller set of IDs only.
+            mp_pool = multiprocessing.Pool(len(ids_))
+            results = mp_pool.starmap(helpers._number_of_location_helper, zip(itertools.repeat(dataframe), ids_))
+
+            # Concatenate all the smaller dataframes and return the answer.
+            results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
+            return results
+
+        else:
+            filtered_df = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
+            return filtered_df.groupby([const.LAT, const.LONG]).ngroups
 
     @staticmethod
     def get_radius_of_gyration(dataframe: NumPandasTraj):
         pass
 
-    @staticmethod
-    def get_number_of_locations(dataframe: NumPandasTraj):
-        pass

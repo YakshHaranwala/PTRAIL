@@ -1,5 +1,4 @@
 from parser import ParserError
-from parser import ParserError
 from typing import Dict, List, Union, Optional, Text
 
 import numpy as np
@@ -14,7 +13,7 @@ from utilities.exceptions import *
 
 class NumPandasTraj(DataFrame):
     def __init__(self, data_set: Union[DataFrame, List, Dict], latitude: Text, longitude: Text, datetime: Text,
-                 traj_id: Text, rest_of_columns: Optional[List[Text]] = []):
+                 traj_id: Text, rest_of_columns: Optional[List[Text]] = None):
         """
             Construct a trajectory dataframe. Note that the mandatory columns in the dataset are:
             Note that the below mentioned columns also need their headers to be provided.
@@ -44,6 +43,7 @@ class NumPandasTraj(DataFrame):
         # Case-1: The data is from a dictionary.
         # Here, first check whether the data is in dictionary form and if it is so, then convert into
         # pandas DataFrame first.
+        rest_of_columns = [] if rest_of_columns is None else rest_of_columns
         column_list = [latitude, longitude, datetime, traj_id] + rest_of_columns
         if isinstance(data_set, dict):
             data_set = DataFrame.from_dict(data_set)
@@ -83,7 +83,16 @@ class NumPandasTraj(DataFrame):
 
             Parameters
             ----------
-                data: the dataframe whose column names are to be changed.
+                data: DataFrame
+                    The dataframe whose column names are to be changed.
+                lat: Text
+                    The header of the Latitude column.
+                lon: Text
+                    The header of the Longitude column.
+                datetime: Text
+                    The header of the DateTime column.
+                traj_id: Text
+                    The header of the Trajectory ID column.
 
             Returns
             -------
@@ -91,19 +100,19 @@ class NumPandasTraj(DataFrame):
                     The pandas dataframe containing the library default column headers.
         """
         cols = data.columns.to_list()  # List of all column names
-        # Iterate over the list of column names and check for keywords in the header to help renaming with appropriate
-        # terms.
+        # Iterate over the list of column names and check for keywords in the header
+        # to help renaming with appropriate terms.
         for i in range(len(cols)):
-            if lat in cols[i]:  # if 'lati' is in header change the header with latitude
+            if lat in cols[i]:
                 cols[i] = const.LAT
-            if lon in cols[i]:  # if 'longi' is in header change the header with longitude
+            if lon in cols[i]:
                 cols[i] = const.LONG
             if datetime in cols[i]:
                 cols[i] = const.DateTime
             if traj_id in cols[i]:
                 cols[i] = const.TRAJECTORY_ID
 
-        data = data.set_axis(cols, axis=1)
+        data = data.set_axis(cols, axis=1)  # Change all the column names to modified values.
         return data
 
     def validate_data_types(self, data: DataFrame):
@@ -119,10 +128,15 @@ class NumPandasTraj(DataFrame):
                 data: pd.DataFrame
                     This is the dataframe that contains the data that was passed in by the user.
                     The data is converted to pandas DF eventually in the import_data function anyway.
-            Returns
-            -------
-                bool
-                    A boolean value indicating whether all the data is of valid type or not.
+
+            Raises
+            ------
+                KeyError:
+                    Dataframe has one of the mandatory columns missing.
+                ParserError:
+                    The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
+                ValueError:
+                    One of the data-types cannot be converted.
         """
         try:
             if data.dtypes[const.LAT] != 'float64':
@@ -136,7 +150,7 @@ class NumPandasTraj(DataFrame):
         except KeyError:
             raise KeyError('dataframe missing one of lat, lon, datetime columns.')
         except ParserError:
-            raise ParserError('datetime column cannot be parsed')
+            raise ParserError('DateTime column cannot be parsed')
         except ValueError:
             raise ValueError('dtypes cannot be converted.')
 
@@ -154,6 +168,12 @@ class NumPandasTraj(DataFrame):
                 bool
                     Indicate whether or not all the columns that are mandatory are
                     present in the Data given by the user.
+
+            Raises
+            ------
+                MissingColumnsException
+                    One or more of the mandatory columns (Latitude, Longitude, DateTime, Traj_ID)
+                    are missing in the data.
         """
         try:
             if np.isin(const.LAT, data.columns) and \
@@ -166,6 +186,13 @@ class NumPandasTraj(DataFrame):
 
     def get_default_column_names(self, DateTime, traj_id, latitude, longitude) -> dict:
         """
+            Get a dictionary containing the key, value pairs of the library default column names
+            for the following columns:
+                1. Latitude
+                2. Longitude
+                3. DateTime
+                4. Trajectory ID
+
             Parameters
             ----------
                 DateTime: Text
@@ -218,6 +245,11 @@ class NumPandasTraj(DataFrame):
                 This must be used everytime after the reset_index is called
                 in order to set the index back to library default values as
                 it is necessary to perform various other functionalities.
+
+            Raises
+            ------
+                MissingColumnsException
+                    DateTime/traj_id column is missing from the dataset.
         """
         try:
             self.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
@@ -237,7 +269,7 @@ class NumPandasTraj(DataFrame):
 
             Raises
             ------
-                KeyError/ IndexError
+                MissingColumnsException
                     Latitude column is missing from the data.
         """
         try:
@@ -277,7 +309,7 @@ class NumPandasTraj(DataFrame):
 
             Raises
             ------
-                KeyError/ValueError
+                MissingColumnsException
                     DateTime column is missing from the data.
         """
         try:
@@ -297,7 +329,7 @@ class NumPandasTraj(DataFrame):
 
             Raises
             ------
-                KeyError/ValueError
+                MissingColumnsException
                     traj_id column is missing from the data.
         """
         try:
@@ -336,8 +368,13 @@ class NumPandasTraj(DataFrame):
                                          f"Please check Trajectory ID and try again.")
 
     def __str__(self):
-        # TODO: Complete the trajectory information accessor when possible.
-        pass
+        return f"------------------------ Dataset Facts ------------------------------\n\n" \
+               f"Number of unique Trajectories in the data: {self.traj_id.nunique()}\n" \
+               f"Number of points in the data: {len(self)}\n" \
+               f"Dataset time range: {self.datetime.max() - self.datetime.min()}\n" \
+               f"Datatype of the DataFrame: {type(self)}\n" \
+               f"Dataset Bounding Box: {(self.latitude.min(), self.longitude.min(), self.latitude.max(), self.longitude.max())}\n\n" \
+               f"---------------------------------------------------------------------"
 
     # ------------------------------- File and DF Operations ----------------------------- #
 

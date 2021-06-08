@@ -19,9 +19,13 @@ class DataTypeMismatchException(Exception):
     pass
 
 
-class NotAllowedError(Exception):
+class MandatoryColumnException(Exception):
     pass
 
 
-class MandatoryColumnException(Exception):
+class MissingTrajIDException(Exception):
+    pass
+
+
+class NotAllowedError(Exception):
     pass

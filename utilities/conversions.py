@@ -24,7 +24,8 @@ class Conversions:
             if col[longitude][-1:] == 'E':
                 col[longitude] = float(col[longitude][:-1])
             else:
-                col[longitude] = float(col[longitude][:-1]) * -1
+                col[longitude] = float(col[longitude][:-1]) * -1 + 360 if float(col[longitude][:-1]) * -1 < -180 \
+                    else float(col[longitude][:-1]) * -1
             return col
 
         return data.apply(decimal_degree_to_decimal, axis=1)

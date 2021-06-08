@@ -11,7 +11,6 @@ import numpy as np
 import pandas
 
 import utilities.constants as const
-import utilities.exceptions as exc
 from utilities.DistanceCalculator import DistanceFormulaLog as calc
 
 
@@ -500,13 +499,13 @@ class Helpers:
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
                                   [const.DateTime, const.LAT, const.LONG]])
             start_time = (filt.loc[filt[const.DateTime] == filt[const.DateTime].min()]).reset_index()
-            results.append([start_time[const.DateTime][0],  ids_[i]])
+            results.append([start_time[const.DateTime][0], ids_[i]])
 
         # Make a new dataframe containing Latitude Longitude and Trajectory id
         df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.DateTime,
                                                                               1: const.TRAJECTORY_ID})
         # Return the dataframe by setting Trajectory id as index
-        return df.set_index(const.DateTime)
+        return df.set_index(const.TRAJECTORY_ID)
 
     @staticmethod
     def _end_time_helper(dataframe, ids_):
