@@ -8,10 +8,6 @@
     @Version 1.0
 """
 
-from core.TrajectoryDF import NumPandasTraj as NumTrajDF
-import numpy as np
-import pandas as pd
-
 
 class Interpolate:
     @staticmethod
@@ -29,4 +25,3 @@ class Interpolate:
     @staticmethod
     def random_walk_interpolation(dataframe):
         pass
-

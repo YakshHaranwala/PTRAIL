@@ -79,9 +79,12 @@ class SpatialFeatures:
         dataframe = dataframe.copy().reset_index()
         if traj_id is None:
             # First, create a list containing all the ids of the data and then further divide that
-            # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+            # list items and split it into sub-lists of ids equal to split_factor.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
+
+            # Get the ideal number of IDs by which the dataframe is to be split.
+            split_factor = helpers._get_partition_size(len(ids_))
+            ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the start locations for a smaller set of IDs only.
@@ -89,7 +92,7 @@ class SpatialFeatures:
             results = mp_pool.starmap(helpers._start_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
-            results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
+            results = pd.concat(results)
             return results
 
         else:
@@ -123,9 +126,12 @@ class SpatialFeatures:
         dataframe = dataframe.copy().reset_index()
         if traj_id is None:
             # First, create a list containing all the ids of the data and then further divide that
-            # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+            # list items and split it into sub-lists of ids equal to split_factor.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
+
+            # Get the ideal number of IDs by which the dataframe is to be split.
+            split_factor = helpers._get_partition_size(len(ids_))
+            ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the end locations for a smaller set of IDs only.
@@ -133,7 +139,7 @@ class SpatialFeatures:
             results = mp_pool.starmap(helpers._end_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
-            results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
+            results = pd.concat(results)
             return results
         else:
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id, [const.DateTime, const.LAT, const.LONG]])
@@ -163,12 +169,22 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        chunks = []  # list for storing the smaller parts of the original dataframe.
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of ids equal to split_factor.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now, lets split the given dataframe into smaller pieces of 75000 rows each
-        # so that we can run parallel tasks on each smaller piece.
-        for i in range(0, len(dataframe), 75001):
-            chunks.append(dataframe.reset_index().loc[i: i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        chunks = []
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now, lets create a pool of processes which contains processes equal to the number
         # of smaller chunks and then run them in parallel so that we can calculate
@@ -199,17 +215,26 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        partitions = []  # List for storing the smaller partitions.
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of ids equal to split_factor.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now, lets partition the dataframe into smaller sets of 75000 rows each
-        # so that we can perform parallel calculations on it.
-        for i in range(0, len(dataframe), 75001):
-            partitions.append(dataframe.reset_index().loc[i:i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
-        pool = multiprocessing.Pool(len(partitions))
-        answer = pool.map(helpers._start_distance_helper, partitions)
+        pool = multiprocessing.Pool(len(df_chunks))
+        answer = pool.map(helpers._start_distance_helper, df_chunks)
 
         answer = pd.concat(answer)
         return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
@@ -278,17 +303,27 @@ class SpatialFeatures:
                     The dataframe containing the resultant column.
 
         """
-        dataframe_list = []  # List for storing the smaller partitions.
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of ids equal to split_factor.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now, lets partition the dataframe into smaller sets of 75000 rows each
-        # so that we can perform parallel calculations on it.
-        for i in range(0, len(dataframe), 75001):
-            dataframe_list.append(dataframe.reset_index().loc[i: i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
-        pool = multiprocessing.Pool(len(dataframe_list))
-        args = zip(dataframe_list, itertools.repeat(coordinates), itertools.repeat(dist_range))
+        pool = multiprocessing.Pool(len(df_chunks))
+        args = zip(df_chunks, itertools.repeat(coordinates), itertools.repeat(dist_range))
         result = pool.starmap(helpers._point_within_range_helper, args)
 
         # Now lets join all the smaller partitions and return the resultant dataframe
@@ -313,17 +348,27 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        part_list = []  # List for storing the smaller partitions.
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of ids equal to split_factor.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now, lets partition the dataframe into smaller sets of 75000 rows each
-        # so that we can perform parallel calculations on it.
-        for i in range(0, len(dataframe), 75001):
-            part_list.append(dataframe.reset_index().loc[i:i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
-        pool = multiprocessing.Pool(len(part_list))
-        answer = pool.starmap(helpers._given_point_distance_helper, zip(part_list, itertools.repeat(coordinates)))
+        pool = multiprocessing.Pool(len(df_chunks))
+        answer = pool.starmap(helpers._given_point_distance_helper, zip(df_chunks, itertools.repeat(coordinates)))
 
         # Now lets join all the smaller partitions and then add the Distance to the
         # specific point column.
@@ -469,19 +514,28 @@ class SpatialFeatures:
                 NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        dataframe_split_list = []  # A list for storing dataframe partitions.
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of ids equal to split_factor.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now, lets spilt the dataframe into smaller pieces of 75000 lines each.
-        # By doing so, we will be able to run calculation on all the smaller chunks
-        # in parallel.
-        for i in range(0, len(dataframe), 75001):
-            dataframe_split_list.append(dataframe.reset_index().loc[i:i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now lets create a Pool of processes which has number of processes equal
         # to the number of smaller pieces of data and then lets run them all in
         # parallel.
-        multi_pool = multiprocessing.Pool(len(dataframe_split_list))
-        result = multi_pool.map(helpers._bearing_helper, dataframe_split_list)
+        multi_pool = multiprocessing.Pool(len(df_chunks))
+        result = multi_pool.map(helpers._bearing_helper, df_chunks)
 
         # Now, lets concat the results and then return the dataframe.
         result = pd.concat(result)
@@ -592,7 +646,8 @@ class SpatialFeatures:
             # First, calculate the distance by calling the distance_between_consecutive_column() function
             # and convert it into a numpy array and then sum the array using nansum() to make sure that
             # NaN values are considered as zeros.
-            distances = SpatialFeatures.create_distance_between_consecutive_column(filtered_df)['Distance_prev_to_curr'].to_numpy()
+            distances = SpatialFeatures.create_distance_between_consecutive_column(filtered_df)[
+                'Distance_prev_to_curr'].to_numpy()
             return np.nansum(distances)
         else:
             raise MissingTrajIDException(f"The Trajectory ID '{traj_id}' is not present in the data."
@@ -620,7 +675,9 @@ class SpatialFeatures:
         dataframe = dataframe.reset_index()
         if traj_id is None:
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
+            # Get the ideal number of IDs by which the dataframe is to be split.
+            split_factor = helpers._get_partition_size(len(ids_))
+            ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the end times for a smaller set of IDs only.
@@ -628,7 +685,7 @@ class SpatialFeatures:
             results = mp_pool.starmap(helpers._number_of_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
-            results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
+            results = pd.concat(results)
             return results
 
         else:
@@ -638,4 +695,3 @@ class SpatialFeatures:
     @staticmethod
     def get_radius_of_gyration(dataframe: NumPandasTraj):
         pass
-

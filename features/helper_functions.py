@@ -6,9 +6,12 @@
              only as helpers. For calculation of features, use the ones in the
              features package.
 """
+import os
+
 import numpy
 import numpy as np
 import pandas
+import psutil
 
 import utilities.constants as const
 from utilities.DistanceCalculator import DistanceFormulaLog as calc
@@ -557,3 +560,32 @@ class Helpers:
         df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: "Number of Unique Coordinates",
                                                                               1: const.TRAJECTORY_ID})
         return df.set_index(const.TRAJECTORY_ID)
+
+    @staticmethod
+    def _get_partition_size(size):
+        """
+            Takes number of ids and makes use of a formula that gives a factor to makes set of ids
+            according to the number of processors available to work with.
+
+            Parameters
+            ----------
+                size: int
+                    The total number of trajectory IDs in the dataset.
+
+            Returns
+            -------
+                int
+                    The factor by which the datasets are to be split.
+        """
+        available_cpus = len(os.sched_getaffinity(0))   # Number of available CPUs.
+
+        # Integer divide the total number of Trajectory IDs by the number of available CPUs
+        # and square the number because if too many partitions are made, then it does more
+        # harm than good for the execution speed. The factor of 1 is added to avoid errors
+        # when the integer division yields a 0.
+        factor = ((size//available_cpus)**2) + 1
+
+        # Return the factor if it is less than 100 otherwise return 100.
+        # This factor hence is capped at 100.
+        return factor if factor < 100 else 100
+

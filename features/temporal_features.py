@@ -16,6 +16,7 @@ import itertools
 import multiprocessing
 from typing import Optional, Text
 
+import numpy as np
 import pandas as pd
 
 from core.TrajectoryDF import NumPandasTraj
@@ -24,37 +25,37 @@ from utilities import constants as const
 
 
 class TemporalFeatures:
-    @staticmethod
-    def create_date_column(dataframe: NumPandasTraj):
-        """
-            Create a Date column in the dataframe given.
-
-            Parameters
-            ----------
-                dataframe: core.TrajectoryDF.NumPandasTraj
-                    The NumPandasTraj on which the creation of date column is to be done.
-
-            Returns
-            -------
-                core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant column.
-        """
-        # Split the entire data set into chunks of 75000 rows each
-        # so that we can work on each separate part in parallel.
-        split_list = []
-        for i in range(0, len(dataframe), 75000):
-            split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 75000])
-
-        method_pool = multiprocessing.Pool(len(split_list))  # Create a pool of processes.
-
-        # Now run the date helper method in parallel with the dataframes in split_list
-        # and the new dataframes with date columns are stored in the variable result which is of type Mapper.
-        result = method_pool.map(helpers._date_helper, split_list)
-
-        ans = pd.concat(result)  # Merge all the smaller chunks together.
-
-        # Now depending on the value of inplace, return the required data structure.
-        return NumPandasTraj(ans, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+    # @staticmethod
+    # def create_date_column_alt(dataframe: NumPandasTraj):
+    #     """
+    #         Create a Date column in the dataframe given.
+    #
+    #         Parameters
+    #         ----------
+    #             dataframe: core.TrajectoryDF.NumPandasTraj
+    #                 The NumPandasTraj on which the creation of date column is to be done.
+    #
+    #         Returns
+    #         -------
+    #             core.TrajectoryDF.NumPandasTraj
+    #                 The dataframe containing the resultant column.
+    #     """
+    #     # Split the entire data set into chunks of 100000 rows each
+    #     # so that we can work on each separate part in parallel.
+    #     split_list = []
+    #     for i in range(0, len(dataframe), 100001):
+    #         split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 100000])
+    #
+    #     method_pool = multiprocessing.Pool(len(split_list))  # Create a pool of processes.
+    #
+    #     # Now run the date helper method in parallel with the dataframes in split_list
+    #     # and the new dataframes with date columns are stored in the variable result which is of type Mapper.
+    #     result = method_pool.map(helpers._date_helper, split_list)
+    #
+    #     ans = pd.concat(result)  # Merge all the smaller chunks together.
+    #
+    #     # Now depending on the value of inplace, return the required data structure.
+    #     return NumPandasTraj(ans, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_time_column(dataframe: NumPandasTraj):
@@ -111,12 +112,22 @@ class TemporalFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        chunk_list = []  # A list for storing the split dataframes.
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now lets split the entire dataframe into chunks of 75000 row each so that
-        # we can run the calculations on each smaller chunk in parallel.
-        for i in range(0, len(dataframe), 75000):
-            chunk_list.append(dataframe.reset_index(drop=False).loc[i:i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now lets create a pool of processes which will then create processes equal to
         # the number of smaller chunks of the original dataframe and will calculate
@@ -144,12 +155,22 @@ class TemporalFeatures:
                     The dataframe containing the resultant column if inplace.
 
         """
-        parts = []
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now lets split the entire dataframe into chunks of 75000 row each so that
-        # we can run the calculations on each smaller chunk in parallel.
-        for i in range(0, len(dataframe), 75000):
-            parts.append(dataframe.reset_index(drop=False).loc[i:i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.
@@ -179,12 +200,22 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        divisions = []
+        df = dataframe.reset_index()
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
+        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
-        # Now lets split the entire dataframe into chunks of 75000 row each so that
-        # we can run the calculations on each smaller chunk in parallel.
-        for i in range(0, len(dataframe), 75000):
-            divisions.append(dataframe.reset_index(drop=False).loc[i:i + 75000])
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.
@@ -255,7 +286,10 @@ class TemporalFeatures:
             # First, create a list containing all the ids of the data and then further divide that
             # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
+
+            # Get the ideal number of IDs by which the dataframe is to be split.
+            split_factor = helpers._get_partition_size(len(ids_))
+            ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the start times for a smaller set of IDs only.
@@ -299,7 +333,10 @@ class TemporalFeatures:
             # First, create a list containing all the ids of the data and then further divide that
             # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-            ids_ = [ids_[i: i + 100] for i in range(0, len(ids_), 100)]
+
+            # Get the ideal number of IDs by which the dataframe is to be split.
+            split_factor = helpers._get_partition_size(len(ids_))
+            ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the end times for a smaller set of IDs only.

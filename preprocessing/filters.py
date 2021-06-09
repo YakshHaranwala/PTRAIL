@@ -10,7 +10,6 @@
 import math
 from typing import Text, Optional
 
-from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 import utilities.constants as const
 from utilities.exceptions import *
 
@@ -92,7 +91,7 @@ class Filters:
             ----------
                 https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html
         """
-        lat, lon = math.radians(lat), math.radians(lon)     #Convert latitude, longitude to radians.
+        lat, lon = math.radians(lat), math.radians(lon)  # Convert latitude, longitude to radians.
 
         # Calculate the delta factor for the latitudes and then
         # find the minimum and maximum latitudes.
@@ -155,7 +154,7 @@ class Filters:
         pass
 
     @staticmethod
-    def remove_short_and_trajectories_with_few_points(dataframe,  min_dist: float, num_min_points: Optional[int] = 2):
+    def remove_short_and_trajectories_with_few_points(dataframe, min_dist: float, num_min_points: Optional[int] = 2):
         pass
 
     @staticmethod
