@@ -58,6 +58,44 @@ class TemporalFeatures:
     #     return NumPandasTraj(ans, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
+    def create_date_column(dataframe: NumPandasTraj):
+        """
+            From the DateTime column already present in the data, extract only the time
+            and then add another column containing just the time.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The DaskTrajectoryDF on which the creation of the time column is to be done.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant column.
+
+        """
+        df_split_list = []  # A list for storing the split dataframes.
+
+        # Now, we are going to split the dataframes into chunks of 75000 rows each.
+        # This is done in order to create processes later and then feed each process
+        # a separate dataframe and calculate the results in parallel.
+        for i in range(0, len(dataframe), 75000):
+            df_split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 75000])
+
+        # Now, create a pool of processes which has a number of processes
+        # equal to the number of smaller chunks of the original dataframe.
+        # Then, calculate the result on each separate part in parallel and store it in
+        # the result variable which is of type Mapper.
+        pool = multiprocessing.Pool(len(df_split_list))
+        result = pool.map(helpers._date_helper, df_split_list)
+
+        time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
+
+        # Now check whether the user wants the result applied to the original dataframe or
+        # wants a separate new dataframe. If the user wants a separate new dataframe, then
+        # a pandas dataframe is returned instead of NumTrajectoryDF.
+        return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+
+    @staticmethod
     def create_time_column(dataframe: NumPandasTraj):
         """
             From the DateTime column already present in the data, extract only the time
@@ -132,8 +170,8 @@ class TemporalFeatures:
         # Now lets create a pool of processes which will then create processes equal to
         # the number of smaller chunks of the original dataframe and will calculate
         # the result on each of the smaller chunk.
-        pool_of_processes = multiprocessing.Pool(len(chunk_list))
-        results = pool_of_processes.map(helpers._day_of_week_helper, chunk_list)
+        pool_of_processes = multiprocessing.Pool(len(df_chunks))
+        results = pool_of_processes.map(helpers._day_of_week_helper, df_chunks)
 
         final_df = pd.concat(results)
         return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
@@ -174,8 +212,8 @@ class TemporalFeatures:
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.
-        mp_pool = multiprocessing.Pool(len(parts))
-        results = mp_pool.map(helpers._weekend_helper, parts)
+        mp_pool = multiprocessing.Pool(len(df_chunks))
+        results = mp_pool.map(helpers._weekend_helper, df_chunks)
 
         # Now, lets merge all the smaller parts together and then return the results based on
         # the value of the inplace parameter.
@@ -219,8 +257,8 @@ class TemporalFeatures:
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.
-        multi_pool = multiprocessing.Pool(len(divisions))
-        results = multi_pool.map(helpers._time_of_day_helper, divisions)
+        multi_pool = multiprocessing.Pool(len(df_chunks))
+        results = multi_pool.map(helpers._time_of_day_helper, df_chunks)
 
         # Now, lets merge all the smaller parts together and then return the results based on
         # the value of the inplace parameter.
