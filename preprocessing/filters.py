@@ -10,8 +10,11 @@
 import math
 from typing import Text, Optional
 
+import numpy as np
+
 import utilities.constants as const
 from utilities.exceptions import *
+from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 
 
 class Filters:
@@ -96,22 +99,47 @@ class Filters:
         # Calculate the delta factor for the latitudes and then
         # find the minimum and maximum latitudes.
         latitude_delta = radius / (const.RADIUS_OF_EARTH * 1000)
-        lat_one = lat - latitude_delta
-        lat_two = lat + latitude_delta
+        lat_one = math.degrees(lat - latitude_delta)
+        lat_two = math.degrees(lat + latitude_delta)
 
         # Calculate the delta factor for the longitudes and then
         # find the minimum and maximum longitudes.
         longitude_delta = math.asin((math.sin(latitude_delta)) / math.cos(lat))
-        lon_one = lon - longitude_delta
-        lon_two = lon + longitude_delta
-
+        lon_one = math.degrees(lon - longitude_delta)
+        lon_two = math.degrees(lon + longitude_delta)
         # Return the bounding box.
         return (lat_one, lon_one,
                 lat_two, lon_two)
 
     @staticmethod
-    def filter_by_bounding_box(dataframe, bounding_box: tuple, inside: bool = True):
-        pass
+    def filter_by_bounding_box(dataframe: NumTrajDF, bounding_box: tuple, inside: bool = True):
+        """
+            Given a bounding box, filter out all the points that are within/outside
+            the bounding box and return a dataframe containing the filtered points.
+
+            Parameters
+            ----------
+                dataframe: NumTrajDF
+                    The dataframe from which the data is to be filtered out.
+                bounding_box: tuple
+                    The bounding box which is to be used to filter the data.
+                inside: bool
+                    Indicate whether the data outside the bounding box is required
+                    or the data inside it.
+
+            Returns
+            -------
+                NumPandasTraj
+                    The filtered dataframe.
+        """
+        filt = (
+                (dataframe[const.LAT] >= bounding_box[0])
+                & (dataframe[const.LONG] >= bounding_box[1])
+                & (dataframe[const.LAT] <= bounding_box[2])
+                & (dataframe[const.LONG] <= bounding_box[3])
+        )
+        df = dataframe.loc[filt] if inside else dataframe.loc[~filt]
+        return NumTrajDF(df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def filter_by_date(dataframe, date: Text):
