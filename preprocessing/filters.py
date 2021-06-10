@@ -402,7 +402,44 @@ class Filters:
 
     @staticmethod
     def filter_by_max_consecutive_distance(dataframe, max_distance: float):
-        pass
+        """
+            Remove the points that have a distance between 2 consecutive points
+            greater than a user specified value.
+            NOTE: max_distance is given in metres.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe which is to be filtered.
+                max_distance: float
+                    The consecutive distance threshold above which the points are to
+                    be removed.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    The filtered dataframe.
+
+            Raises
+            ------
+                KeyError:
+                    The column 'Distance_prev_to_curr' is not present in the dataframe.
+
+                """
+        try:
+            dataframe = dataframe.reset_index()
+            # Filter out all the values greater than the maximum consecutive distance.
+            # The NaNs are filled with max_distance+1 to avoid data loss as well as
+            # to avoid false positives in calculation and comparison.
+            filt = dataframe['Distance_prev_to_curr'].fillna(max_distance + 1) <= max_distance
+            filtered_df = dataframe.loc[filt]
+
+            # Convert the smaller dataframe back to NumPandasTraj and return it.
+            return NumTrajDF(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        except KeyError:
+            raise MissingColumnsException(f"The column 'Distance_prev_to_curr is not present in the dataset. "
+                                          f"Please run the function create_distance_between_consecutive_column() before"
+                                          f" running this filter.")
 
     @staticmethod
     def filter_by_max_distance_and_speed(dataframe, max_distance: float, max_speed: float):
