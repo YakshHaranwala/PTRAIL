@@ -179,7 +179,7 @@ class Filters:
         """
         try:
             # Reset Index and create a variable for storing filtered DataFrame.
-            dataframe.reset_index(inplace=True)
+            dataframe = dataframe.reset_index()
             filtered_df = None
 
             # Convert the user-given string dates to pandas datetime format.
@@ -209,7 +209,7 @@ class Filters:
                     raise ValueError(f"End Date should be later than Start Date.")
                 else:
                     filt = np.logical_and(dataframe['Date'] >= start_date, dataframe['Date'] <= end_date)
-                    filtered_df = dataframe.loc[filt]
+                    filtered_df = dataframe.loc[filt].reset_index()
 
             # Convert the smaller dataframe back to NumPandasTraj and return it.
             return NumTrajDF(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
@@ -249,7 +249,7 @@ class Filters:
                     The filtered dataframe containing the resultant data.
         """
         # Reset Index and create a variable for storing filtered DataFrame.
-        dataframe.reset_index(inplace=True)
+        dataframe = dataframe.reset_index()
         filtered_df = None
 
         # Convert the user-given string datetime to pandas datetime format.
@@ -280,7 +280,7 @@ class Filters:
             else:
                 filt = np.logical_and(dataframe[const.DateTime] >= start_dateTime,
                                       dataframe[const.DateTime] <= end_dateTime)
-                filtered_df = dataframe.loc[filt]
+                filtered_df = dataframe.loc[filt].reset_index()
 
         # Convert the smaller dataframe back to NumPandasTraj and return it.
         return NumTrajDF(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
@@ -313,7 +313,7 @@ class Filters:
             # The NaNs are filled with max_speed+1 to avoid data loss as well as
             # to avoid false positives in calculation and comparison.
             filt = dataframe['Speed_prev_to_curr'].fillna(max_speed + 1) <= max_speed
-            filtered_df = dataframe.loc[filt]
+            filtered_df = dataframe.loc[filt].reset_index(drop=True)
 
             # Convert the smaller dataframe back to NumPandasTraj and return it.
             return NumTrajDF(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
@@ -350,7 +350,7 @@ class Filters:
             # The NaNs are filled with min_speed-1 to avoid data loss as well as
             # to avoid false positives in calculation and comparison.
             filt = dataframe['Speed_prev_to_curr'].fillna(min_speed - 1) >= min_speed
-            filtered_df = dataframe.loc[filt]
+            filtered_df = dataframe.loc[filt].reset_index()
 
             # Convert the smaller dataframe back to NumPandasTraj and return it.
             return NumTrajDF(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
@@ -391,7 +391,7 @@ class Filters:
             # The NaNs are filled with min_distance-1 to avoid data loss as well as
             # to avoid false positives in calculation and comparison.
             filt = dataframe['Distance_prev_to_curr'].fillna(min_distance - 1) >= min_distance
-            filtered_df = dataframe.loc[filt]
+            filtered_df = dataframe.loc[filt].reset_index(drop=True)
 
             # Convert the smaller dataframe back to NumPandasTraj and return it.
             return NumTrajDF(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
@@ -469,11 +469,52 @@ class Filters:
             # filtered_df = Filters.filter_by_max_speed(filt, max_speed)
 
             # Filter the dataframe based on maximum distance and speed.
-            filt = np.logical_and(dataframe['Distance_prev_to_curr'] <= max_distance,
-                                  dataframe['Speed_prev_to_curr'] <= max_speed)
+            filt = np.logical_and(dataframe['Distance_prev_to_curr'].fillna(max_distance + 1) <= max_distance,
+                                  dataframe['Speed_prev_to_curr'].fillna(max_speed + 1) <= max_speed)
             filtered_df = dataframe.loc[filt]
 
             return filtered_df      # Return the df filtered on the basis of 2 constraints.
+        except KeyError:
+            # The system asks the user to only run create_speed_from_prev_column() function because
+            # running create_speed_from_prev_column() function create the 'Distance_prev_to_curr'
+            # function automatically if the column is already not present.
+            raise MissingColumnsException(f"Either of the columns 'Distance_prev_to_curr' or 'Speed_prev_to_curr'"
+                                          f"are missing in the dataset. Please run the function "
+                                          f"create_speed_from_prev_column() first before running the function.")
+
+    @staticmethod
+    def filter_by_min_distance_and_speed(dataframe, min_distance: float, min_speed: float):
+        """
+            Filter out values that have distance between consecutive points lesser
+            than a user-given distance speed between consecutive points lesser than
+            a user-given speed.
+            NOTE: The min_distance is given in metres
+            NOTE: The min_speed is given in metres/second (m/s).
+
+            Parameters
+            ----------
+            dataframe: NumPandasTraj
+                The dataframe which is to be filtered.
+            min_distance: float
+                The minimum distance between 2 consecutive points.
+            min_speed: float
+                The minimum speed between 2 consecutive points.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    The filtered dataframe.
+        """
+        try:
+            # filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)
+            # filtered_df = Filters.filter_by_max_speed(filt, max_speed)
+
+            # Filter the dataframe based on minimum distance and speed.
+            filt = np.logical_and(dataframe['Distance_prev_to_curr'] >= min_distance,
+                                  dataframe['Speed_prev_to_curr'] >= min_speed)
+            filtered_df = dataframe.loc[filt]
+
+            return filtered_df  # Return the df filtered on the basis of 2 constraints.
         except KeyError:
             # The system asks the user to only run create_speed_from_prev_column() function because
             # running create_speed_from_prev_column() function create the 'Distance_prev_to_curr'
