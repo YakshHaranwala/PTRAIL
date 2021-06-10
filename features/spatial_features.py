@@ -78,10 +78,7 @@ class SpatialFeatures:
         # location of that point.
         dataframe = dataframe.copy().reset_index()
         if traj_id is None:
-            # First, create a list containing all the ids of the data and then further divide that
-            # list items and split it into sub-lists of ids equal to split_factor.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
             # Get the ideal number of IDs by which the dataframe is to be split.
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
@@ -125,10 +122,7 @@ class SpatialFeatures:
         # location of that point.
         dataframe = dataframe.copy().reset_index()
         if traj_id is None:
-            # First, create a list containing all the ids of the data and then further divide that
-            # list items and split it into sub-lists of ids equal to split_factor.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
             # Get the ideal number of IDs by which the dataframe is to be split.
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
@@ -169,28 +163,15 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        chunks = []
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now, lets create a pool of processes which contains processes equal to the number
         # of smaller chunks and then run them in parallel so that we can calculate
         # the distance for each smaller chunk and then merge all of them together.
-        multi_pool = multiprocessing.Pool(len(chunks))
-        result = multi_pool.map(helpers._consecutive_distance_helper, chunks)
+        multi_pool = multiprocessing.Pool(len(df_chunks))
+        result = multi_pool.map(helpers._consecutive_distance_helper, df_chunks)
 
         # Now lets, merge the smaller pieces and then return the dataframe
         result = pd.concat(result)
@@ -215,21 +196,9 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        df_chunks = []
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
@@ -303,22 +272,9 @@ class SpatialFeatures:
                     The dataframe containing the resultant column.
 
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        df_chunks = []
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
@@ -348,22 +304,9 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        df_chunks = []
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
@@ -514,22 +457,9 @@ class SpatialFeatures:
                 NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        df_chunks = []
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now lets create a Pool of processes which has number of processes equal
         # to the number of smaller pieces of data and then lets run them all in

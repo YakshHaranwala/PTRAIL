@@ -111,20 +111,16 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        df_split_list = []  # A list for storing the split dataframes.
-
-        # Now, we are going to split the dataframes into chunks of 75000 rows each.
-        # This is done in order to create processes later and then feed each process
-        # a separate dataframe and calculate the results in parallel.
-        for i in range(0, len(dataframe), 75000):
-            df_split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 75000])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now, create a pool of processes which has a number of processes
         # equal to the number of smaller chunks of the original dataframe.
         # Then, calculate the result on each separate part in parallel and store it in
         # the result variable which is of type Mapper.
-        pool = multiprocessing.Pool(len(df_split_list))
-        result = pool.map(helpers._time_helper, df_split_list)
+        pool = multiprocessing.Pool(len(df_chunks))
+        result = pool.map(helpers._time_helper, df_chunks)
 
         time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
 
@@ -150,22 +146,9 @@ class TemporalFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        df_chunks = []
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now lets create a pool of processes which will then create processes equal to
         # the number of smaller chunks of the original dataframe and will calculate
@@ -193,22 +176,9 @@ class TemporalFeatures:
                     The dataframe containing the resultant column if inplace.
 
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        df_chunks = []
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.
@@ -238,22 +208,9 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        df = dataframe.reset_index()
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
-        ids_ = df[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = helpers._get_partition_size(len(ids_))
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        df_chunks = []
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(df.loc[df[const.TRAJECTORY_ID].isin(ids_[i])])
+        dataframe = dataframe.reset_index()
+        # splitting the dataframe according to trajectory ids
+        df_chunks = helpers._df_split_helper(dataframe)
 
         # Now lets create a pool of processes and run the weekend calculator function
         # on all the smaller parts of the original dataframe and store their results.

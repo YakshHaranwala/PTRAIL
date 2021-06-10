@@ -11,6 +11,7 @@ import os
 import numpy
 import numpy as np
 import pandas
+import pandas as pd
 import psutil
 
 import utilities.constants as const
@@ -48,7 +49,7 @@ class Helpers:
         for i in range(len(gen)):
             gen[i] = gen[i][1].strftime(date_format)
 
-        dataframe['Date'] = gen  # Assign the date column to the dataframe.
+        dataframe['Date'] = pd.to_datetime(gen)
         return dataframe  # Return the dataframe with the date column inside it.
 
     @staticmethod
@@ -81,7 +82,7 @@ class Helpers:
         for i in range(len(datetime)):
             datetime[i] = datetime[i][1].strftime(time_format)
 
-        dataframe['Time'] = datetime
+        dataframe['Time'] = pd.to_datetime(datetime)
         return dataframe
 
     @staticmethod
@@ -221,7 +222,7 @@ class Helpers:
                 distances[i + 1] = np.NAN
 
         # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
-        dataframe['Distance_prev_to_curr'] = distances
+        dataframe['Distance_prev_to_curr'] = distances.astype('float64')
         return dataframe
 
     @staticmethod
@@ -589,3 +590,21 @@ class Helpers:
         # This factor hence is capped at 100.
         return factor if factor < 100 else 100
 
+    @staticmethod
+    def _df_split_helper(dataframe):
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of ids equal to split_factor.
+        ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
+
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = Helpers._get_partition_size(len(ids_))
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        df_chunks = []
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        for i in range(len(ids_)):
+            df_chunks.append(dataframe.loc[dataframe[const.TRAJECTORY_ID].isin(ids_[i])])
+
+        return df_chunks
