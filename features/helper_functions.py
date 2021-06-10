@@ -578,7 +578,8 @@ class Helpers:
                 int
                     The factor by which the datasets are to be split.
         """
-        available_cpus = len(os.sched_getaffinity(0))   # Number of available CPUs.
+        available_cpus = len(os.sched_getaffinity(0)) if os.name == 'posix' \
+            else psutil.cpu_count()     # Number of available CPUs.
 
         # Integer divide the total number of Trajectory IDs by the number of available CPUs
         # and square the number because if too many partitions are made, then it does more
