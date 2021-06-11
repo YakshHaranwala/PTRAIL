@@ -201,6 +201,7 @@ class Helpers:
                     pandas.core.dataframe
                         The dataframe containing the resultant Distance_prev_to_curr column.
         """
+
         # First, lets fetch the latitude and longitude columns from the dataset and store it
         # in a numpy array.
         traj_ids = np.array(dataframe.reset_index()[const.TRAJECTORY_ID])
@@ -222,7 +223,7 @@ class Helpers:
                 distances[i + 1] = np.NAN
 
         # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
-        dataframe['Distance_prev_to_curr'] = distances.astype('float64')
+        dataframe['Distance_prev_to_curr'] = distances
         return dataframe
 
     @staticmethod

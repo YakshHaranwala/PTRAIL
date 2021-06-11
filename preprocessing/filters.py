@@ -12,6 +12,7 @@ from typing import Text, Optional
 
 import numpy as np
 import pandas as pd
+import scipy.stats as stat
 
 import utilities.constants as const
 from utilities.exceptions import *
@@ -473,7 +474,7 @@ class Filters:
                                   dataframe['Speed_prev_to_curr'].fillna(max_speed + 1) <= max_speed)
             filtered_df = dataframe.loc[filt]
 
-            return filtered_df      # Return the df filtered on the basis of 2 constraints.
+            return filtered_df  # Return the df filtered on the basis of 2 constraints.
         except KeyError:
             # The system asks the user to only run create_speed_from_prev_column() function because
             # running create_speed_from_prev_column() function create the 'Distance_prev_to_curr'
@@ -514,7 +515,8 @@ class Filters:
                                   dataframe['Speed_prev_to_curr'] >= min_speed)
             filtered_df = dataframe.loc[filt]
 
-            return filtered_df  # Return the df filtered on the basis of 2 constraints.
+            # Return the df filtered on the basis of 2 constraints.
+            return filtered_df
         except KeyError:
             # The system asks the user to only run create_speed_from_prev_column() function because
             # running create_speed_from_prev_column() function create the 'Distance_prev_to_curr'
@@ -524,12 +526,132 @@ class Filters:
                                           f"create_speed_from_prev_column() first before running the function.")
 
     @staticmethod
-    def filter_outliers_by_consecutive_distance(dataframe):
-        pass
+    def filter_outliers_by_consecutive_distance(dataframe: NumTrajDF):
+        """
+            Check the outlier points based on distance between 2 consecutive points.
+            Outlier formula:
+                Lower outlier = Q1 - (1.5*IQR)
+                Higher outlier = Q3 + (1.5*IQR)
+
+                IQR = Inter quartile range = Q3 - Q1
+            We need to find points between lower and higher outlier
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe which is to be filtered.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe which has been filtered.
+
+            Raises
+            ------
+                KeyError:
+                    The column 'Distance_prev_to_curr' is not present in the dataset.
+        """
+        try:
+            # Find the lower and higher quantile first along with the inter-quantile range.
+            dataframe = dataframe.reset_index()
+            q_low = dataframe['Distance_prev_to_curr'].quantile(0.25)
+            q_high = dataframe['Distance_prev_to_curr'].quantile(0.75)
+            iqr = q_high - q_low
+            cut_off = iqr * 1.5     # Cut off value.
+
+            # Now, find the upper limit and the lower limit for the data.
+            lower = q_low - cut_off
+            higher = q_high + cut_off
+
+            # Filter out the dataframe based on the range calculated and return it.
+            df_filt = np.logical_and(dataframe['Distance_prev_to_curr'] > lower,
+                                     dataframe['Distance_prev_to_curr'] < higher)
+
+            filtered_df = dataframe.loc[df_filt]
+            return NumTrajDF(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+
+        except KeyError:
+            raise MissingColumnsException(f"The column 'Distance_prev_to_curr' is missing in the dataset. "
+                                          f"Please run the function create_distance_between_consecutive_column() "
+                                          f"before running this filter.")
+
+    # @staticmethod
+    # def filter_outliers_by_consecutive_distance_using_zscore(dataframe: NumTrajDF):
+    #     """
+    #         Check the outlier points based on distance between 2 consecutive points.
+    #         Outlier means the points which have z-score greater than |3|. The z-score
+    #         is calculated as follows:
+    #                 z = (x - average) / standard_deviation
+    #         Outliers are those points that have the absolute value of z-score larger
+    #         than 3.
+    #
+    #         Parameters
+    #         ----------
+    #             dataframe: NumPandasTraj
+    #                 The dataframe which is to be filtered.
+    #
+    #         Returns
+    #         -------
+    #             NumPandasTraj:
+    #                 The dataframe which has been filtered.
+    #
+    #         Raises
+    #         ------
+    #             KeyError:
+    #                 The column 'Distance_prev_to_curr' is not present in the dataset.
+    #     """
+    #     try:
+    #         filt = np.abs(stat.zscore(dataframe['Distance_prev_to_curr'], nan_policy='omit') < 3)
+    #         dataframe = dataframe.loc[filt]
+    #         return dataframe
+    #     except KeyError:
+    #         raise MissingColumnsException(f"The column 'Distance_prev_to_curr' is missing in the dataset. "
+    #                                       f"Please run the function create_distance_between_consecutive_column() "
+    #                                       f"before running this filter.")
 
     @staticmethod
     def filter_outliers_by_consecutive_speed(dataframe):
-        pass
+        """
+            Check the outlier points based on distance between 2 consecutive points.
+            Outlier formula:
+                Lower outlier = Q1 - (1.5*IQR)
+                Higher outlier = Q3 + (1.5*IQR)
+
+                IQR = Inter quartile range = Q3 - Q1
+            We need to find points between lower and higher outlier
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe which is to be filtered.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe which has been filtered.
+
+            Raises
+            ------
+                KeyError:
+                The column 'Distance_prev_to_curr' is not present in the dataset.
+        """
+        try:
+            q_low = dataframe['Speed_prev_to_curr'].quantile(0.25)
+            q_high = dataframe['Speed_prev_to_curr'].quantile(0.75)
+            iqr = q_high - q_low
+            cut_off = iqr * 1.5
+
+            lower = q_low - cut_off
+            higher = q_high + cut_off
+
+            df_filt = np.logical_and(dataframe['Speed_prev_to_curr'] > lower,
+                                     dataframe['Speed_prev_to_curr'] < higher)
+            return dataframe.loc[df_filt]
+
+        except KeyError:
+            raise MissingColumnsException(f"The column 'Speed_prev_to_curr' is missing in the dataset. "
+                                          f"Please run the function create_speed_from_prev_column() "
+                                          f"before running this filter.")
 
     @staticmethod
     def remove_trajectories_with_less_points(dataframe, num_min_points: Optional[int] = 2):
