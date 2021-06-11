@@ -183,48 +183,48 @@ class Helpers:
         dataframe['Time_Of_Day'] = timestamps
         return dataframe
 
-    @staticmethod
-    def _consecutive_distance_helper(dataframe):
-        """
-            This function is the helper function of the create_distance_between_consecutive_column() function.
-            The create_distance_between_consecutive_column() function delegates the actual task of calculating
-            the distance between 2 consecutive points. This function does the calculation and creates a column
-            called Distance_prev_to_curr and places it in the dataframe and returns it.
-
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which calculation is to be performed.
-
-                Returns
-                -------
-                    pandas.core.dataframe
-                        The dataframe containing the resultant Distance_prev_to_curr column.
-        """
-
-        # First, lets fetch the latitude and longitude columns from the dataset and store it
-        # in a numpy array.
-        traj_ids = np.array(dataframe.reset_index()[const.TRAJECTORY_ID])
-        latitudes = np.array(dataframe[const.LAT])
-        longitudes = np.array(dataframe[const.LONG])
-        distances = np.zeros(len(latitudes))
-
-        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
-        # each of the values in the distance numpy array.
-        distances[0] = np.NAN
-        for i in range(len(latitudes) - 1):
-            # If the traj_id is same it calculates its distance from the above mentioned formula.
-            if traj_ids[i] == traj_ids[i + 1]:
-                distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i],
-                                                           latitudes[i + 1], longitudes[i + 1])
-            # The point at which a new trajectory starts, its distance is set to zero and the calculation
-            # for that trajectory id starts from that point.
-            else:
-                distances[i + 1] = np.NAN
-
-        # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
-        dataframe['Distance_prev_to_curr'] = distances
-        return dataframe
+    # @staticmethod
+    # def _consecutive_distance_helper(dataframe):
+    #     """
+    #         This function is the helper function of the create_distance_between_consecutive_column() function.
+    #         The create_distance_between_consecutive_column() function delegates the actual task of calculating
+    #         the distance between 2 consecutive points. This function does the calculation and creates a column
+    #         called Distance_prev_to_curr and places it in the dataframe and returns it.
+    #
+    #         Parameters
+    #         ----------
+    #             dataframe: NumPandasTraj
+    #                 The dataframe on which calculation is to be performed.
+    #
+    #             Returns
+    #             -------
+    #                 pandas.core.dataframe
+    #                     The dataframe containing the resultant Distance_prev_to_curr column.
+    #     """
+    #
+    #     # First, lets fetch the latitude and longitude columns from the dataset and store it
+    #     # in a numpy array.
+    #     traj_ids = np.array(dataframe.reset_index()[const.TRAJECTORY_ID])
+    #     latitudes = np.array(dataframe[const.LAT])
+    #     longitudes = np.array(dataframe[const.LONG])
+    #     distances = np.zeros(len(latitudes))
+    #
+    #     # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
+    #     # each of the values in the distance numpy array.
+    #     distances[0] = np.NAN
+    #     for i in range(len(latitudes) - 1):
+    #         # If the traj_id is same it calculates its distance from the above mentioned formula.
+    #         if traj_ids[i] == traj_ids[i + 1]:
+    #             distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i],
+    #                                                        latitudes[i + 1], longitudes[i + 1])
+    #         # The point at which a new trajectory starts, its distance is set to zero and the calculation
+    #         # for that trajectory id starts from that point.
+    #         else:
+    #             distances[i + 1] = np.NAN
+    #
+    #     # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
+    #     dataframe['Distance_prev_to_curr'] = distances
+    #     return dataframe
 
     @staticmethod
     def _consecutive_distance_alt(dataframe):
@@ -616,12 +616,11 @@ class Helpers:
     def _df_split_helper(dataframe):
         # First, create a list containing all the ids of the data and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = dataframe.traj_id.value_counts().keys().to_list()
+        ids_ = list(dataframe.traj_id.value_counts().keys())
 
         # Get the ideal number of IDs by which the dataframe is to be split.
         split_factor = Helpers._get_partition_size(len(ids_))
         ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
 
         # Now split the dataframes based on set of Trajectory ids.
         # As of now, each smaller chunk is supposed to have data of 100
