@@ -163,19 +163,17 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
-
         # Now, lets create a pool of processes which contains processes equal to the number
         # of smaller chunks and then run them in parallel so that we can calculate
         # the distance for each smaller chunk and then merge all of them together.
         multi_pool = multiprocessing.Pool(len(df_chunks))
-        result = multi_pool.map(helpers._consecutive_distance_helper, df_chunks)
+        result = multi_pool.map(helpers._consecutive_distance_alt, df_chunks)
 
         # Now lets, merge the smaller pieces and then return the dataframe
         result = pd.concat(result)
-        return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return result
 
     @staticmethod
     def create_distance_from_start_column(dataframe: NumPandasTraj):
@@ -196,7 +194,7 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        dataframe = dataframe.reset_index()
+        #dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
@@ -206,7 +204,8 @@ class SpatialFeatures:
         answer = pool.map(helpers._start_distance_helper, df_chunks)
 
         answer = pd.concat(answer)
-        return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return answer
+        #return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def get_distance_travelled_by_date_and_traj_id(dataframe: NumPandasTraj, date, traj_id=None):

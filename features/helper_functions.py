@@ -227,6 +227,26 @@ class Helpers:
         return dataframe
 
     @staticmethod
+    def _consecutive_distance_alt(dataframe):
+        dataframe = dataframe.reset_index().set_index(const.TRAJECTORY_ID)
+        ids_ = dataframe.index.unique()
+
+        for val in ids_:
+            curr_lat = dataframe.at[val, 'lat']
+            curr_lon = dataframe.at[val, 'lon']
+            size_id = curr_lat.size
+
+            if size_id <= 1:
+                dataframe.at[val, 'Distance_prev_to_curr'] = np.nan
+            else:
+                prev_lat = curr_lat.shift(1)
+                prev_lon = curr_lon.shift(1)
+                dataframe.at[val, 'Distance_prev_to_curr'] = \
+                    calc.haversine_distance(prev_lat, prev_lon, curr_lat, curr_lon)
+
+        return dataframe.reset_index().set_index([const.DateTime, const.TRAJECTORY_ID])
+
+    @staticmethod
     def _start_distance_helper(dataframe):
         """
             This function is the helper function of the create_distance_from_start_column() function.
@@ -558,7 +578,7 @@ class Helpers:
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
                                   [const.DateTime, const.LAT, const.LONG]])
             results.append([filt.groupby([const.LAT, const.LONG]).ngroups, ids_[i]])
-            
+
         df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: "Number of Unique Coordinates",
                                                                               1: const.TRAJECTORY_ID})
         return df.set_index(const.TRAJECTORY_ID)
@@ -596,17 +616,16 @@ class Helpers:
     def _df_split_helper(dataframe):
         # First, create a list containing all the ids of the data and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
+        ids_ = dataframe.traj_id.value_counts().keys().to_list()
 
         # Get the ideal number of IDs by which the dataframe is to be split.
         split_factor = Helpers._get_partition_size(len(ids_))
         ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
-        df_chunks = []
+
         # Now split the dataframes based on set of Trajectory ids.
         # As of now, each smaller chunk is supposed to have data of 100
         # trajectory IDs max
-        for i in range(len(ids_)):
-            df_chunks.append(dataframe.loc[dataframe[const.TRAJECTORY_ID].isin(ids_[i])])
-
+        df_chunks = [dataframe.loc[dataframe.index.get_level_values(const.TRAJECTORY_ID).isin(ids_[i])]
+                     for i in range(len(ids_))]
         return df_chunks

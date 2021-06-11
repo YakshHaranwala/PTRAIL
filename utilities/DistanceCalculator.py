@@ -8,6 +8,8 @@
 """
 import math
 
+import numpy as np
+
 import utilities.constants as const
 
 
@@ -34,14 +36,24 @@ class DistanceFormulaLog:
                 float
                     The great-circle distance between the 2 points.
         """
-        dLat = math.radians(lat2 - lat1)
-        dLon = math.radians(lon2 - lon1)
-        a = ((math.sin(dLat / 2)) ** 2) + \
-            (math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * (math.sin(dLon / 2)) ** 2)
+        lat1, lon1, lat2, lon2 = np.radians([lat1, lon1, lat2, lon2])
+        a = (
+                np.sin((lat2 - lat1) / 2.0)
+                ** 2 + np.cos(lat1)
+                * np.cos(lat2)
+                * np.sin((lon2 - lon1) / 2.0) ** 2
+        )
 
-        crow_distance = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return (const.RADIUS_OF_EARTH * 2 * np.arctan2(a ** 0.5, (1 - a) ** 0.5)) * 1000
 
-        return const.RADIUS_OF_EARTH * crow_distance * 1000
+        # dLat = math.radians(lat2 - lat1)
+        # dLon = math.radians(lon2 - lon1)
+        # a = ((math.sin(dLat / 2)) ** 2) + \
+        #     (math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * (math.sin(dLon / 2)) ** 2)
+        #
+        # crow_distance = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        #
+        # return const.RADIUS_OF_EARTH * crow_distance * 1000
 
     @staticmethod
     def bearing_calculation(lat1, lon1, lat2, lon2):

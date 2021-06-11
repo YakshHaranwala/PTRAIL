@@ -19,7 +19,7 @@ class Interpolate:
         pass
 
     @staticmethod
-    def quadratic_interpolation(dataframe):
+    def kinetic_interpolation(dataframe):
         pass
 
     @staticmethod
