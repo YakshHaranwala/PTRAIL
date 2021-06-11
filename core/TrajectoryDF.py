@@ -217,24 +217,24 @@ class NumPandasTraj(DataFrame):
             longitude: const.LONG
         }
 
-    def set_index(self, keys, drop=True, append=False, inplace=False, verify_integrity=False):
-        """
-            Change the index of the DataFrame.
-            !!!!                                                            !!!!
-                WARNING:
-                -------
-                    CHANGING OF THE INDEX IS NOT ALLOWED IN DaskTrajectoryDF.
-                    BY MANDATORY CONSTRAINTS, THE INDEX NEEDS TO BE DateTime.
-            !!!!                                                            !!!!
-
-            Raises
-            ------
-                NotAllowedError
-                    The change of index is not allowed in DaskTrajectoryDF.
-
-        """
-        raise NotAllowedError("Changing of index is not allowed.\n"
-                              "The index must be DateTime at all times.")
+    # def set_index(self, keys, drop=True, append=False, inplace=False, verify_integrity=False):
+    #     """
+    #         Change the index of the DataFrame.
+    #         !!!!                                                            !!!!
+    #             WARNING:
+    #             -------
+    #                 CHANGING OF THE INDEX IS NOT ALLOWED IN DaskTrajectoryDF.
+    #                 BY MANDATORY CONSTRAINTS, THE INDEX NEEDS TO BE DateTime.
+    #         !!!!                                                            !!!!
+    #
+    #         Raises
+    #         ------
+    #             NotAllowedError
+    #                 The change of index is not allowed in DaskTrajectoryDF.
+    #
+    #     """
+    #     raise NotAllowedError("Changing of index is not allowed.\n"
+    #                           "The index must be DateTime at all times.")
 
     def __reset_default_index(self):
         """
