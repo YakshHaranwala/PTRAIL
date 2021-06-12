@@ -163,6 +163,11 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
+        # TODO: ON MONDAY, MAKE SURE TO REFACTOR THIS FILE.
+        # TODO: INCLUDE A CHECK WHERE WE CAN CALL THE HELPER DIRECTLY AND RUN STRAIGHT
+        #       INSTEAD OF PARALLEL WHEN THE NUMBER OF IDs IS SMALL.
+        # TODO: MAKE SURE TO DO THIS FOR ALL FUNCTIONS THAT CAN HAVE IT.
+
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
         # Now, lets create a pool of processes which contains processes equal to the number
@@ -172,8 +177,7 @@ class SpatialFeatures:
         result = multi_pool.map(helpers._consecutive_distance_alt, df_chunks)
 
         # Now lets, merge the smaller pieces and then return the dataframe
-        result = pd.concat(result)
-        return result
+        return pd.concat(result)
 
     @staticmethod
     def create_distance_from_start_column(dataframe: NumPandasTraj):
