@@ -60,8 +60,11 @@ class TemporalFeatures:
     @staticmethod
     def create_date_column(dataframe: NumPandasTraj):
         """
-            From the DateTime column already present in the data, extract only the time
-            and then add another column containing just the time.
+            From the DateTime column already present in the data, extract only the date
+            and then add another column containing just the date. First split the dataframe 
+            in smaller ones based on ids and then run all the smaller dataframes in parallel
+            and extract the date column and then concat all of the dataframes into the
+            original one with an additional date column.
             Parameters
             ----------
                 dataframe: NumPandasTraj
@@ -85,17 +88,18 @@ class TemporalFeatures:
         result = pool.map(helpers._date_helper, df_chunks)
 
         time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
-
-        # Now check whether the user wants the result applied to the original dataframe or
-        # wants a separate new dataframe. If the user wants a separate new dataframe, then
-        # a pandas dataframe is returned instead of NumTrajectoryDF.
+        
+        # Returns the dataframe by converting it to NumPandasTraj
         return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_time_column(dataframe: NumPandasTraj):
         """
             From the DateTime column already present in the data, extract only the time
-            and then add another column containing just the time.
+            and then add another column containing just the time.  First split the dataframe 
+            in smaller ones based on ids and then run all the smaller dataframes in parallel
+            and extract the time column and then concat all of the dataframes into the
+            original one with an additional time column
             Parameters
             ----------
                 dataframe: NumPandasTraj
@@ -120,9 +124,7 @@ class TemporalFeatures:
 
         time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
 
-        # Now check whether the user wants the result applied to the original dataframe or
-        # wants a separate new dataframe. If the user wants a separate new dataframe, then
-        # a pandas dataframe is returned instead of NumTrajectoryDF.
+        # Returns the dataframe by converting it to NumPandasTraj
         return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
@@ -130,7 +132,8 @@ class TemporalFeatures:
         """
             Create a column called Day_Of_Week which contains the day of the week
             on which the trajectory point is recorded. This is calculated on the basis
-            of timestamp recorded in the data.
+            of timestamp recorded in the data. By running smaller chunks of the original
+            dataframes in parallel and extracting the days from there.
 
             Parameters
             ----------
@@ -152,7 +155,9 @@ class TemporalFeatures:
         pool_of_processes = multiprocessing.Pool(len(df_chunks))
         results = pool_of_processes.map(helpers._day_of_week_helper, df_chunks)
 
-        final_df = pd.concat(results)
+        final_df = pd.concat(results)       # Merging the chunks of dataframe with the new column
+
+        # Returns the dataframe by converting it to NumPandasTraj
         return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
@@ -181,15 +186,16 @@ class TemporalFeatures:
         mp_pool = multiprocessing.Pool(len(df_chunks))
         results = mp_pool.map(helpers._weekend_helper, df_chunks)
 
-        # Now, lets merge all the smaller parts together and then return the results based on
-        # the value of the inplace parameter.
+        # Now, lets merge all the smaller parts together
         final_df = pd.concat(results)
+
+        # Returns the dataframe by converting it to NumPandasTraj
         return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_time_of_day_column(dataframe: NumPandasTraj):
         """
-            Create a Time_Of_Day column in the dataframe which indicates at what time of the
+            Create a Time_Of_Day column in the dataframe using parallelization which indicates at what time of the
             day was the point data captured.
             Note: The divisions of the day based on the time are provided in the utilities.constants module.
 
@@ -213,9 +219,10 @@ class TemporalFeatures:
         multi_pool = multiprocessing.Pool(len(df_chunks))
         results = multi_pool.map(helpers._time_of_day_helper, df_chunks)
 
-        # Now, lets merge all the smaller parts together and then return the results based on
-        # the value of the inplace parameter.
+        # Now, lets merge all the smaller parts together
         final_df = pd.concat(results)
+
+        # Returns the dataframe by converting it to NumPandasTraj
         return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod

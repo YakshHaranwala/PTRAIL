@@ -153,6 +153,9 @@ class SpatialFeatures:
                   from the first point of the new trajectory ID and the first point of the new trajectory
                   ID will be set to 0.
 
+            When converting to NumPandasTraj we see a jump of 140-150ms in execution time but converting the
+            dataframe provides the user with the option to use the NumPandasTraj functionalities.
+
             Parameters
             ----------
                 dataframe: NumPandasTraj
@@ -314,7 +317,7 @@ class SpatialFeatures:
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
         pool = multiprocessing.Pool(len(df_chunks))
-        answer = pool.starmap(helpers._given_point_distance_helper, zip(df_chunks, itertools.repeat(coordinates)))
+        answer = pool.starmap(helpers._distance_from_distance_helper, zip(df_chunks, itertools.repeat(coordinates)))
 
         # Now lets join all the smaller partitions and then add the Distance to the
         # specific point column.
@@ -346,6 +349,8 @@ class SpatialFeatures:
             # then extract it, calculate the time differences between the consecutive
             # rows in the dataframe and then calculate distances/time_deltas in order to
             # calculate the speed.
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             distances = dataframe.reset_index()['Distance_prev_to_curr']
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
@@ -359,6 +364,8 @@ class SpatialFeatures:
             #   1. Calculate the distance by calling the create_distance_between_consecutive_column() function.
             #   2. Calculate the time deltas.
             #   3. Divide the 2 values to calculate the speed.
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_distance_between_consecutive_column(dataframe)
             distances = dataframe.reset_index()['Distance_prev_to_curr']
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
@@ -388,6 +395,8 @@ class SpatialFeatures:
             # When Speed column is present extract the data from there and then take calculate the time delta
             # And use that to calculate acceleration by dividing speed by time delta and then add the column to
             # the dataframe
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
@@ -397,6 +406,8 @@ class SpatialFeatures:
         except KeyError:
             # When Speed column is not present then first call create_speed_from_prev_column() function to make
             # the speed column and then follow the steps mentioned above
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_speed_from_prev_column(dataframe)
             speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
@@ -425,6 +436,8 @@ class SpatialFeatures:
             # When acceleration column is present extract the data from there and then take calculate the time delta
             # And use that to calculate acceleration by dividing speed_delta by time delta and then add the column to
             # the dataframe
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
@@ -434,6 +447,8 @@ class SpatialFeatures:
         except KeyError:
             # When Speed column is not present then first call create_speed_from_prev_column() function to make
             # the speed column and then follow the steps mentioned above
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_acceleration_from_prev_column(dataframe)
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
@@ -495,6 +510,8 @@ class SpatialFeatures:
             # If Bearing from previous column is present, extract that and then calculate time_deltas
             # Using these calculate Bearing_rate_from_prev by dividing bearing_deltas with time_deltas
             # And then adding the column to the dataframe
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
@@ -502,6 +519,8 @@ class SpatialFeatures:
             return dataframe
         except KeyError:
             # Similar to the step above but just makes the Bearing column first
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_bearing_column(dataframe)
             bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
@@ -530,6 +549,8 @@ class SpatialFeatures:
             # If Bearing from previous column is present, extract that and then calculate time_deltas
             # Using these calculate Bearing_rate_from_prev by dividing bearing_deltas with time_deltas
             # And then adding the column to the dataframe
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
             bearing_rate_deltas = dataframe.reset_index()['Bearing_rate_from_prev'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
@@ -537,7 +558,9 @@ class SpatialFeatures:
             return dataframe
         except KeyError:
             # Similar to the step above but just makes the Bearing column first
-            dataframe = SpatialFeatures.create_bearing_column(dataframe)
+            # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
+            #             does not account for time difference when it is negative.
+            dataframe = SpatialFeatures.create_bearing_rate_column(dataframe)
             bearing_rate_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
 
