@@ -8,17 +8,16 @@
 """
 import os
 
-import numpy
 import numpy as np
-import pandas
 import pandas as pd
 import psutil
-from numba import jit, prange
+
 import utilities.constants as const
-from utilities.DistanceCalculator import DistanceFormulaLog as calc
+from utilities.DistanceCalculator import FormulaLog as calc
 
 
 class Helpers:
+    # ------------------------------------ Temporal Helpers --------------------------------------#
     @staticmethod
     def _date_helper(dataframe):
         """
@@ -183,59 +182,158 @@ class Helpers:
         dataframe['Time_Of_Day'] = timestamps
         return dataframe
 
-    # @staticmethod
-    # def _consecutive_distance_helper(dataframe):
-    #     """
-    #         This function is the helper function of the create_distance_between_consecutive_column() function.
-    #         The create_distance_between_consecutive_column() function delegates the actual task of calculating
-    #         the distance between 2 consecutive points. This function does the calculation and creates a column
-    #         called Distance_prev_to_curr and places it in the dataframe and returns it.
-    #
-    #         Parameters
-    #         ----------
-    #             dataframe: NumPandasTraj
-    #                 The dataframe on which calculation is to be performed.
-    #
-    #             Returns
-    #             -------
-    #                 pandas.core.dataframe
-    #                     The dataframe containing the resultant Distance_prev_to_curr column.
-    #     """
-    #
-    #     # First, lets fetch the latitude and longitude columns from the dataset and store it
-    #     # in a numpy array.
-    #     traj_ids = np.array(dataframe.reset_index()[const.TRAJECTORY_ID])
-    #     latitudes = np.array(dataframe[const.LAT])
-    #     longitudes = np.array(dataframe[const.LONG])
-    #     distances = np.zeros(len(latitudes))
-    #
-    #     # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
-    #     # each of the values in the distance numpy array.
-    #     distances[0] = np.NAN
-    #     for i in range(len(latitudes) - 1):
-    #         # If the traj_id is same it calculates its distance from the above mentioned formula.
-    #         if traj_ids[i] == traj_ids[i + 1]:
-    #             distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i],
-    #                                                        latitudes[i + 1], longitudes[i + 1])
-    #         # The point at which a new trajectory starts, its distance is set to zero and the calculation
-    #         # for that trajectory id starts from that point.
-    #         else:
-    #             distances[i + 1] = np.NAN
-    #
-    #     # Now assign the column 'Distance_prev_to_curr' to the dataframe and return the dataframe.
-    #     dataframe['Distance_prev_to_curr'] = distances
-    #     return dataframe
+    @staticmethod
+    def _traj_duration_helper(dataframe, ids_):
+        """
+            Calculate the duration of the trajectory i.e. subtract the max time of
+            the trajectory by the min time of the trajectory.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe containing all the original data.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    The resultant dataframe containing all the trajectory durations.
+        """
+        durations = []  # A list for storing results.
+
+        # Iterate over each ID and calculate the time duration of each unique ID.
+        for i in range(len(ids_)):
+            # Filter out only the points of the ID in question.
+            small = dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i], [const.DateTime]]
+
+            # Calculate the duration of the trajectory in question nd append
+            # a row containing [traj_duration, traj_id] to the results list.
+            durations.append([(small.max() - small.min())[0], ids_[i]])
+
+        # Convert the list containing results to a pandas dataframe, reset the index
+        # and then rename the columns.
+        result = pd.DataFrame(durations).reset_index(drop=True).rename(columns={0: "Traj_Duration",
+                                                                                1: const.TRAJECTORY_ID})
+        # Set the index to traj_id and return it.
+        return result.set_index(const.TRAJECTORY_ID)
+
 
     @staticmethod
-    def _consecutive_distance_alt(dataframe):
-        dataframe = dataframe.reset_index().set_index(const.TRAJECTORY_ID)
-        ids_ = dataframe.index.unique()
+    def _start_time_helper(dataframe, ids_):
+        """
+            This function is the helper function of the get_start_time(). The get_start_time() function
+            delegates the task of calculating the end location of the trajectories in the dataframe because the
+            original functions runs multiple instances of this function in parallel. This function finds the start
+            time of the specified trajectory IDs the DF and then another returns dataframe containing
+            end latitude, end longitude, DateTime and trajectory ID for each trajectory
 
+            Parameter
+            ---------
+                dataframe: NumPandasTraj
+                    The dataframe of which the locations are to be found.dataframe
+                ids_: list
+                    List of trajectory ids for which the end locations are to be calculated
+
+            Returns
+            -------
+                pandas.core.dataframe.Dataframe
+                    New dataframe containing Trajectory ID as index and latitude and longitude
+                    as other 2 columns.
+        """
+        results = []
+
+        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
+        # and then further filter that dataframe according to the earliest(minimum) time.
+        # And then append the data of that earliest time into a list.
+        for i in range(len(ids_)):
+            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
+                                  [const.DateTime, const.LAT, const.LONG]])
+            start_time = (filt.loc[filt[const.DateTime] == filt[const.DateTime].min()]).reset_index()
+            results.append([start_time[const.DateTime][0], ids_[i]])
+
+        # Make a new dataframe containing Latitude Longitude and Trajectory id
+        df = pd.DataFrame(results).reset_index(drop=True).rename(columns={0: const.DateTime,
+                                                                          1: const.TRAJECTORY_ID})
+        # Return the dataframe by setting Trajectory id as index
+        return df.set_index(const.TRAJECTORY_ID)
+
+    @staticmethod
+    def _end_time_helper(dataframe, ids_):
+        """
+            This function is the helper function of the get_start_time(). The get_start_time() function
+            delegates the task of calculating the end location of the trajectories in the dataframe because the
+            original functions runs multiple instances of this function in parallel. This function finds the start
+            time of the specified trajectory IDs the DF and then another returns dataframe containing
+            end latitude, end longitude, DateTime and trajectory ID for each trajectory
+
+            Parameter
+            ---------
+                dataframe: NumPandasTraj
+                    The dataframe of which the locations are to be found.dataframe
+                ids_: list
+                    List of trajectory ids for which the end locations are to be calculated
+
+            Returns
+            -------
+                pandas.core.dataframe.Dataframe
+                    New dataframe containing Trajectory ID as index and latitude and longitude
+                    as other 2 columns.
+        """
+        results = []
+
+        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
+        # and then further filter that dataframe according to the latest(maximum) time.
+        # And then append the data of that latest time into a list.
+        for i in range(len(ids_)):
+            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
+                                  [const.DateTime, const.LAT, const.LONG]])
+            start_time = (filt.loc[filt[const.DateTime] == filt[const.DateTime].max()]).reset_index()
+            results.append([start_time[const.DateTime][0], ids_[i]])
+
+        # Make a new dataframe containing Latitude Longitude and Trajectory id
+        df = pd.DataFrame(results).reset_index(drop=True).rename(columns={0: const.DateTime,
+                                                                          1: const.TRAJECTORY_ID})
+        # Return the dataframe by setting Trajectory id as index
+        return df.set_index(const.TRAJECTORY_ID)
+
+    # -------------------------------------- Spatial Helpers ----------------------------------------------- #
+    @staticmethod
+    def _distance_between_consecutive_helper(dataframe):
+        """
+            This function is the helper function of the create_distance_between_consecutive_column() function.
+            The create_distance_between_consecutive_column() function delegates the actual task of calculating
+            the distance between 2 consecutive points. This function does the calculation and creates a column
+            called Distance_prev_to_curr and places it in the dataframe and returns it.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which calculation is to be performed.
+
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj
+                    The dataframe containing the resultant Distance_prev_to_curr column.
+
+            References
+            ----------
+                "Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
+                 Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
+                 Universidade Federal Do Cear ́a, 2019."
+        """
+        # Reset the index and set it to trajectory ID in order to iterate
+        # over the dataframe based on trajectory ID.
+        dataframe = dataframe.reset_index().set_index(const.TRAJECTORY_ID)
+        ids_ = dataframe.index.unique()  # Find out all the unique IDs in the dataframe.
+
+        # For each unique ID, calculate the haversine distance and then assign it to
+        # a new column and add that column to the dataframe.
         for val in ids_:
             curr_lat = dataframe.at[val, 'lat']
             curr_lon = dataframe.at[val, 'lon']
             size_id = curr_lat.size
 
+            # Check whether the IDs are changing in the dataset and if they are, then assign
+            # Nan as the value to the first point of the new Trajectory ID.
             if size_id <= 1:
                 dataframe.at[val, 'Distance_prev_to_curr'] = np.nan
             else:
@@ -244,10 +342,10 @@ class Helpers:
                 dataframe.at[val, 'Distance_prev_to_curr'] = \
                     calc.haversine_distance(prev_lat, prev_lon, curr_lat, curr_lon)
 
-        return dataframe.reset_index().set_index([const.DateTime, const.TRAJECTORY_ID])
+        return dataframe.reset_index()  # Reset the index and return the dataframe.
 
     @staticmethod
-    def _start_distance_helper(dataframe):
+    def _distance_from_start_helper(dataframe):
         """
             This function is the helper function of the create_distance_from_start_column() function.
             The create_distance_from_start_column() function delegates the actual task of calculating
@@ -265,36 +363,41 @@ class Helpers:
                     pandas.core.dataframe
                         The dataframe containing the resultant Distance_start_to_curr column.
         """
-        # First, lets create some numpy arrays containing the trajectory ID, latitude,
-        # longitudes and distances.
-        traj_ids = numpy.array(dataframe.reset_index()[const.TRAJECTORY_ID])
-        latitudes = numpy.array(dataframe[const.LAT])
-        longitudes = numpy.array(dataframe[const.LONG])
-        distances = numpy.zeros(len(traj_ids))
+        dataframe = dataframe.reset_index().set_index(const.TRAJECTORY_ID)
+        ids_ = dataframe.index.unique()  # Find out all the unique IDs in the dataframe.
 
-        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
-        # each of the values in the distance numpy array.
-        start = 0  # The index of the starting point.
-        distances[0] = np.NAN
-        for i in range(len(distances) - 1):
-            # Check if the 2 points between which the distance is being calculated are
-            # of the same trajectory ID, and if so continue with the calculation.
-            if traj_ids[i] == traj_ids[i + 1]:
-                distances[i + 1] = calc.haversine_distance(latitudes[start], longitudes[start],
-                                                           latitudes[i + 1], longitudes[i + 1])
-            # Otherwise, when the trajectory ID changes, then assign the distance 0 to the first
-            # point and change the start index to that point so that calculation yields correct
-            # results
+        # For each unique ID, calculate the haversine distance and then assign it to
+        # a new column and add that column to the dataframe.
+        for val in ids_:
+            curr_lat = dataframe.at[val, const.LAT]
+            curr_lon = dataframe.at[val, const.LONG]
+            size_id = curr_lat.size
+
+            # Here, the purpose of the if else statement is as follows:
+            #   In the above curr_lat variable, when the current latitude is extracted, sometimes
+            #   if the trajectory has only a single point, then it only returns a single float value
+            #   which naturally cannot be indexed. This if else statement checks if the value returned
+            #   by the curr_lat extraction is a float and if so, then dont try to index it and instead
+            #   take the value itself. The values are also shifted by 1 to avoid the distance calculation
+            #   yielding the value 0 and instead give out NaN.
+            start_lat = pd.Series(np.full(size_id,
+                                          curr_lat[0] if type(curr_lat) is not np.float64 else curr_lat)).shift(1)
+            start_lon = pd.Series(np.full(size_id,
+                                          curr_lon[0] if type(curr_lat) is not np.float64 else curr_lat)).shift(1)
+
+            # Check whether the IDs are changing in the dataset and if they are, then assign
+            # Nan as the value to the first point of the new Trajectory ID.
+            if size_id <= 1:
+                dataframe.at[val, 'Distance_start_to_curr'] = np.nan
+
             else:
-                distances[i + 1] = np.NAN
-                start = i + 1
+                dataframe.at[val, 'Distance_start_to_curr'] = \
+                    calc.haversine_distance(start_lat, start_lon, curr_lat, curr_lon)
 
-        # Now, assign the new column to the dataframe and return it.
-        dataframe['Distance_start_to_curr'] = distances
-        return dataframe
+        return dataframe.reset_index()  # Reset the index and return the dataframe.
 
     @staticmethod
-    def _given_point_distance_helper(dataframe, coordinates):
+    def _distance_from_given_point_helper(dataframe, coordinates):
         """
             This function is the helper function of the create_distance_from_point() function. The
             create_distance_from_point() function delegates the actual task of calculating distance
@@ -369,46 +472,45 @@ class Helpers:
     @staticmethod
     def _bearing_helper(dataframe):
         """
-            This function is the helper function of the create_bearing_column(). The create_bearing_column()
-            delegates the task of calculation of bearing between 2 points to this function because the original
-            functions runs multiple instances of this function in parallel. This function does the calculation
-            of bearing between 2 consecutive points in the entire DF and then creates a column in the dataframe
-            and returns it.
+             This function is the helper function of the create_bearing_column(). The create_bearing_column()
+             delegates the task of calculation of bearing between 2 points to this function because the original
+             functions runs multiple instances of this function in parallel. This function does the calculation
+             of bearing between 2 consecutive points in the entire DF and then creates a column in the dataframe
+             and returns it.
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which the calculation is to be done.
+             Parameters
+             ----------
+                 dataframe: NumPandasTraj
+                     The dataframe on which the calculation is to be done.
 
-            Returns
-            -------
-                NumPandasTraj:
-                    The dataframe containing the Bearing column.
-        """
-        # First, lets create 3 numpy arrays containing latitude, longitude and
-        # trajectory ids of the data.
-        latitude = np.array(dataframe[const.LAT])
-        longitude = np.array(dataframe[const.LONG])
-        traj_ids = np.array(dataframe.reset_index()[const.TRAJECTORY_ID])
-        bearings = np.zeros(len(latitude))
+             Returns
+             -------
+                 NumPandasTraj:
+                     The dataframe containing the Bearing column.
+         """
+        # Reset the index and set it to trajectory ID in order to iterate
+        # over the dataframe based on trajectory ID.
+        dataframe = dataframe.reset_index().set_index(const.TRAJECTORY_ID)
+        ids_ = dataframe.index.unique()  # Find out all the unique IDs in the dataframe.
 
-        # Now, lets loop over the data and calculate the bearing between
-        # 2 consecutive points.
-        bearings[0] = np.NaN
-        for i in range(len(bearings) - 1):
-            # Check if the 2 points between which the distance is being calculated are
-            # of the same trajectory ID, and if so continue with the calculation.
-            if traj_ids[i] == traj_ids[i + 1]:
-                bearings[i + 1] = calc.bearing_calculation(latitude[i], longitude[i],
-                                                           latitude[i + 1], longitude[i + 1])
-            # Otherwise, when the trajectory ID changes, then assign the distance 0 to the first
-            # point and change the start index to that point so that calculation yields correct
-            # results
+        # For each unique ID, calculate the haversine distance and then assign it to
+        # a new column and add that column to the dataframe.
+        for val in ids_:
+            curr_lat = dataframe.at[val, 'lat']
+            curr_lon = dataframe.at[val, 'lon']
+            size_id = curr_lat.size
+
+            # Check whether the IDs are changing in the dataset and if they are, then assign
+            # Nan as the value to the first point of the new Trajectory ID.
+            if size_id <= 1:
+                dataframe.at[val, 'Bearing_between_consecutive'] = np.nan
             else:
-                bearings[i + 1] = np.NaN
+                prev_lat = curr_lat.shift(1)
+                prev_lon = curr_lon.shift(1)
+                dataframe.at[val, 'Bearing_between_consecutive'] = \
+                    calc.bearing_calculation(prev_lat, prev_lon, curr_lat, curr_lon)
 
-        dataframe['Bearing_between_consecutive'] = bearings
-        return dataframe
+        return dataframe.reset_index()
 
     @staticmethod
     def _start_location_helper(dataframe, ids_):
@@ -445,9 +547,9 @@ class Helpers:
             results.append([start_loc[const.LAT][0], start_loc[const.LONG][0], ids_[i]])
 
         # Make a new dataframe containing Latitude Longitude and Trajectory id
-        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.LAT,
-                                                                              1: const.LONG,
-                                                                              2: const.TRAJECTORY_ID})
+        df = pd.DataFrame(results).reset_index(drop=True).rename(columns={0: const.LAT,
+                                                                          1: const.LONG,
+                                                                          2: const.TRAJECTORY_ID})
 
         # Return the dataframe by setting Trajectory id as index
         return df.set_index(const.TRAJECTORY_ID)
@@ -487,102 +589,55 @@ class Helpers:
             results.append([start_loc[const.LAT][0], start_loc[const.LONG][0], ids_[i]])
 
         # Make a new dataframe containing Latitude Longitude and Trajectory id
-        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.LAT,
-                                                                              1: const.LONG,
-                                                                              2: const.TRAJECTORY_ID})
-        # Return the dataframe by setting Trajectory id as index
-        return df.set_index(const.TRAJECTORY_ID)
-
-    @staticmethod
-    def _start_time_helper(dataframe, ids_):
-        """
-            This function is the helper function of the get_start_time(). The get_start_time() function
-            delegates the task of calculating the end location of the trajectories in the dataframe because the
-            original functions runs multiple instances of this function in parallel. This function finds the start
-            time of the specified trajectory IDs the DF and then another returns dataframe containing
-            end latitude, end longitude, DateTime and trajectory ID for each trajectory
-
-            Parameter
-            ---------
-                dataframe: NumPandasTraj
-                    The dataframe of which the locations are to be found.dataframe
-                ids_: list
-                    List of trajectory ids for which the end locations are to be calculated
-
-            Returns
-            -------
-                pandas.core.dataframe.Dataframe
-                    New dataframe containing Trajectory ID as index and latitude and longitude
-                    as other 2 columns.
-        """
-        results = []
-
-        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
-        # and then further filter that dataframe according to the earliest(minimum) time.
-        # And then append the data of that earliest time into a list.
-        for i in range(len(ids_)):
-            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
-                                  [const.DateTime, const.LAT, const.LONG]])
-            start_time = (filt.loc[filt[const.DateTime] == filt[const.DateTime].min()]).reset_index()
-            results.append([start_time[const.DateTime][0], ids_[i]])
-
-        # Make a new dataframe containing Latitude Longitude and Trajectory id
-        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.DateTime,
-                                                                              1: const.TRAJECTORY_ID})
-        # Return the dataframe by setting Trajectory id as index
-        return df.set_index(const.TRAJECTORY_ID)
-
-    @staticmethod
-    def _end_time_helper(dataframe, ids_):
-        """
-            This function is the helper function of the get_start_time(). The get_start_time() function
-            delegates the task of calculating the end location of the trajectories in the dataframe because the
-            original functions runs multiple instances of this function in parallel. This function finds the start
-            time of the specified trajectory IDs the DF and then another returns dataframe containing
-            end latitude, end longitude, DateTime and trajectory ID for each trajectory
-
-            Parameter
-            ---------
-                dataframe: NumPandasTraj
-                    The dataframe of which the locations are to be found.dataframe
-                ids_: list
-                    List of trajectory ids for which the end locations are to be calculated
-
-            Returns
-            -------
-                pandas.core.dataframe.Dataframe
-                    New dataframe containing Trajectory ID as index and latitude and longitude
-                    as other 2 columns.
-        """
-        results = []
-
-        # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
-        # and then further filter that dataframe according to the latest(maximum) time.
-        # And then append the data of that latest time into a list.
-        for i in range(len(ids_)):
-            filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
-                                  [const.DateTime, const.LAT, const.LONG]])
-            start_time = (filt.loc[filt[const.DateTime] == filt[const.DateTime].max()]).reset_index()
-            results.append([start_time[const.DateTime][0], ids_[i]])
-
-        # Make a new dataframe containing Latitude Longitude and Trajectory id
-        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: const.DateTime,
-                                                                              1: const.TRAJECTORY_ID})
+        df = pd.DataFrame(results).reset_index(drop=True).rename(columns={0: const.LAT,
+                                                                          1: const.LONG,
+                                                                          2: const.TRAJECTORY_ID})
         # Return the dataframe by setting Trajectory id as index
         return df.set_index(const.TRAJECTORY_ID)
 
     @staticmethod
     def _number_of_location_helper(dataframe, ids_):
-        results = []
+        """
+            This is the helper function for the get_number_of_locations() function. The
+            get_number_of_locations() delegates the actual task of calculating the number of
+            unique locations visited by a particular object to this function. This function
+            calculates the number of unique locations by each of the unique object and returns
+            a dataframe containing the results.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe containing all the original data.
+                ids_: list
+                    The list of ids for which the number of unique locations visited
+                    is to be calculated.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    dataframe containing the results.
+        """
+        results = []        # A list for storing results.
+
+        # Iterate over each ID and calculate the number of locations visited by each ID.
         for i in range(len(ids_)):
+            # Filter out only the points of the ID in question.
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
                                   [const.DateTime, const.LAT, const.LONG]])
+
+            # Calculate the total number of unique (lat, lon) points visited
+            # by the ID and append a row containing [# of unique locations, traj_id]
+            # to the results list.
             results.append([filt.groupby([const.LAT, const.LONG]).ngroups, ids_[i]])
 
-        df = pandas.DataFrame(results).reset_index(drop=True).rename(columns={0: "Number of Unique Coordinates",
-                                                                              1: const.TRAJECTORY_ID})
+        # Convert the list containing results to a pandas dataframe, reset the index
+        # and then rename the columns.
+        df = pd.DataFrame(results).reset_index(drop=True).rename(columns={0: "Number of Unique Coordinates",
+                                                                          1: const.TRAJECTORY_ID})
+        # Set the index to traj_id and return it.
         return df.set_index(const.TRAJECTORY_ID)
 
+    # ------------------------------------ General Utilities ------------------------------------ #
     @staticmethod
     def _get_partition_size(size):
         """
@@ -599,6 +654,8 @@ class Helpers:
                 int
                     The factor by which the datasets are to be split.
         """
+        # Based on the Operating system, get the number of CPUs available for
+        # multiprocessing.
         available_cpus = len(os.sched_getaffinity(0)) if os.name == 'posix' \
             else psutil.cpu_count()  # Number of available CPUs.
 
@@ -614,6 +671,26 @@ class Helpers:
 
     @staticmethod
     def _df_split_helper(dataframe):
+        """
+            This is the helper function for splitting up dataframes into smaller chunks.
+            This function is widely used for main functions to help split the original
+            dataframe into smaller chunks based on a fixed range of IDs. This function
+            splits the dataframes based on a predetermined number, stores them in a list
+            and returns it.
+            NOTE: The dataframe is split based on the number of CPU cores available for.
+                  For more info, take a look at the documentation of the get_partition_size()
+                  function.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe that is to be split.
+
+            Returns
+            -------
+                list:
+                    The list containing smaller dataframe chunks.
+        """
         # First, create a list containing all the ids of the data and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
         ids_ = list(dataframe.traj_id.value_counts().keys())

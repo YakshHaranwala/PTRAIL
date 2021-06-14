@@ -12,11 +12,10 @@ from typing import Text, Optional
 
 import numpy as np
 import pandas as pd
-import scipy.stats as stat
 
 import utilities.constants as const
-from utilities.exceptions import *
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
+from utilities.exceptions import *
 
 
 class Filters:
@@ -557,7 +556,7 @@ class Filters:
             q_low = dataframe['Distance_prev_to_curr'].quantile(0.25)
             q_high = dataframe['Distance_prev_to_curr'].quantile(0.75)
             iqr = q_high - q_low
-            cut_off = iqr * 1.5     # Cut off value.
+            cut_off = iqr * 1.5  # Cut off value.
 
             # Now, find the upper limit and the lower limit for the data.
             lower = q_low - cut_off

@@ -16,7 +16,6 @@ import itertools
 import multiprocessing
 from typing import Optional, Text
 
-import numpy as np
 import pandas as pd
 
 from core.TrajectoryDF import NumPandasTraj
@@ -25,38 +24,6 @@ from utilities import constants as const
 
 
 class TemporalFeatures:
-    # @staticmethod
-    # def create_date_column_alt(dataframe: NumPandasTraj):
-    #     """
-    #         Create a Date column in the dataframe given.
-    #
-    #         Parameters
-    #         ----------
-    #             dataframe: core.TrajectoryDF.NumPandasTraj
-    #                 The NumPandasTraj on which the creation of date column is to be done.
-    #
-    #         Returns
-    #         -------
-    #             core.TrajectoryDF.NumPandasTraj
-    #                 The dataframe containing the resultant column.
-    #     """
-    #     # Split the entire data set into chunks of 100000 rows each
-    #     # so that we can work on each separate part in parallel.
-    #     split_list = []
-    #     for i in range(0, len(dataframe), 100001):
-    #         split_list.append(dataframe.reset_index(drop=False).iloc[i:i + 100000])
-    #
-    #     method_pool = multiprocessing.Pool(len(split_list))  # Create a pool of processes.
-    #
-    #     # Now run the date helper method in parallel with the dataframes in split_list
-    #     # and the new dataframes with date columns are stored in the variable result which is of type Mapper.
-    #     result = method_pool.map(helpers._date_helper, split_list)
-    #
-    #     ans = pd.concat(result)  # Merge all the smaller chunks together.
-    #
-    #     # Now depending on the value of inplace, return the required data structure.
-    #     return NumPandasTraj(ans, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-
     @staticmethod
     def create_date_column(dataframe: NumPandasTraj):
         """
@@ -245,11 +212,20 @@ class TemporalFeatures:
                 pandas.TimeDelta
                     The trajectory duration.
         """
+        dataframe = dataframe.reset_index()
         if traj_id is None:
-            return dataframe.reset_index()['DateTime'].max() - dataframe.reset_index()['DateTime'].min()
+            ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
+
+            split_factor = helpers._get_partition_size(len(ids_))
+            ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+            mp_pool = multiprocessing.Pool(len(ids_))
+            results = mp_pool.starmap(helpers._traj_duration_helper, zip(itertools.repeat(dataframe), ids_))
+
+            results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
+            return results
         else:
-            small = dataframe.reset_index().loc[
-                dataframe.reset_index()[const.TRAJECTORY_ID] == traj_id, [const.DateTime]]
+            small = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id, [const.DateTime]]
             if len(small) == 0:
                 return f"No {traj_id} exists in the given data. Please try again."
             else:

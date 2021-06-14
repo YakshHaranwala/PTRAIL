@@ -6,14 +6,13 @@
     @Date: 28th May, 2021
     @Version 1.0
 """
-import math
 
 import numpy as np
 
 import utilities.constants as const
 
 
-class DistanceFormulaLog:
+class FormulaLog:
     @staticmethod
     def haversine_distance(lat1, lon1, lat2, lon2):
         """
@@ -37,9 +36,11 @@ class DistanceFormulaLog:
                     The great-circle distance between the 2 points.
         """
         lat1, lon1, lat2, lon2 = np.radians([lat1, lon1, lat2, lon2])
-        a = (np.sin((lat2 - lat1) / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2.0) ** 2)
+        val_one = (np.sin((lat2 - lat1) / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin((lon2 - lon1) / 2.0) ** 2)
 
-        return (const.RADIUS_OF_EARTH * 2 * np.arctan2(a ** 0.5, (1 - a) ** 0.5)) * 1000
+        crow_distance = 2 * np.arctan2(val_one ** 0.5, (1 - val_one) ** 0.5)
+
+        return (const.RADIUS_OF_EARTH * crow_distance) * 1000
 
     @staticmethod
     def bearing_calculation(lat1, lon1, lat2, lon2):
@@ -50,13 +51,13 @@ class DistanceFormulaLog:
 
             Parameters
             ----------
-                lat1: float
+                lat1:
                     The latitude value of point 1.
-                lon1: float
+                lon1:
                     The longitude value of point 1.
-                lat2: float
+                lat2:
                     The latitude value of point 2.
-                lon2: float
+                lon2:
                     The longitude value of point 2.
 
             Returns
@@ -64,12 +65,11 @@ class DistanceFormulaLog:
                 float
                     Bearing between 2 points
         """
-        y = math.cos(math.radians(lat2)) * math.sin(math.radians(lon2) - math.radians(lon1))
+        lat1, lon1, lat2, lon2 = np.radians([lat1, lon1, lat2, lon2])
 
-        x = (math.cos(math.radians(lat1)) * math.sin(math.radians(lat2))) - \
-            (math.sin(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.cos(
-                math.radians(lon2) - math.radians(lon1)))
+        y = np.cos(lat2) * np.sin(lon2 - lon1)
+        x = np.cos(lat1) * np.sin(lat2) - np.sin(lat1) * np.cos(lat2) * np.cos(lon2 - lon1)
 
-        bearing = math.atan2(y, x)
+        bearing = np.arctan2(y, x)
 
-        return math.degrees(bearing)
+        return np.rad2deg(bearing)

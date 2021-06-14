@@ -21,7 +21,7 @@ import pandas as pd
 from core.TrajectoryDF import NumPandasTraj
 from features.helper_functions import Helpers as helpers
 from utilities import constants as const
-from utilities.DistanceCalculator import DistanceFormulaLog as calc
+from utilities.DistanceCalculator import FormulaLog as calc
 from utilities.exceptions import *
 
 
@@ -166,21 +166,25 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        # TODO: ON MONDAY, MAKE SURE TO REFACTOR THIS FILE.
-        # TODO: INCLUDE A CHECK WHERE WE CAN CALL THE HELPER DIRECTLY AND RUN STRAIGHT
-        #       INSTEAD OF PARALLEL WHEN THE NUMBER OF IDs IS SMALL.
-        # TODO: MAKE SURE TO DO THIS FOR ALL FUNCTIONS THAT CAN HAVE IT.
+        # Case-1: The number of unique Trajectory IDs is less than x.
+        if dataframe.traj_id.nunique() < const.MIN_IDS:
+            result = helpers._distance_between_consecutive_helper(dataframe)
+            return NumPandasTraj(result, const.LAT, const.LONG,
+                                 const.DateTime, const.TRAJECTORY_ID)
 
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
-        # Now, lets create a pool of processes which contains processes equal to the number
-        # of smaller chunks and then run them in parallel so that we can calculate
-        # the distance for each smaller chunk and then merge all of them together.
-        multi_pool = multiprocessing.Pool(len(df_chunks))
-        result = multi_pool.map(helpers._consecutive_distance_alt, df_chunks)
+        # Case-2: The number unique Trajectory IDs is significant.
+        else:
+            # splitting the dataframe according to trajectory ids.
+            df_chunks = helpers._df_split_helper(dataframe)
 
-        # Now lets, merge the smaller pieces and then return the dataframe
-        return pd.concat(result)
+            # Now, create a multiprocessing pool and then run processes in parallel
+            # which calculate the end locations for a smaller set of IDs only.
+            multi_pool = multiprocessing.Pool(len(df_chunks))
+            result = multi_pool.map(helpers._distance_between_consecutive_helper, df_chunks)
+
+            # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
+            return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
+                                 const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_distance_from_start_column(dataframe: NumPandasTraj):
@@ -201,18 +205,25 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        #dataframe = dataframe.reset_index()
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
+        # Case-1: The number of unique Trajectory IDs is less than x.
+        if dataframe.traj_id.nunique() < const.MIN_IDS:
+            result = helpers._distance_from_start_helper(dataframe)
+            return NumPandasTraj(result, const.LAT, const.LONG,
+                                 const.DateTime, const.TRAJECTORY_ID)
 
-        # Now, lets create a multiprocessing pool of processes and then create as many
-        # number of processes as there are number of partitions and run each process in parallel.
-        pool = multiprocessing.Pool(len(df_chunks))
-        answer = pool.map(helpers._start_distance_helper, df_chunks)
+        # Case-2: The number unique Trajectory IDs is significant.
+        else:
+            # splitting the dataframe according to trajectory ids.
+            df_chunks = helpers._df_split_helper(dataframe)
 
-        answer = pd.concat(answer)
-        return answer
-        #return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            # Now, create a multiprocessing pool and then run processes in parallel
+            # which calculate the end locations for a smaller set of IDs only.
+            multi_pool = multiprocessing.Pool(len(df_chunks))
+            result = multi_pool.map(helpers._distance_from_start_helper, df_chunks)
+
+            # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
+            return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
+                                 const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def get_distance_travelled_by_date_and_traj_id(dataframe: NumPandasTraj, date, traj_id=None):
@@ -352,7 +363,7 @@ class SpatialFeatures:
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             distances = dataframe.reset_index()['Distance_prev_to_curr']
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             # Assign the new column and return the NumPandasTrajDF.
             dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy()
@@ -368,10 +379,10 @@ class SpatialFeatures:
             #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_distance_between_consecutive_column(dataframe)
             distances = dataframe.reset_index()['Distance_prev_to_curr']
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             # Assign the column and return the NumPandasTrajDF.
-            dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy()
+            dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy(dtype=np.float64)
             return dataframe
 
     @staticmethod
@@ -398,7 +409,7 @@ class SpatialFeatures:
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Acceleration_prev_to_curr'] = (speed_deltas / time_deltas).to_numpy()
             return dataframe
@@ -410,7 +421,7 @@ class SpatialFeatures:
             #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_speed_from_prev_column(dataframe)
             speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Acceleration_prev_to_curr'] = (speed_deltas / time_deltas).to_numpy()
             return dataframe
@@ -439,7 +450,7 @@ class SpatialFeatures:
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
             return dataframe
@@ -451,7 +462,7 @@ class SpatialFeatures:
             #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_acceleration_from_prev_column(dataframe)
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
             return dataframe
@@ -475,19 +486,25 @@ class SpatialFeatures:
                 NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        dataframe = dataframe.reset_index()
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
+        # Case-1: The number of unique Trajectory IDs is less than x.
+        if dataframe.traj_id.nunique() < const.MIN_IDS:
+            result = helpers._bearing_helper(dataframe)
+            return NumPandasTraj(result, const.LAT, const.LONG,
+                                 const.DateTime, const.TRAJECTORY_ID)
 
-        # Now lets create a Pool of processes which has number of processes equal
-        # to the number of smaller pieces of data and then lets run them all in
-        # parallel.
-        multi_pool = multiprocessing.Pool(len(df_chunks))
-        result = multi_pool.map(helpers._bearing_helper, df_chunks)
+        # Case-2: The number unique Trajectory IDs is significant.
+        else:
+            # splitting the dataframe according to trajectory ids.
+            df_chunks = helpers._df_split_helper(dataframe)
 
-        # Now, lets concat the results and then return the dataframe.
-        result = pd.concat(result)
-        return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            # Now, create a multiprocessing pool and then run processes in parallel
+            # which calculate the end locations for a smaller set of IDs only.
+            multi_pool = multiprocessing.Pool(len(df_chunks))
+            result = multi_pool.map(helpers._bearing_helper, df_chunks)
+
+            # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
+            return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
+                                 const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_bearing_rate_column(dataframe: NumPandasTraj):
@@ -513,7 +530,7 @@ class SpatialFeatures:
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Bearing_rate_from_prev'] = (bearing_deltas / time_deltas).to_numpy()
             return dataframe
@@ -523,7 +540,7 @@ class SpatialFeatures:
             #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_bearing_column(dataframe)
             bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Bearing_rate_from_prev'] = (bearing_deltas / time_deltas).to_numpy()
             return dataframe
@@ -552,7 +569,7 @@ class SpatialFeatures:
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             bearing_rate_deltas = dataframe.reset_index()['Bearing_rate_from_prev'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
             return dataframe
@@ -562,7 +579,7 @@ class SpatialFeatures:
             #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_bearing_rate_column(dataframe)
             bearing_rate_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
-            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.seconds
+            time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
             return dataframe
