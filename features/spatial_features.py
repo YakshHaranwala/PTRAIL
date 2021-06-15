@@ -321,14 +321,14 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        dataframe = dataframe.reset_index()
+        #dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
         # Now, lets create a multiprocessing pool of processes and then create as many
         # number of processes as there are number of partitions and run each process in parallel.
         pool = multiprocessing.Pool(len(df_chunks))
-        answer = pool.starmap(helpers._distance_from_distance_helper, zip(df_chunks, itertools.repeat(coordinates)))
+        answer = pool.starmap(helpers._distance_from_given_point_helper, zip(df_chunks, itertools.repeat(coordinates)))
 
         # Now lets join all the smaller partitions and then add the Distance to the
         # specific point column.

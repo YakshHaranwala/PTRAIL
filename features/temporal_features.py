@@ -28,10 +28,8 @@ class TemporalFeatures:
     def create_date_column(dataframe: NumPandasTraj):
         """
             From the DateTime column already present in the data, extract only the date
-            and then add another column containing just the date. First split the dataframe 
-            in smaller ones based on ids and then run all the smaller dataframes in parallel
-            and extract the date column and then concat all of the dataframes into the
-            original one with an additional date column.
+            and then add another column containing just the date.
+
             Parameters
             ----------
                 dataframe: NumPandasTraj
@@ -63,10 +61,8 @@ class TemporalFeatures:
     def create_time_column(dataframe: NumPandasTraj):
         """
             From the DateTime column already present in the data, extract only the time
-            and then add another column containing just the time.  First split the dataframe 
-            in smaller ones based on ids and then run all the smaller dataframes in parallel
-            and extract the time column and then concat all of the dataframes into the
-            original one with an additional time column
+            and then add another column containing just the time.
+
             Parameters
             ----------
                 dataframe: NumPandasTraj
