@@ -42,7 +42,11 @@ class TemporalFeatures:
 
         """
         df = dataframe.reset_index()
+
+        # From the DateTime value extract the dates and store them in Date column
         df['Date'] = df[const.DateTime].dt.date
+
+        # Return the dataframe by converting it to NumPandasTraj
         return NumPandasTraj(df.reset_index(drop=True), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
@@ -82,8 +86,7 @@ class TemporalFeatures:
         """
             Create a column called Day_Of_Week which contains the day of the week
             on which the trajectory point is recorded. This is calculated on the basis
-            of timestamp recorded in the data. By running smaller chunks of the original
-            dataframes in parallel and extracting the days from there.
+            of timestamp recorded in the data.
 
             Parameters
             ----------
@@ -125,6 +128,12 @@ class TemporalFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column if inplace.
 
+            References
+            ----------
+                "Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
+                 Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
+                 Universidade Federal Do Cear ́a, 2019."
+
         """
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
@@ -158,19 +167,21 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
-
-        # Now lets create a pool of processes and run the weekend calculator function
-        # on all the smaller parts of the original dataframe and store their results.
-        multi_pool = multiprocessing.Pool(len(df_chunks))
-        results = multi_pool.map(helpers._time_of_day_helper, df_chunks)
-
-        # Now, lets merge all the smaller parts together
-        final_df = pd.concat(results)
-
-        # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(final_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        dataframe = dataframe.reset_index()
+        # Extract the hours from the Datetime column and then create a list of conditions for the
+        # different periods of time
+        hours = dataframe[const.DateTime].dt.hour
+        conditions = [
+            (hours > 4) & (hours <= 8),
+            (hours > 8) & (hours <= 12),
+            (hours > 12) & (hours <= 16),
+            (hours > 16) & (hours <= 20),
+            (hours > 20) & (hours <= 0),
+            (hours > 0) & (hours <= 4),
+        ]
+        # Map the conditions to the different periods of  the day
+        dataframe['Time_Of_Day'] = np.select(conditions, const.TIME_OF_DAY)
+        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def get_traj_duration(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
