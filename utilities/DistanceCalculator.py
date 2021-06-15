@@ -73,3 +73,35 @@ class FormulaLog:
         bearing = np.arctan2(y, x)
 
         return np.rad2deg(bearing)
+
+    @staticmethod
+    def interpolate_haversine(p1: tuple, p2: tuple):
+        """
+            Parameters
+            ----------
+                p1: tuple
+                    The coordinates of point 1.
+                p2: tuple
+                    The coordinates of point 2.
+
+            Returns
+            -------
+                float:
+                    The distance between 2 points.
+
+            References
+            ----------
+                "Etemad, M., Etemad, Z., Soares, A., Bogorny, V., Matwin12, S., & Torgo, L., 2020.
+                Wise Sliding Window Segmentation: A classification-aided approach for trajectory segmentation."
+
+        """
+        lat, lon = p1
+        lat2, lon2 = p2
+
+        # Convert the required values to radians and then calculate the crow-distance.
+        d_lat, d_lon, lat1, lat2 = map(np.radians, (lat2 - lat, lon2 - lon, lat, lat2))
+        a = np.sin(d_lat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(d_lon / 2) ** 2
+
+        # Calculate the final distance.
+        distance_val = 2 * np.arcsin(np.sqrt(a)) * 6372.8 * 1000  # convert to meter
+        return distance_val

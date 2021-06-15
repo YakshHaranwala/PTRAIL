@@ -574,40 +574,6 @@ class Filters:
                                           f"Please run the function create_distance_between_consecutive_column() "
                                           f"before running this filter.")
 
-    # @staticmethod
-    # def filter_outliers_by_consecutive_distance_using_zscore(dataframe: NumTrajDF):
-    #     """
-    #         Check the outlier points based on distance between 2 consecutive points.
-    #         Outlier means the points which have z-score greater than |3|. The z-score
-    #         is calculated as follows:
-    #                 z = (x - average) / standard_deviation
-    #         Outliers are those points that have the absolute value of z-score larger
-    #         than 3.
-    #
-    #         Parameters
-    #         ----------
-    #             dataframe: NumPandasTraj
-    #                 The dataframe which is to be filtered.
-    #
-    #         Returns
-    #         -------
-    #             NumPandasTraj:
-    #                 The dataframe which has been filtered.
-    #
-    #         Raises
-    #         ------
-    #             KeyError:
-    #                 The column 'Distance_prev_to_curr' is not present in the dataset.
-    #     """
-    #     try:
-    #         filt = np.abs(stat.zscore(dataframe['Distance_prev_to_curr'], nan_policy='omit') < 3)
-    #         dataframe = dataframe.loc[filt]
-    #         return dataframe
-    #     except KeyError:
-    #         raise MissingColumnsException(f"The column 'Distance_prev_to_curr' is missing in the dataset. "
-    #                                       f"Please run the function create_distance_between_consecutive_column() "
-    #                                       f"before running this filter.")
-
     @staticmethod
     def filter_outliers_by_consecutive_speed(dataframe):
         """
@@ -654,16 +620,33 @@ class Filters:
 
     @staticmethod
     def remove_trajectories_with_less_points(dataframe, num_min_points: Optional[int] = 2):
-        pass
+        """
+            Remove out the trajectories from the dataframe which have few points.
 
-    @staticmethod
-    def remove_short_and_trajectories_with_few_points(dataframe, min_dist: float, num_min_points: Optional[int] = 2):
-        pass
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe from which trajectories with few points are to be
+                    removed.
+                num_min_points: Optional[int], default = 2
+                    The minimum number of points that a trajectory should have if it
+                    is to be retained in the dataset.
 
-    @staticmethod
-    def filter_by_label(dataframe, column_name, value):
-        pass
+            Returns
+            -------
+                NumPandasTraj:
+                    The filtered dataframe which does not contain the trajectories
+                    with few points anymore.
+        """
+        dataframe = dataframe.reset_index()
+        # Mapping the trajectory id column with only those trajectory ids that contain more
+        # or equal points than specified by the user.
+        filt = dataframe[const.TRAJECTORY_ID].map(dataframe[const.TRAJECTORY_ID].value_counts()) >= num_min_points
 
-    @staticmethod
-    def filter_outliers_knn(dataframe, k: int):
-        pass
+        # Apply the filter, convert the resultant dataframe to NumTrajDF and return it.
+        df = dataframe[filt]
+        return NumTrajDF(df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+
+    # @staticmethod
+    # def filter_outliers_knn(dataframe, k: int):
+    #     pass
