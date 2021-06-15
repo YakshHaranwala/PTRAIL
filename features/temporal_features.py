@@ -17,6 +17,7 @@ import multiprocessing
 from typing import Optional, Text
 
 import pandas as pd
+import numpy as np
 
 from core.TrajectoryDF import NumPandasTraj
 from features.helper_functions import Helpers as helpers
@@ -66,20 +67,13 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
+        dataframe = dataframe.reset_index()
 
-        # Now, create a pool of processes which has a number of processes
-        # equal to the number of smaller chunks of the original dataframe.
-        # Then, calculate the result on each separate part in parallel and store it in
-        # the result variable which is of type Mapper.
-        pool = multiprocessing.Pool(len(df_chunks))
-        result = pool.map(helpers._time_helper, df_chunks)
+        # From the DateTime column extract the time and store them in the Time column
+        dataframe['Time'] = dataframe[const.DateTime].dt.time
 
-        time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
-
-        # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(time_containing_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Return the dataframe by converting it into NumPandasTraj type
+        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_day_of_week_column(dataframe: NumPandasTraj):
@@ -98,19 +92,13 @@ class TemporalFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
+        dataframe = dataframe.reset_index()
 
-        # Now lets create a pool of processes which will then create processes equal to
-        # the number of smaller chunks of the original dataframe and will calculate
-        # the result on each of the smaller chunk.
-        pool_of_processes = multiprocessing.Pool(len(df_chunks))
-        results = pool_of_processes.map(helpers._day_of_week_helper, df_chunks)
+        # From the DateTime column extract the time and store them in the Time column
+        dataframe['Day_Of_Week'] = dataframe[const.DateTime].dt.day_name()
 
-        final_df = pd.concat(results)       # Merging the chunks of dataframe with the new column
-
-        # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(final_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Return the dataframe by converting it into NumPandasTraj type
+        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_weekend_indicator_column(dataframe: NumPandasTraj):
@@ -135,19 +123,21 @@ class TemporalFeatures:
                  Universidade Federal Do Cear ́a, 2019."
 
         """
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
+        dataframe = dataframe.reset_index()
+        # Check if Day_of_Week column is present in the dataframe
+        if 'Day_Of_Week' in dataframe.columns:
+            # store the weekend days in a series
+            fd = np.logical_or(dataframe['Day_Of_Week'] == const.WEEKEND[0],
+                               dataframe['Day_Of_Week'] == const.WEEKEND[1])
+            # store the index of the weekends
+            index_fd = dataframe[fd].index
+            # initialize the Weekend column with False and then update all the indexes which
+            # indicates that it's a weekend
+            dataframe['Weekend'] = False
+            dataframe.at[index_fd, 'Weekend'] = True
 
-        # Now lets create a pool of processes and run the weekend calculator function
-        # on all the smaller parts of the original dataframe and store their results.
-        mp_pool = multiprocessing.Pool(len(df_chunks))
-        results = mp_pool.map(helpers._weekend_helper, df_chunks)
-
-        # Now, lets merge all the smaller parts together
-        final_df = pd.concat(results)
-
-        # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(final_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Return the dataframe by converting it into NumPandasTraj
+        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_time_of_day_column(dataframe: NumPandasTraj):
@@ -165,6 +155,12 @@ class TemporalFeatures:
             -------
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
+
+            References
+            ----------
+                "Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
+                 Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
+                 Universidade Federal Do Cear ́a, 2019."
 
         """
         dataframe = dataframe.reset_index()

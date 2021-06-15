@@ -14,7 +14,7 @@ OBJECT_ID = 'object_id'
 
 MANDATORY_COLUMNS = [LAT, LONG, DateTime, TRAJECTORY_ID]
 
-# ----------------------------------- Temporal Constants ---------------------------------------#
+# ----------------------------------- Temporal Constants ----------------------------------------#
 WEEKEND = ['Saturday', 'Sunday']
 
 TIME_OF_DAY = [
@@ -28,4 +28,5 @@ TIME_OF_DAY = [
 # ---------------------------------- Spatial Constants -------------------------------------------#
 RADIUS_OF_EARTH = 6371  # KM
 
+# ---------------------------------- Splitting Constants -----------------------------------------#
 MIN_IDS = 100
