@@ -1,11 +1,12 @@
 from parser import ParserError
-from typing import Dict, List, Union, Optional, Text
+from typing import Dict, List, Union, Optional, Text, Hashable, Sequence
 
 import numpy as np
 import pandas as pd
 import pandas.core.dtypes.common
 from pandas import DataFrame
 from pandas._libs import lib
+from pandas._typing import Label
 
 import utilities.constants as const
 from utilities.exceptions import *
@@ -70,7 +71,7 @@ class NumPandasTraj(DataFrame):
         # of all the columns abd then calling the super() to create and return the dataframe.
         if self.validate_columns(data_set):
             self.validate_data_types(data_set)
-            data_set.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
+            data_set.set_index([const.TRAJECTORY_ID, const.DateTime], inplace=True)
             super(NumPandasTraj, self).__init__(data_set)
 
     # ------------------------------ General Utilities ----------------------------- #

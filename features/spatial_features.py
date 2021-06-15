@@ -247,8 +247,8 @@ class SpatialFeatures:
         """
         # First, reset the index of the dataframe.
         # Then, filter the dataframe based on Date and Trajectory ID if given by user.
-        data = dataframe.reset_index()
-        filt = data.loc[data[const.DateTime].dt.date == pd.to_datetime(date)]
+        dataframe = dataframe.reset_index()
+        filt = dataframe.loc[dataframe[const.DateTime].dt.date == pd.to_datetime(date)]
         small = filt.loc[filt[const.TRAJECTORY_ID] == traj_id] if traj_id is not None else filt
 
         # First, lets fetch the latitude and longitude columns from the dataset and store it
@@ -289,7 +289,6 @@ class SpatialFeatures:
                     The dataframe containing the resultant column.
 
         """
-        dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
@@ -301,7 +300,7 @@ class SpatialFeatures:
 
         # Now lets join all the smaller partitions and return the resultant dataframe
         result = pd.concat(result)
-        return NumPandasTraj(result, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return NumPandasTraj(result.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_distance_from_given_point_column(dataframe: NumPandasTraj, coordinates: tuple):
@@ -335,7 +334,7 @@ class SpatialFeatures:
         answer = pd.concat(answer)
 
         # return the answer dataframe converted to NumPandasTraj.
-        return NumPandasTraj(answer, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return NumPandasTraj(answer.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_speed_from_prev_column(dataframe: NumPandasTraj):

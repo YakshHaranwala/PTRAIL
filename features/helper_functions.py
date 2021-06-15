@@ -52,6 +52,12 @@ class Helpers:
         return dataframe  # Return the dataframe with the date column inside it.
 
     @staticmethod
+    def _date_alt(dataframe):
+        dataframe = dataframe.reset_index()
+        dataframe['Date'] = dataframe[const.DateTime].dt.date
+        return dataframe.reset_index(drop=True)
+
+    @staticmethod
     def _time_helper(dataframe):
         """
             This function is a helper method for the create_time_column(). The create_time_helper()
@@ -81,7 +87,8 @@ class Helpers:
         for i in range(len(datetime)):
             datetime[i] = datetime[i][1].strftime(time_format)
 
-        dataframe['Time'] = pd.to_datetime(datetime)
+        dataframe['Time'] = pd.to_datetime(datetime, format=time_format)
+        dataframe['Time'] = dataframe['Time'].dt.time
         return dataframe
 
     @staticmethod

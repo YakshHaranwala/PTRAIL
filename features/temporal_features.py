@@ -41,21 +41,9 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        dataframe = dataframe.reset_index()
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe)
-
-        # Now, create a pool of processes which has a number of processes
-        # equal to the number of smaller chunks of the original dataframe.
-        # Then, calculate the result on each separate part in parallel and store it in
-        # the result variable which is of type Mapper.
-        pool = multiprocessing.Pool(len(df_chunks))
-        result = pool.map(helpers._date_helper, df_chunks)
-
-        time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
-        
-        # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        df = dataframe.reset_index()
+        df['Date'] = df[const.DateTime].dt.date
+        return NumPandasTraj(df.reset_index(drop=True), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_time_column(dataframe: NumPandasTraj):
@@ -74,7 +62,6 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
@@ -88,7 +75,7 @@ class TemporalFeatures:
         time_containing_df = pd.concat(result)  # Now join all the smaller pieces together.
 
         # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(time_containing_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return NumPandasTraj(time_containing_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_day_of_week_column(dataframe: NumPandasTraj):
@@ -108,7 +95,6 @@ class TemporalFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
@@ -121,7 +107,7 @@ class TemporalFeatures:
         final_df = pd.concat(results)       # Merging the chunks of dataframe with the new column
 
         # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return NumPandasTraj(final_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_weekend_indicator_column(dataframe: NumPandasTraj):
@@ -140,7 +126,6 @@ class TemporalFeatures:
                     The dataframe containing the resultant column if inplace.
 
         """
-        dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
@@ -153,7 +138,7 @@ class TemporalFeatures:
         final_df = pd.concat(results)
 
         # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return NumPandasTraj(final_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_time_of_day_column(dataframe: NumPandasTraj):
@@ -173,7 +158,6 @@ class TemporalFeatures:
                     The dataframe containing the resultant column.
 
         """
-        dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
@@ -186,7 +170,7 @@ class TemporalFeatures:
         final_df = pd.concat(results)
 
         # Returns the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(final_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return NumPandasTraj(final_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def get_traj_duration(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
