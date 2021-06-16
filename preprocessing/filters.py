@@ -18,6 +18,12 @@ from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from utilities.exceptions import *
 
 
+# TODO: When we filter out the trajectories based o distance and time, i think we need to
+#      calculate the actual distances again as I feel that the distance reported are 
+#      incorrect because there might be some kinematic features which are calculated from the 
+#      points that were removed and those features now would be reported incorrectly.
+
+
 class Filters:
     @staticmethod
     def remove_duplicates(dataframe: NumTrajDF):

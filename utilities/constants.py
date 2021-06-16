@@ -27,6 +27,7 @@ TIME_OF_DAY = [
 ]
 # ---------------------------------- Spatial Constants -------------------------------------------#
 RADIUS_OF_EARTH = 6371  # KM
+PREV_DIST = 'Distance_prev_to_curr'
 
 # ---------------------------------- Splitting Constants -----------------------------------------#
 MIN_IDS = 100
