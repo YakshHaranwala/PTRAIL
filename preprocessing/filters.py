@@ -619,7 +619,7 @@ class Filters:
                                           f"before running this filter.")
 
     @staticmethod
-    def remove_trajectories_with_less_points(dataframe, num_min_points: Optional[int] = 2):
+    def remove_trajectories_with_less_points(dataframe, num_min_points: Optional[int] = 3):
         """
             Remove out the trajectories from the dataframe which have few points.
 
