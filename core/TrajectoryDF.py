@@ -72,6 +72,7 @@ class NumPandasTraj(DataFrame):
         if self.validate_columns(data_set):
             self.validate_data_types(data_set)
             data_set.set_index([const.TRAJECTORY_ID, const.DateTime], inplace=True)
+            data_set.sort_values([const.TRAJECTORY_ID, const.DateTime], inplace=True)
             super(NumPandasTraj, self).__init__(data_set)
 
     # ------------------------------ General Utilities ----------------------------- #

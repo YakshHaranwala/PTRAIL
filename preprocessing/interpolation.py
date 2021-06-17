@@ -7,16 +7,19 @@
     @Date: 10th June, 2021
     @Version 1.0
 """
-from typing import Optional, Text
-
-import pandas as pd
-
-from core.TrajectoryDF import NumPandasTraj as NumTrajDF
-from utilities.DistanceCalculator import FormulaLog as calc
-import utilities.constants as const
-from features.spatial_features import SpatialFeatures as spatial
-from features.helper_functions import Helpers as help
 from utilities.exceptions import *
+from typing import Optional, Text
+from core.TrajectoryDF import NumPandasTraj as NumTrajDF
+from features.spatial_features import SpatialFeatures as spatial
+from preprocessing.helpers import InterpolationHelpers as ip_help
+
+import multiprocessing
+import pandas as pd
+import itertools
+import utilities.constants as const
+
+pd.set_option('mode.chained_assignment', None)
+
 
 # TODO: So basically, the WS-II Repository is performing calculations and
 #       returning a point that is interpolated on the basis of 7 rows of dataframes.
@@ -86,32 +89,30 @@ class Interpolate:
                     Distance_prev_to_curr column is not present in the dataframe
         """
         try:
-            # First, break down the originally given dataframe by the user
-            # into smaller chunks based on the trajectory ID and store all the
-            # smaller dataframes in a list.
-            # dataframe = spatial.create_distance_between_consecutive_column(dataframe)
-            dataframe[const.PREV_DIST] = dataframe[const.PREV_DIST].fillna(0)
+
+            # First, split the dataframe based on the number of IDs and store all the
+            # smaller chunks into a list.
+            # dataframe[const.PREV_DIST] = dataframe[const.PREV_DIST].fillna(0)
             dataframe = dataframe.reset_index()
-            ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys()
-            chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
+            df_chunks = ip_help._df_split_helper(dataframe)
 
-            # On all the separate dataframes, run the linear interpolation calculation
-            # on all of the smaller dataframes containing only a smaller set of points.
-            results = []
-            for i in range(len(chunks)):
-                results.append(Interpolate.linear_interpolate(chunks[i], distance_threshold))
+            # Now, create a multiprocessing pool and run all the processes in
+            # parallel to interpolate the dataframes.
+            mp_pool = multiprocessing.Pool(len(df_chunks))
+            print(len(df_chunks))
+            results = mp_pool.starmap(Interpolate.cubic_interpolation,
+                                      (zip(df_chunks, itertools.repeat(distance_threshold))))
 
-            # Convert the resultant dataframe from the above calculations into a NumPandasTraj
-            # and again perform the consecutive distance calculation in order to avoid false
-            # reporting of the values.
+            # Now, convert the results DF into NumPandasTraj, calculate distance
+            # between consecutive columns and return the dataframe.
             to_return = NumTrajDF(pd.concat(results), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-            return spatial.create_distance_between_consecutive_column(to_return)
-
+            return spatial.create_distance_between_consecutive_column(to_return).sort_values(by=[const.TRAJECTORY_ID,
+                                                                                                 const.DateTime])
         except KeyError:
-            raise MissingColumnsException("The column 'Distance_prev_to_curr' is missing in the data."
-                                          "Please run the function create_distance_between_consecutive() from"
-                                          "the spatial features module first before running the interpolation.")
-
+            raise MissingColumnsException("The column 'Distance_prev_to_curr' is missing in the dataset."
+                                          "Please run the function create_distance_between_consecutive_column()"
+                                          "function from the spatial_features module of the features package"
+                                          "before running interpolation.")
 
     @staticmethod
     def linear_interpolate(dataframe, distance_threshold):
@@ -132,40 +133,27 @@ class Interpolate:
                 pandas.core.dataframe.DataFrame:
                     The dataframe with enhanced trajectory points calculated by linear
                     interpolation method.
+
+            References
+            ----------
+                "Etemad, M., Soares, A., Etemad, E. et al. SWS: an unsupervised trajectory
+                segmentation algorithm based on change detection with interpolation kernels.
+                Geoinformatica (2020)"
         """
         df = dataframe.copy()
         df1 = df[[const.TRAJECTORY_ID, const.DateTime, const.LAT, const.LONG, const.PREV_DIST]]
-        dists = dataframe[const.PREV_DIST].to_list()
+        ids_ = df1[const.TRAJECTORY_ID].to_list()
+        dists = dataframe[const.PREV_DIST].fillna(0).to_list()
         for i in range(len(df)):
             if dists[i] > distance_threshold:
-                if dists[i - 1] and dists[i - 2]:
-                    vals = Interpolate.linear(dataframe.iloc[i - 2: i + 1])
-                else:
-                    vals = Interpolate.linear(dataframe.iloc[i: i + 3])
-
-                # dataframe.loc[(2 * i - 1) / 2] = [dataframe[const.TRAJECTORY_ID].iloc[0], vals['inter_time'],
-                #                                   vals['inter_x'], vals['inter_y'], 0]
+                if (dists[i - 1] and dists[i - 2]) and (ids_[i - 2] == ids_[i - 1] == ids_[i]):
+                    vals = ip_help._linear_helper(dataframe.iloc[i - 2: i + 1])
+                elif ids_[i - 1] == ids_[i] == ids_[i + 1]:
+                    vals = ip_help._linear_helper(dataframe.iloc[i - 1: i + 2])
                 df1.loc[(2 * i - 1) / 2] = [dataframe[const.TRAJECTORY_ID].iloc[0], vals['inter_time'],
                                             vals['inter_x'], vals['inter_y'], 0]
 
         return df1.sort_index().reset_index(drop=True)
-
-    @staticmethod
-    def linear(dataframe):
-        mid = int(len(dataframe) / 2)
-
-        lat = dataframe.lat.values
-        lon = dataframe.lon.values
-        time = dataframe[const.DateTime].values
-
-        interpolated_x, interpolated_y = (lat[mid - 1] + lat[mid + 1]) / 2, (lon[mid - 1] + lon[mid + 1]) / 2
-        interpolated_time_diff = (time[mid + 1] - time[mid - 1]) / 2
-        interpolated_time = time[mid - 1] + interpolated_time_diff
-
-        return {'inter_x': interpolated_x,
-                'inter_y': interpolated_y,
-                'inter_time': interpolated_time
-                }
 
     @staticmethod
     def cubic_interpolation(dataframe, distance_threshold):
