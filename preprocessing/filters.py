@@ -8,12 +8,13 @@
     @Version: 1.0
 """
 import math
-from typing import Text, Optional
-
+import warnings
 import numpy as np
 import pandas as pd
 
 import utilities.constants as const
+from hampel import hampel
+from typing import Text, Optional
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from utilities.exceptions import *
 
@@ -653,6 +654,52 @@ class Filters:
         df = dataframe[filt]
         return NumTrajDF(df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
-    # @staticmethod
-    # def filter_outliers_knn(dataframe, k: int):
-    #     pass
+    @staticmethod
+    def hampel_outlier_detection(dataframe, column_name: Text):
+        """
+            Use the hampel filter to remove outliers from the dataset on the basis
+            of column specified by the user.
+
+            WARNING: The execution speed is slower than the other outlier detection methods
+                     provided in the library.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe from which the outliers are to be removed.
+                column_name: Text
+                    The column on te basis of which the outliers are to be detected.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe with the outliers removed.
+
+            Raises
+            ------
+                KeyError:
+                    The user-specified column is not present in the dataset.
+
+            References
+            ----------
+                "Pedrido, M.O., "Hampel", (2020), GitHub repository,
+                https://github.com/MichaelisTrofficus/hampel_filter"
+        """
+        try:
+            # First, extract the column from the dataframe and then obtain the
+            # outlier indices which are to be removed.
+            dataframe = dataframe.reset_index()
+            col = dataframe[column_name]
+            outlier_indices = hampel(col)
+
+            # Now, drop the indices given out by the hampel filter.
+            to_return = dataframe.drop(dataframe.index[outlier_indices])
+
+            warnings.warn("If kinematic features have been generated on the dataframe, then make "
+                          "sure to generate them again as outlier detection drops the point from "
+                          "the dataframe and does not run the kinematic features again.")
+
+            return NumTrajDF(to_return, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        except KeyError as e:
+            raise MissingColumnsException(f"The column {column_name} does not exist in the dataset."
+                                          f"Please check the column name and try again.")

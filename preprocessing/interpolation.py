@@ -99,15 +99,16 @@ class Interpolate:
             # Now, create a multiprocessing pool and run all the processes in
             # parallel to interpolate the dataframes.
             mp_pool = multiprocessing.Pool(len(df_chunks))
-            print(len(df_chunks))
-            results = mp_pool.starmap(Interpolate.cubic_interpolation,
+            results = mp_pool.starmap(Interpolate._linear_interpolate,
                                       (zip(df_chunks, itertools.repeat(distance_threshold))))
 
             # Now, convert the results DF into NumPandasTraj, calculate distance
             # between consecutive columns and return the dataframe.
             to_return = NumTrajDF(pd.concat(results), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-            return spatial.create_distance_between_consecutive_column(to_return).sort_values(by=[const.TRAJECTORY_ID,
-                                                                                                 const.DateTime])
+            final = spatial.create_distance_between_consecutive_column(to_return).sort_values(by=[const.TRAJECTORY_ID,
+                                                                                                  const.DateTime])
+            return final
+
         except KeyError:
             raise MissingColumnsException("The column 'Distance_prev_to_curr' is missing in the dataset."
                                           "Please run the function create_distance_between_consecutive_column()"
@@ -115,8 +116,11 @@ class Interpolate:
                                           "before running interpolation.")
 
     @staticmethod
-    def linear_interpolate(dataframe, distance_threshold):
+    def _linear_interpolate(dataframe, distance_threshold):
         """
+            WARNING: DONT USE THIS METHOD DIRECTLY AS IT WILL NOT WORK.
+                       INSTEAD, USE THE METHOD interploate_position().
+
             Use the Linear Interpolation method to smoothen the trajectory
             when the distance between 2 consecutive points is greater than
             the user-specified value.
@@ -200,28 +204,35 @@ class Interpolate:
 
     @staticmethod
     def cubic_alt(dataframe, distance_threshold):
-        df = dataframe.reset_index().copy()
+        df = dataframe.reset_index().copy()[
+            [const.TRAJECTORY_ID, const.DateTime, const.LAT, const.LONG, const.PREV_DIST]]
         ids_ = list(dataframe.traj_id.value_counts().keys())
         chunks = [df.loc[df[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
         results = []
         for i in range(len(chunks)):
             results.append(Interpolate.cubic_inter(chunks[i], distance_threshold))
 
-        return pd.concat(results).reset_index().set_index([const.TRAJECTORY_ID, const.DateTime]).sort_values([const.TRAJECTORY_ID, const.DateTime])
-        #return NumTrajDF(pd.concat(results).reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        final = NumTrajDF(pd.concat(results).reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+
+        to_return = spatial.create_distance_between_consecutive_column(final)
+        return to_return
+        # return NumTrajDF(pd.concat(results).reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def cubic_inter(dataframe, distance_threshold):
         df = dataframe.copy().set_index([const.DateTime])
         idx = df[const.TRAJECTORY_ID].iloc[0]
-        if len(dataframe) > 6:
-            for i in range(len(dataframe)-7):
-                seven_points = df.iloc[i:i+7, :]
+        l = len(dataframe)
+        if l > 7:
+            for i in range(len(dataframe) - 7):
+                seven_points = df.iloc[i:i + 7, :]
                 if Interpolate.check_threshold(seven_points, distance_threshold):
                     vals = ip_help.cubic(seven_points)
                     df.loc[pd.to_datetime(vals['inter_time'])] = [idx, vals['inter_x'], vals['inter_y'], 0]
-
-
+        elif 4 < l <= 6:
+            if Interpolate.check_threshold(df, distance_threshold):
+                vals = ip_help.cubic(df)
+                df.loc[pd.to_datetime(vals['inter_time'])] = [idx, vals['inter_x'], vals['inter_y'], 0]
         return df
 
     @staticmethod
