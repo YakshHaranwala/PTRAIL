@@ -7,16 +7,17 @@
     @Date: 10th June, 2021
     @Version 1.0
 """
-from utilities.exceptions import *
+import itertools
+import multiprocessing
 from typing import Optional, Text
+
+import pandas as pd
+
+import utilities.constants as const
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from features.spatial_features import SpatialFeatures as spatial
 from preprocessing.helpers import InterpolationHelpers as ip_help
-
-import multiprocessing
-import pandas as pd
-import itertools
-import utilities.constants as const
+from utilities.exceptions import *
 
 pd.set_option('mode.chained_assignment', None)
 

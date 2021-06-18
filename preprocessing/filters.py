@@ -9,12 +9,13 @@
 """
 import math
 import warnings
+from typing import Text, Optional
+
 import numpy as np
 import pandas as pd
+from hampel import hampel
 
 import utilities.constants as const
-from hampel import hampel
-from typing import Text, Optional
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from utilities.exceptions import *
 

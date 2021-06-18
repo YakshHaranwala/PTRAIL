@@ -1,12 +1,11 @@
 from parser import ParserError
-from typing import Dict, List, Union, Optional, Text, Hashable, Sequence
+from typing import Dict, List, Union, Optional, Text
 
 import numpy as np
 import pandas as pd
 import pandas.core.dtypes.common
 from pandas import DataFrame
 from pandas._libs import lib
-from pandas._typing import Label
 
 import utilities.constants as const
 from utilities.exceptions import *

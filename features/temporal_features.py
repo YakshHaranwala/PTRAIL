@@ -16,8 +16,8 @@ import itertools
 import multiprocessing
 from typing import Optional, Text
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from core.TrajectoryDF import NumPandasTraj
 from features.helper_functions import Helpers as helpers

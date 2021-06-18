@@ -320,7 +320,7 @@ class SpatialFeatures:
                 core.TrajectoryDF.NumPandasTraj
                     The dataframe containing the resultant column.
         """
-        #dataframe = dataframe.reset_index()
+        # dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 

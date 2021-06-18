@@ -14,12 +14,13 @@
     @Version: 1.0
     @Date: 16th June, 2021
 """
-import pandas as pd
-from scipy.interpolate import CubicSpline
-from scipy.interpolate import interp1d
 import os
+
 import numpy as np
 import psutil
+from scipy.interpolate import CubicSpline
+from scipy.interpolate import interp1d
+
 import utilities.constants as const
 
 
@@ -134,11 +135,10 @@ class InterpolationHelpers:
         loncs = CubicSpline(np.abs(t), lon)
         new_y = loncs(t3)
 
-        new_time = datetime[mid] - ((t3/2))
+        new_time = datetime[mid] - ((t3 / 2))
 
         pb = (new_x, new_y)
         pc = ((pf[0] + pb[0]) / 2, (pf[1] + pb[1]) / 2)
-
 
         return {'inter_x': pc[0],
                 'inter_y': pc[1],
@@ -170,7 +170,7 @@ class InterpolationHelpers:
         new_y = fy(t3)
 
         pc = (new_x, new_y)
-        new_time = datetime[mid] - ((t3 / 2)*10e9)
+        new_time = datetime[mid] - ((t3 / 2) * 10e9)
         return {'inter_x': pc[0],
                 'inter_y': pc[1],
                 'inter_time': new_time
