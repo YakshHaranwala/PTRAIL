@@ -37,7 +37,7 @@ class NumPandasTraj(DataFrame):
                     The header of the latitude column.
                 longitude: str
                     The header of the longitude column.
-                rest_of_columns: list[str]
+                rest_of_columns: Optional[list[Text]]
                     A list containing headers of the columns other than the mandatory ones.
         """
         # Case-1: The data is from a dictionary.
@@ -75,7 +75,8 @@ class NumPandasTraj(DataFrame):
             super(NumPandasTraj, self).__init__(data_set)
 
     # ------------------------------ General Utilities ----------------------------- #
-    def rename_df_col_headers(self, data: DataFrame, lat, lon, datetime, traj_id) -> DataFrame:
+    def rename_df_col_headers(self, data: DataFrame, lat: Text, lon: Text,
+                              datetime: Text, traj_id: Text):
         """
             Change the column headers of the columns when the user given data is in the
             form of a pandas DF while creating the NumPandasTraj. This method is mainly
@@ -120,9 +121,9 @@ class NumPandasTraj(DataFrame):
         """
             Check whether all the data given by the user is of valid type and if it isn't,
             it converts them to the specified data types.
-                1. Trajectory_ID: Python: string -> pd.datetime
-                2. LAT and LONG: Python: float -> float64
-                3. DateTime: Python: string -> dask.datetime64[ns]
+                1. Trajectory_ID: Any -> str
+                2. LAT and LONG: Any -> float64
+                3. DateTime: Any -> dask.datetime64[ns]
 
             Parameters
             ----------
@@ -217,25 +218,6 @@ class NumPandasTraj(DataFrame):
             latitude: const.LAT,
             longitude: const.LONG
         }
-
-    # def set_index(self, keys, drop=True, append=False, inplace=False, verify_integrity=False):
-    #     """
-    #         Change the index of the DataFrame.
-    #         !!!!                                                            !!!!
-    #             WARNING:
-    #             -------
-    #                 CHANGING OF THE INDEX IS NOT ALLOWED IN DaskTrajectoryDF.
-    #                 BY MANDATORY CONSTRAINTS, THE INDEX NEEDS TO BE DateTime.
-    #         !!!!                                                            !!!!
-    #
-    #         Raises
-    #         ------
-    #             NotAllowedError
-    #                 The change of index is not allowed in DaskTrajectoryDF.
-    #
-    #     """
-    #     raise NotAllowedError("Changing of index is not allowed.\n"
-    #                           "The index must be DateTime at all times.")
 
     def __reset_default_index(self):
         """
