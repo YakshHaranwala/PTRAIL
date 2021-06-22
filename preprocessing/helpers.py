@@ -15,167 +15,12 @@
     @Date: 16th June, 2021
 """
 import os
-
-import numpy as np
 import psutil
-from scipy.interpolate import CubicSpline
-from scipy.interpolate import interp1d
 
 import utilities.constants as const
 
 
-class InterpolationHelpers:
-    # ------------------------------------ Interpolation calculators ------------------------- #
-    @staticmethod
-    def _linear_helper(dataframe):
-        """
-            Use the linear interpolation formula and calculate the interpolated
-            position and time of a point, in a given 3 point dataframe chunk.
-
-            Parameters
-            ----------
-                dataframe: NumPandsTraj/pandas.core.dataframe.DataFrame
-                    The dataframe containing 3 points that are to be interpolated.
-
-            Returns
-            -------
-                dict:
-                    The interpolated latitude,longitude and time of the missing point.
-
-            References
-            ----------
-                "Etemad, M., Soares, A., Etemad, E. et al. SWS: an unsupervised trajectory
-                segmentation algorithm based on change detection with interpolation kernels.
-                Geoinformatica (2020)"
-        """
-        mid = int(len(dataframe) / 2)  # The middle point of the dataframe.
-
-        # Extract the latitude, longitude and time values of the points.
-        lat = dataframe.lat.values
-        lon = dataframe.lon.values
-        time = dataframe[const.DateTime].values
-
-        # Interpolate the latitude, longitude.
-        interpolated_x, interpolated_y = (lat[mid - 1] + lat[mid + 1]) / 2, (lon[mid - 1] + lon[mid + 1]) / 2
-
-        # Here, this equation is used since the pandas datetime format does not
-        # support addition.
-        interpolated_time_diff = (time[mid + 1] - time[mid - 1]) / 2
-        interpolated_time = time[mid - 1] + interpolated_time_diff
-
-        # Return a dictionary containing interpolated latitude, longitude and datetime.
-        return {'inter_x': interpolated_x,
-                'inter_y': interpolated_y,
-                'inter_time': interpolated_time
-                }
-
-    @staticmethod
-    def _cubic_helper(dataframe):
-        """
-            Use the cubic interpolation formula and calculate the interpolated
-            position and time of a point, in a given 3 point dataframe chunk.
-
-            Parameters
-            ----------
-                dataframe: NumPandsTraj/pandas.core.dataframe.DataFrame
-                    The dataframe containing 3 points that are to be interpolated.
-
-            Returns
-            -------
-                dict:
-                    The interpolated latitude,longitude and time of the missing point.
-
-            References
-            ----------
-                "Etemad, M., Soares, A., Etemad, E. et al. SWS: an unsupervised trajectory
-                segmentation algorithm based on change detection with interpolation kernels.
-                Geoinformatica (2020)"
-        """
-        # Set the index as just DateTime because it is being used
-        dataframe = dataframe.reset_index().set_index([const.DateTime]).sort_values(['DateTime'])
-        lat = dataframe.lat.values
-        lon = dataframe.lon.values
-        datetime = dataframe.reset_index()[const.DateTime].values
-        mid = int(len(lon) / 2)
-
-        x3 = lat[mid]
-        y3 = lon[mid]
-        lat = np.delete(lat, mid)
-        lon = np.delete(lon, mid)
-        t = np.diff(dataframe.index) / 1000000000
-        t3 = t[mid]
-        t = np.delete(t, mid)
-        t = np.cumsum(t)
-        t = np.insert(t, 0, 0).astype(float)
-
-        latcs = CubicSpline(np.abs(t), lat)
-        new_x = latcs(t3)
-
-        loncs = CubicSpline(np.abs(t), lon)
-        new_y = loncs(t3)
-
-        pf = (new_x, new_y)
-
-        # reverse
-        lat = dataframe.lat.values[::-1]
-        lon = dataframe.lon.values[::-1]
-        tidx = dataframe.index[::-1]
-
-        lat = np.delete(lat, mid)
-        lon = np.delete(lon, mid)
-        t = np.diff(tidx)
-        t3 = t[mid]
-        t = np.delete(t, mid)
-        t = np.cumsum(t)
-        t = np.insert(t, 0, 0).astype(float)
-
-        latcs = CubicSpline(np.abs(t), lat)
-        new_x = latcs(t3)
-
-        loncs = CubicSpline(np.abs(t), lon)
-        new_y = loncs(t3)
-
-        new_time = datetime[mid] - ((t3 / 2))
-
-        pb = (new_x, new_y)
-        pc = ((pf[0] + pb[0]) / 2, (pf[1] + pb[1]) / 2)
-
-        return {'inter_x': pc[0],
-                'inter_y': pc[1],
-                'inter_time': new_time
-                }
-
-        # dataframe.loc[pd.to_datetime(new_time)] = [dataframe[const.TRAJECTORY_ID].iloc[0], pc[0], pc[1], 0]
-        # return dataframe
-
-    @staticmethod
-    def cubic(dataframe):
-        lat = dataframe.lat.values
-        lon = dataframe.lon.values
-        datetime = dataframe.reset_index()[const.DateTime].values
-        mid = int(len(lon) / 2)
-
-        x3 = lat[3]
-        y3 = lon[3]
-        lat = np.delete(lat, mid)
-        lon = np.delete(lon, mid)
-        t = np.diff(dataframe.index) / 1000000000
-        t3 = t[mid]
-        t = np.delete(t, mid)
-        t = np.cumsum(t)
-        t = np.insert(t, 0, 0).astype(float)
-        fx = interp1d(t, lat, kind='cubic', fill_value='extrapolate')
-        fy = interp1d(t, lon, kind='cubic', fill_value='extrapolate')
-        new_x = fx(t3)
-        new_y = fy(t3)
-
-        pc = (new_x, new_y)
-        new_time = datetime[mid] - ((t3 / 2) * 10e9)
-        return {'inter_x': pc[0],
-                'inter_y': pc[1],
-                'inter_time': new_time
-                }
-
+class Helpers:
     # -------------------------------------- General Utilities ---------------------------------- #
     @staticmethod
     def _get_partition_size(size):
@@ -235,7 +80,7 @@ class InterpolationHelpers:
         ids_ = list(dataframe.traj_id.value_counts().keys())
 
         # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = InterpolationHelpers._get_partition_size(len(ids_))
+        split_factor = Helpers._get_partition_size(len(ids_))
         ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
         # Now split the dataframes based on set of Trajectory ids.

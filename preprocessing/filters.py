@@ -701,6 +701,6 @@ class Filters:
                           "the dataframe and does not run the kinematic features again.")
 
             return NumTrajDF(to_return, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        except KeyError as e:
+        except KeyError:
             raise MissingColumnsException(f"The column {column_name} does not exist in the dataset."
                                           f"Please check the column name and try again.")
