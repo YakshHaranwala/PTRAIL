@@ -10,6 +10,7 @@
     @Date: 21st June, 2021
     @Version: 1.0
 """
+import threading
 import itertools
 import numpy as np
 import pandas as pd
@@ -17,6 +18,7 @@ import utilities.constants as const
 import multiprocessing as mlp
 
 from preprocessing.helpers import Helpers as helper
+from preprocessing.filters import Filters as filt
 from scipy.interpolate import CubicSpline, interp1d
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from typing import Optional, Text
@@ -71,14 +73,22 @@ class Interpolation:
 
         # Create a pool of processes which has number of processes
         # equal to the number of unique dataframe partitions.
-        pool = mlp.Pool(len(df_chunks))
+        processes = [None] * len(df_chunks)
+        manager = mlp.Manager()
+        return_list = manager.list()
 
         ip_type = ip_type.lower().strip()
-        results = None
         if ip_type == 'linear':
-            results = pool.starmap(Interpolation._linear_ip, (zip(df_chunks, itertools.repeat(time_jump))))
+            for i in range(len(processes)):
+                processes[i] = mlp.Process(target=Interpolation._linear_ip, args=(df_chunks[i], time_jump, return_list))
+                processes[i].start()
+
+            for j in range(len(processes)):
+                processes[j].join()
+
         elif ip_type == 'cubic':
-            results = pool.starmap(Interpolation._cubic_ip, (zip(df_chunks, itertools.repeat(time_jump))))
+            #results = pool.starmap(Interpolation._cubic_ip, (zip(df_chunks, itertools.repeat(time_jump))))
+            pass
         elif ip_type == 'kinematic':
             pass
         elif ip_type == 'random-walk':
@@ -87,12 +97,74 @@ class Interpolation:
             raise ValueError(f"Interpolation type: {ip_type} specified does not exist. Please check the"
                              "interpolation type specified and type again.")
 
-        return NumTrajDF(pd.concat(results).reset_index(), const.LAT, const.LONG,
-                         const.DateTime, const.TRAJECTORY_ID)
+        return NumTrajDF(pd.concat(return_list).reset_index().drop_duplicates([const.LAT, const.LONG,
+                                                                               const.TRAJECTORY_ID]),
+                         const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
+
+    # @staticmethod
+    # def _linear_ip(dataframe, time_jump):
+    #     """
+    #         Interpolate the position of points using the Linear Interpolation method. It makes
+    #         the use of numpy's interpolation technique for the interpolation of the points.
+    #
+    #         WARNING: Do not use this method directly as it will run slower. Instead,
+    #                  use the method interpolate_position() and specify the ip_type as
+    #                  linear to perform linear interpolation much faster.
+    #
+    #         Parameters
+    #         ----------
+    #             dataframe: NumPandasTraj
+    #                 The dataframe containing the original data.
+    #             time_jump: float
+    #                 The maximum time difference between 2 points. If the time difference between
+    #                 2 consecutive points is greater than the time jump, then another point will
+    #                 be inserted between the given 2 points.
+    #
+    #         Returns
+    #         -------
+    #             pandas.core.dataframe.DataFrame:
+    #                 The dataframe enhanced with interpolated points.
+    #     """
+    #     # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
+    #     # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
+    #     # a list.
+    #     dataframe = dataframe.reset_index(drop=True)[
+    #         [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+    #     ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
+    #
+    #     # Now, for each unique ID in the dataframe, interpolate the points.
+    #     for i in range(len(ids_)):
+    #         df = dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]]   # Extract points of only 1 traj ID.
+    #         # Create a Series containing new times which are calculated as follows:
+    #         #    new_time[i] = original_time[i] + time_jump.
+    #         new_times = df.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+    #
+    #         # Now, interpolate the latitudes using numpy based on the new times calculated above.
+    #         ip_lat = np.interp(new_times,
+    #                            df.reset_index()[const.DateTime],
+    #                            df.reset_index()[const.LAT])
+    #
+    #         # Now, interpolate the longitudes using numpy based on the new times calculated above.
+    #         ip_long = np.interp(new_times,
+    #                             df.reset_index()[const.DateTime],
+    #                             df.reset_index()[const.LONG])
+    #
+    #         # Here, store the time difference between all the consecutive points in an array.
+    #         time_deltas = df.reset_index()[const.DateTime].diff().dt.total_seconds()
+    #         id_ = df.reset_index()[const.TRAJECTORY_ID].iloc[0]
+    #
+    #         # Now, for each point in the trajectory, check whether the time difference between
+    #         # 2 consecutive points is greater than the user-specified time_jump, and if so then
+    #         # insert a new point that is linearly interpolated between the 2 original points.
+    #         for j in range(len(time_deltas)):
+    #             if time_deltas[j] > time_jump:
+    #                 dataframe.loc[new_times[j-1]] = [id_, ip_lat[j-1], ip_long[j-1]]
+    #
+    #     return dataframe
 
     @staticmethod
-    def _linear_ip(dataframe, time_jump):
+    def _linear_ip(dataframe, time_jump, return_list):
         """
             Interpolate the position of points using the Linear Interpolation method. It makes
             the use of numpy's interpolation technique for the interpolation of the points.
@@ -121,34 +193,40 @@ class Interpolation:
         dataframe = dataframe.reset_index(drop=True)[
             [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
         ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
+        df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
 
+        small_pool = mlp.Pool(len(ids_))
+        final = small_pool.starmap(Interpolation.linear_help,
+                                   zip(df_chunks, ids_, itertools.repeat(time_jump)))
+
+        return_list.append(pd.concat(final))
+
+    @staticmethod
+    def linear_help(dataframe, id_, time_jump):
         # Now, for each unique ID in the dataframe, interpolate the points.
-        for i in range(len(ids_)):
-            df = dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]]   # Extract points of only 1 traj ID.
-            # Create a Series containing new times which are calculated as follows:
-            #    new_time[i] = original_time[i] + time_jump.
-            new_times = df.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+        # Create a Series containing new times which are calculated as follows:
+        #    new_time[i] = original_time[i] + time_jump.
+        new_times = dataframe.reset_index(drop=True)[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
 
-            # Now, interpolate the latitudes using numpy based on the new times calculated above.
-            ip_lat = np.interp(new_times,
-                               df.reset_index()[const.DateTime],
-                               df.reset_index()[const.LAT])
+        # Now, interpolate the latitudes using numpy based on the new times calculated above.
+        ip_lat = np.interp(new_times,
+                           dataframe.reset_index()[const.DateTime],
+                           dataframe.reset_index()[const.LAT])
 
-            # Now, interpolate the longitudes using numpy based on the new times calculated above.
-            ip_long = np.interp(new_times,
-                                df.reset_index()[const.DateTime],
-                                df.reset_index()[const.LONG])
+        # Now, interpolate the longitudes using numpy based on the new times calculated above.
+        ip_long = np.interp(new_times,
+                            dataframe.reset_index()[const.DateTime],
+                            dataframe.reset_index()[const.LONG])
 
-            # Here, store the time difference between all the consecutive points in an array.
-            time_deltas = df.reset_index()[const.DateTime].diff().dt.total_seconds()
-            id_ = df.reset_index()[const.TRAJECTORY_ID].iloc[0]
+        # Here, store the time difference between all the consecutive points in an array.
+        time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            # Now, for each point in the trajectory, check whether the time difference between
-            # 2 consecutive points is greater than the user-specified time_jump, and if so then
-            # insert a new point that is linearly interpolated between the 2 original points.
-            for j in range(len(time_deltas)):
-                if time_deltas[j] > time_jump:
-                    dataframe.loc[new_times[j-1]] = [id_, ip_lat[j-1], ip_long[j-1]]
+        # Now, for each point in the trajectory, check whether the time difference between
+        # 2 consecutive points is greater than the user-specified time_jump, and if so then
+        # insert a new point that is linearly interpolated between the 2 original points.
+        for j in range(len(time_deltas)):
+            if time_deltas[j] > time_jump:
+                dataframe.loc[new_times[j - 1]] = [id_, ip_lat[j - 1], ip_long[j - 1]]
 
         return dataframe
 
