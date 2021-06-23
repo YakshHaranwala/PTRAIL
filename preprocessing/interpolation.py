@@ -255,6 +255,9 @@ class Interpolation:
         # a list
         dataframe = dataframe.reset_index(drop=True)[
             [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+
+        # Split the smaller dataframe further into smaller chunks containing only 1
+        # Trajectory ID per index.
         ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
 
         # Now, for each unique ID in the dataframe, interpolate the points.
