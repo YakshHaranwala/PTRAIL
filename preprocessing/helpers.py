@@ -14,15 +14,18 @@
     @Version: 1.0
     @Date: 16th June, 2021
 """
+import math
 import os
 import psutil
 import pandas as pd
 import numpy as np
 import utilities.constants as const
 
+from features.spatial_features import SpatialFeatures as spatial
 from scipy.interpolate import CubicSpline
 from typing import Text, Union
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
+from scipy.stats import truncnorm
 
 
 class Helpers:
@@ -45,6 +48,8 @@ class Helpers:
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
                 time_jump: float
+                    The maximum time difference between 2 points greater than which
+                    a point will be inserted between 2 points.
 
             Returns
             -------
@@ -98,6 +103,8 @@ class Helpers:
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
                 time_jump: float
+                    The maximum time difference between 2 points greater than which
+                    a point will be inserted between 2 points.
 
             Returns
             -------

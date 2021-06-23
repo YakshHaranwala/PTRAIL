@@ -76,7 +76,8 @@ class Interpolation:
         ip_type = ip_type.lower().strip()
         if ip_type == 'linear':
             for i in range(len(processes)):
-                processes[i] = mlp.Process(target=Interpolation._linear_ip, args=(df_chunks[i], time_jump, return_list))
+                processes[i] = mlp.Process(target=Interpolation._linear_ip,
+                                           args=(df_chunks[i], time_jump, return_list))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -84,7 +85,8 @@ class Interpolation:
 
         elif ip_type == 'cubic':
             for i in range(len(processes)):
-                processes[i] = mlp.Process(target=Interpolation._cubic_ip, args=(df_chunks[i], time_jump, return_list))
+                processes[i] = mlp.Process(target=Interpolation._cubic_ip,
+                                           args=(df_chunks[i], time_jump, return_list))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -92,7 +94,13 @@ class Interpolation:
         elif ip_type == 'kinematic':
             pass
         elif ip_type == 'random-walk':
-            pass
+            for i in range(len(processes)):
+                processes[i] = mlp.Process(target=Interpolation._random_walk_ip,
+                                           args=(df_chunks[i], time_jump, return_list))
+                processes[i].start()
+
+            for j in range(len(processes)):
+                processes[j].join()
         else:
             raise ValueError(f"Interpolation type: {ip_type} specified does not exist. Please check the"
                              "interpolation type specified and type again.")
