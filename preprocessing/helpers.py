@@ -192,6 +192,9 @@ class Helpers:
         b_mean = np.abs(df['Bearing_between_consecutive'].mean(skipna=True))
         b_std = np.abs(df['Bearing_between_consecutive'].std(skipna=True))
 
+        if d_std == 0 or b_std == 0:
+            return dataframe
+
         # Here, using Scipy's truncnorm() function, create an object that gives out random
         # values. It is to be noted that the values are restricted between latitude.min()
         # and latitude.max().
@@ -205,7 +208,7 @@ class Helpers:
             (df['lon'].min() - b_mean) / b_std, (df['lon'].max() - b_mean) / b_std, loc=b_mean, scale=b_std)
 
         # Using the 2 objects created above, generate a random value from them. The value
-        # is selected randomly from a uniformly distributed sample.
+        # is selected randomly from a uniformly distributed sample
         calc_a = d_mean.rvs()
         calc_b = math.radians(b_mean.rvs())
 
