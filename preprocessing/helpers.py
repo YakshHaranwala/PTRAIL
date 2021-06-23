@@ -140,6 +140,88 @@ class Helpers:
 
         return df
 
+    @staticmethod
+    def _random_walk_help(dataframe: NumTrajDF, id_: Text, time_jump: float):
+        """
+            This method takes a dataframe and uses random-walk interpolation to determine coordinates
+            of location on Datetime where the time difference between 2 consecutive points exceeds
+            the user-specified time_jump and inserts the interpolated point those between 2 points.
+
+            WARNING: Private Helper method
+                Can't be used for dataframes with multiple trajectory ids and there might be a significant
+                drop in performance.
+
+            Parameters
+            ----------
+                dataframe: Union[pd.DataFrame, NumTrajDF]
+                     The dataframe containing the original trajectory data.
+                id_: Text
+                    The Trajectory ID of the points in the dataframe.
+                time_jump: float
+                    The maximum time difference between 2 points greater than which
+                    a point will be inserted between 2 points.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the trajectory enhanced with interpolated
+                    points.
+        """
+        # Create a Series containing new times which are calculated as follows:
+        #    new_time[i] = original_time[i] + time_jump.
+        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+
+        # First, create a distance between the consecutive points of the dataframe,
+        # then, calculate the mean and standard deviation of all the distances between
+        # consecutive points.
+        df1 = spatial.create_distance_between_consecutive_column(dataframe)
+        d_mean = np.abs(df1['Distance_prev_to_curr'].mean(skipna=True))
+        d_std = np.abs(df1['Distance_prev_to_curr'].std(skipna=True))
+
+        # Now, create a bearing between the consecutive points of the dataframe,
+        # then, calculate the mean and standard deviation of all the bearings between
+        # consecutive points.
+        df = spatial.create_bearing_column(df1)
+        b_mean = np.abs(df['Bearing_between_consecutive'].mean(skipna=True))
+        b_std = np.abs(df['Bearing_between_consecutive'].std(skipna=True))
+
+        # Here, using Scipy's truncnorm() function, create an object that gives out random
+        # values. It is to be noted that the values are restricted between latitude.min()
+        # and latitude.max().
+        d_mean = truncnorm(
+            (df1['lat'].min() - d_mean) / d_std, (df1['lat'].max() - d_mean) / d_std, loc=d_mean, scale=d_std)
+
+        # Here, using Scipy's truncnorm() function, create an object that gives out random
+        # values. It is to be noted that the values are restricted between longitude.min()
+        # and longitude.max().
+        b_mean = truncnorm(
+            (df['lon'].min() - b_mean) / b_std, (df['lon'].max() - b_mean) / b_std, loc=b_mean, scale=b_std)
+
+        # Using the 2 objects created above, generate a random value from them. The value
+        # is selected randomly from a uniformly distributed sample.
+        calc_a = d_mean.rvs()
+        calc_b = math.radians(b_mean.rvs())
+
+        dy = calc_a * np.cos(calc_b)
+        dx = calc_a * np.sin(calc_b)
+
+        # Here, store the time difference between all the consecutive points in an array.
+        time_deltas = df.reset_index()[const.DateTime].diff().dt.total_seconds()
+
+        # Look for a time diff that exceeds the time_jump and if one is found, calculate the
+        # latitude and longitude and then append them to the dataframe at the location where
+        # the threshold ios crossed.
+        for i in range(len(time_deltas)):
+            if time_deltas[i] > time_jump:
+                new_lat = df[const.LAT].iloc[i - 1] + \
+                          (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
+                new_lon = df[const.LONG].iloc[i - 1] + \
+                          (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(df[const.LAT].iloc[i - 1] * np.pi / 180)
+                dataframe.loc[new_times[i - 1]] = [id_, new_lat, new_lon]
+
+        # Return the new dataframe
+        return dataframe
+
     # -------------------------------------- General Utilities ---------------------------------- #
     @staticmethod
     def _get_partition_size(size):

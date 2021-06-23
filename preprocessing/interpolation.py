@@ -222,7 +222,7 @@ class Interpolation:
         pass
 
     @staticmethod
-    def random_walk_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump, return_list):
+    def _random_walk_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump, return_list):
         """
              Method for Kinematic interpolation of a dataframe based on the time jump provided.
              It interpolates the coordinates based on the Datetime of the dataframe.
@@ -247,4 +247,23 @@ class Interpolation:
                      The dataframe containing the new interpolated points.
 
          """
-        pass
+        # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
+        # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
+        # a list.
+        dataframe = dataframe.reset_index()[
+            [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+
+        # Split the smaller dataframe further into smaller chunks containing only 1
+        # Trajectory ID per index.
+        ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
+        df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
+
+        # Now, create a pool of processes where number of processes is equal to the total
+        # number of unique Trajectory IDs.
+        small_pool = mlp.Pool(len(ids_))
+        final = small_pool.starmap(helper._random_walk_help,
+                                   zip(df_chunks, ids_, itertools.repeat(time_jump)))
+
+        # Append the smaller dataframe to process manager list so that result
+        # can be finally merged into a larger dataframe.
+        return_list.append(pd.concat(final))
