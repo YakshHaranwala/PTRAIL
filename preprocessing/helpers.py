@@ -219,12 +219,13 @@ class Helpers:
         # latitude and longitude and then append them to the dataframe at the location where
         # the threshold ios crossed.
         for i in range(len(time_deltas)):
-            if time_deltas[i] > time_jump:
-                new_lat = df[const.LAT].iloc[i - 1] + \
-                          (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
-                new_lon = df[const.LONG].iloc[i - 1] + \
-                          (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(df[const.LAT].iloc[i - 1] * np.pi / 180)
-                dataframe.loc[new_times[i - 1]] = [id_, new_lat, new_lon]
+            if len(df) > 3:
+                if time_deltas[i] > time_jump:
+                    new_lat = df[const.LAT].iloc[i - 1] + \
+                              (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
+                    new_lon = df[const.LONG].iloc[i - 1] + \
+                              (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(df[const.LAT].iloc[i - 1] * np.pi / 180)
+                    dataframe.loc[new_times[i - 1]] = [id_, new_lat, new_lon]
 
         # Return the new dataframe
         return dataframe
