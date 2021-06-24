@@ -182,35 +182,43 @@ class Helpers:
         # then, calculate the mean and standard deviation of all the distances between
         # consecutive points.
         df1 = spatial.create_distance_between_consecutive_column(dataframe)
-        d_mean = np.abs(df1['Distance_prev_to_curr'].mean(skipna=True))
-        d_std = np.abs(df1['Distance_prev_to_curr'].std(skipna=True))
+        d_mean = (df1['Distance_prev_to_curr'].mean(skipna=True))
+        d_std = (df1['Distance_prev_to_curr'].std(skipna=True))
 
         # Now, create a bearing between the consecutive points of the dataframe,
         # then, calculate the mean and standard deviation of all the bearings between
         # consecutive points.
         df = spatial.create_bearing_column(df1)
-        b_mean = np.abs(df['Bearing_between_consecutive'].mean(skipna=True))
-        b_std = np.abs(df['Bearing_between_consecutive'].std(skipna=True))
+        b_mean = df['Bearing_between_consecutive'].mean(skipna=True)
+        b_std = df['Bearing_between_consecutive'].std(skipna=True)
 
-        if d_std == 0 or b_std == 0:
-            return dataframe
+        calc_a = np.random.normal(d_mean, d_std, 1)/1000
+        calc_b = np.radians(np.random.normal(b_mean, b_std, 1))
 
-        # Here, using Scipy's truncnorm() function, create an object that gives out random
-        # values. It is to be noted that the values are restricted between latitude.min()
-        # and latitude.max().
-        d_mean = truncnorm(
-            (df1['lat'].min() - d_mean) / d_std, (df1['lat'].max() - d_mean) / d_std, loc=d_mean, scale=d_std)
-
-        # Here, using Scipy's truncnorm() function, create an object that gives out random
-        # values. It is to be noted that the values are restricted between longitude.min()
-        # and longitude.max().
-        b_mean = truncnorm(
-            (df['lon'].min() - b_mean) / b_std, (df['lon'].max() - b_mean) / b_std, loc=b_mean, scale=b_std)
-
-        # Using the 2 objects created above, generate a random value from them. The value
-        # is selected randomly from a uniformly distributed sample
-        calc_a = d_mean.rvs()
-        calc_b = math.radians(b_mean.rvs())
+        #print(f"Calc: {calc_a, calc_b}")
+        # if d_std == 0 or b_std == 0:
+        #     return dataframe
+        #
+        # # Here, using Scipy's truncnorm() function, create an object that gives out random
+        # # values. It is to be noted that the values are restricted between latitude.min()
+        # # and latitude.max().
+        # d_mean = truncnorm((df1['lat'].min() - d_mean) / d_std,
+        #                    (df1['lat'].max() - d_mean) / d_std,
+        #                    loc=d_mean,
+        #                    scale=d_std)
+        #
+        # # Here, using Scipy's truncnorm() function, create an object that gives out random
+        # # values. It is to be noted that the values are restricted between longitude.min()
+        # # and longitude.max().
+        # b_mean = truncnorm((df['lon'].min() - b_mean) / b_std,
+        #                    (df['lon'].max() - b_mean) / b_std,
+        #                    loc=b_mean,
+        #                    scale=b_std)
+        #
+        # # Using the 2 objects created above, generate a random value from them. The value
+        # # is selected randomly from a uniformly distributed sample
+        # calc_a = d_mean.rvs()
+        # calc_b = math.radians(b_mean.rvs())
 
         dy = calc_a * np.cos(calc_b)
         dx = calc_a * np.sin(calc_b)
@@ -228,7 +236,7 @@ class Helpers:
                               (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
                     new_lon = df[const.LONG].iloc[i - 1] + \
                               (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(df[const.LAT].iloc[i - 1] * np.pi / 180)
-                    dataframe.loc[new_times[i - 1]] = [id_, new_lat, new_lon]
+                    dataframe.loc[new_times[i - 1]] = [id_, new_lat[0], new_lon[0]]
 
         # Return the new dataframe
         return dataframe
