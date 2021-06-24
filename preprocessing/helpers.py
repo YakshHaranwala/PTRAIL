@@ -192,10 +192,10 @@ class Helpers:
         b_mean = df['Bearing_between_consecutive'].mean(skipna=True)
         b_std = df['Bearing_between_consecutive'].std(skipna=True)
 
-        calc_a = np.random.normal(d_mean, d_std, 1)/1000
+        calc_a = np.random.normal(d_mean, d_std, 1) / 1000
         calc_b = np.radians(np.random.normal(b_mean, b_std, 1))
 
-        #print(f"Calc: {calc_a, calc_b}")
+        # print(f"Calc: {calc_a, calc_b}")
         # if d_std == 0 or b_std == 0:
         #     return dataframe
         #
@@ -228,19 +228,91 @@ class Helpers:
 
         # Look for a time diff that exceeds the time_jump and if one is found, calculate the
         # latitude and longitude and then append them to the dataframe at the location where
-        # the threshold ios crossed.
+        # the threshold is crossed.
         for i in range(len(time_deltas)):
             if len(df) > 3:
                 if time_deltas[i] > time_jump:
                     new_lat = df[const.LAT].iloc[i - 1] + \
                               (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
                     new_lon = df[const.LONG].iloc[i - 1] + \
-                              (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(df[const.LAT].iloc[i - 1] * np.pi / 180)
+                              (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(
+                        df[const.LAT].iloc[i - 1] * np.pi / 180)
                     dataframe.loc[new_times[i - 1]] = [id_, new_lat[0], new_lon[0]]
 
         # Return the new dataframe
         return dataframe
 
+    @staticmethod
+    def _kinematic_help(dataframe: Union[pd.DataFrame, NumTrajDF], id_: Text, time_jump: float):
+        """
+            This method takes a dataframe and uses kinematic interpolation to determine coordinates
+            of location on Datetime where the time difference between 2 consecutive points exceeds
+            the user-specified time_jump and inserts the interpolated point those between 2 points.
+
+            WARNING: Private Helper method
+                Can't be used for dataframes with multiple trajectory ids and there might be a significant
+                drop in performance.
+
+            Parameters
+            ----------
+                dataframe: Union[pd.DataFrame, NumTrajDF]
+                     The dataframe containing the original trajectory data.
+                id_: Text
+                    The Trajectory ID of the points in the dataframe.
+                time_jump: float
+                    The maximum time difference between 2 points greater than which
+                    a point will be inserted between 2 points.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame
+                    The dataframe containing the trajectory enhanced with interpolated
+                    points.
+        """
+        # Create a Series containing new times which are calculated as follows:
+        #    new_time[i] = original_time[i] + time_jump.
+        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+        
+        # Here, store the time difference between all the consecutive points in an array.
+        time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
+        lat_diff = dataframe.reset_index()[const.LAT].diff()
+        lon_diff = dataframe.reset_index()[const.LONG].diff()
+        
+        lat_velocity = lat_diff/time_deltas
+        lon_velocity = lon_diff/time_deltas
+
+        lat = list(dataframe.reset_index()[const.LAT].values)
+        lon = list(dataframe.reset_index()[const.LONG].values)
+
+        # Look for a time diff that exceeds the time_jump and if one is found, calculate the
+        # latitude and longitude and then append them to the dataframe at the location where
+        # the threshold is crossed.
+        for i in range(len(time_deltas)):
+            if time_deltas[i] > time_jump and not np.isnan(lat_velocity[i-1]):
+                ax = np.array([ [(time_deltas[i]**2)/2, (time_deltas[i]**3)/6],
+                                [float(time_deltas[i]), (time_deltas[i]**2)/2] ])
+                bx = [lat[i]-lat[i-1]-lat_velocity[i-1]*time_deltas[i], lat_velocity[i]-lat_velocity[i-1]]
+                coef_x = np.linalg.solve(ax, bx)
+
+                ay = ax
+                by = [lon[i]-lon[i-1]-lon_velocity[i-1]*time_deltas[i], lon_velocity[i]-lon_velocity[i-1]]
+                coef_y = np.linalg.solve(ay, by)
+
+                td = new_times[i-1].timestamp()/10e9
+                # x = lat[i-1] + lat_velocity[i-1] * td + \
+                #     (td**2)*coef_x[0]/2 + (td**3)*coef_x[1]/6
+                # y = lon[i-1] + lon_velocity[i-1] * td + \
+                #     (td ** 2) * coef_y[0] / 2 + (td ** 3) * coef_y[1] / 6
+                x = Helpers.pos(t=td, x1=lat[i-1], v1=lat_velocity[i-1], b=coef_x[0], c=coef_x[1])
+                y = Helpers.pos(t=td, x1=lon[i-1], v1=lon_velocity[i-1], b=coef_y[0], c=coef_y[1])
+                dataframe.loc[new_times[i-1]] = [id_, x, y]
+
+        return dataframe
+
+    @staticmethod
+    def pos(t, x1, v1, b, c):
+        return x1 + v1 * t + (t ** 2) * b / 2 + (t ** 3) * c / 6
+                
     # -------------------------------------- General Utilities ---------------------------------- #
     @staticmethod
     def _get_partition_size(size):
