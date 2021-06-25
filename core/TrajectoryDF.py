@@ -9,6 +9,7 @@ from pandas._libs import lib
 
 import utilities.constants as const
 from utilities.exceptions import *
+import folium
 
 
 class NumPandasTraj(DataFrame):
@@ -371,3 +372,38 @@ class NumPandasTraj(DataFrame):
                     The sorted dataframe.
         """
         return self.sort_values([const.TRAJECTORY_ID, const.DateTime], ascending=ascending)
+
+    # ------------------------------------- Visualization ----------------------------------- #
+    def plot_folium_traj(self, color: Text, weight: float, opacity: float):
+        """
+            Use folium to plot the trajectory on a map.
+
+            Parameters
+            ----------
+                color: Text
+                    The color of the trajectory line on the map.
+                weight: float
+                    The weight of the trajectory line on the map.
+                opacity: float
+                    The opacity of the trajectory line on the map.
+
+            Returns
+            -------
+                folium.folium.Map
+                    The map with plotted trajectory.
+        """
+        # Create a list of coordinate pairs of the dataframe.
+        locations = [zip(self.latitude, self.longitude)]
+
+        # Create a map with the initial point.
+        map_ = folium.Map(location=[self.latitude[0], self.longitude[0]], zoom_start=100)
+
+        # Add the trajectory line to the map and then return the map.
+        folium.PolyLine(locations,
+                        color=color,
+                        weight=weight,
+                        opacity=opacity).add_to(map_)
+
+        return map_
+
+
