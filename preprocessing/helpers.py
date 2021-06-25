@@ -173,6 +173,12 @@ class Helpers:
                 pandas.core.dataframe.DataFrame
                     The dataframe containing the trajectory enhanced with interpolated
                     points.
+
+            References
+            ----------
+                "Etemad, M., Soares, A., Etemad, E. et al. SWS: an unsupervised trajectory
+                segmentation algorithm based on change detection with interpolation kernels.
+                Geoinformatica (2020)"
         """
         # Create a Series containing new times which are calculated as follows:
         #    new_time[i] = original_time[i] + time_jump.
@@ -268,6 +274,11 @@ class Helpers:
                 pandas.core.dataframe.DataFrame
                     The dataframe containing the trajectory enhanced with interpolated
                     points.
+
+            References
+            ----------
+                "Nogueira, T.O., "kinematic_interpolation.py", (2016), GitHub repository,
+                "https://gist.github.com/talespaiva/128980e3608f9bc5083b.js" "
         """
         # Create a Series containing new times which are calculated as follows:
         #    new_time[i] = original_time[i] + time_jump.
