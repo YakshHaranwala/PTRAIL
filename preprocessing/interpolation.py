@@ -111,8 +111,8 @@ class Interpolation:
             raise ValueError(f"Interpolation type: {ip_type} specified does not exist. Please check the"
                              "interpolation type specified and type again.")
 
-        return NumTrajDF(pd.concat(return_list).reset_index(),const.LAT, const.LONG,
-                         const.DateTime, const.TRAJECTORY_ID)
+        return NumTrajDF(pd.concat(return_list).reset_index(),
+                         const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def _linear_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump: float, return_list: list):

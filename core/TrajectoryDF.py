@@ -374,7 +374,7 @@ class NumPandasTraj(DataFrame):
         return self.sort_values([const.TRAJECTORY_ID, const.DateTime], ascending=ascending)
 
     # ------------------------------------- Visualization ----------------------------------- #
-    def plot_folium_traj(self, color: Text, weight: float, opacity: float):
+    def plot_folium_traj(self, color: Text = 'blue', weight: float = 3, opacity: float = 0.5):
         """
             Use folium to plot the trajectory on a map.
 
