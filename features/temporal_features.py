@@ -312,6 +312,3 @@ class TemporalFeatures:
             filt_two = filt.loc[filt[const.DateTime] == filt[const.DateTime].max()]
             return filt_two[const.DateTime].iloc[0]
 
-    @staticmethod
-    def convert_timezone(dataframe: NumPandasTraj, from_timezone, target_timezone):
-        pass

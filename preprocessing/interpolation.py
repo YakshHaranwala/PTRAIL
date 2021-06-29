@@ -11,6 +11,8 @@
     @Version: 1.0
 """
 import itertools
+
+import pandas
 import pandas as pd
 import utilities.constants as const
 import multiprocessing as mlp
@@ -300,3 +302,7 @@ class Interpolation:
         # Append the smaller dataframe to process manager list so that result
         # can be finally merged into a larger dataframe.
         return_list.append(pd.concat(final))
+
+    @staticmethod
+    def interpolate_at_time(dataframe: Union[NumTrajDF, pandas.DataFrame], time: Text, ip_type: Text = 'linear'):
+        pass
