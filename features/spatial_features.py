@@ -13,10 +13,12 @@
 """
 import itertools
 import multiprocessing
+import os
 from typing import Optional, Text
 
 import numpy as np
 import pandas as pd
+import psutil
 
 from core.TrajectoryDF import NumPandasTraj
 from features.helper_functions import Helpers as helpers
@@ -24,6 +26,7 @@ from utilities import constants as const
 from utilities.DistanceCalculator import FormulaLog as calc
 from utilities.exceptions import *
 
+NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
 
 class SpatialFeatures:
     @staticmethod
@@ -83,9 +86,12 @@ class SpatialFeatures:
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
-            # Now, create a multiprocessing pool and then run processes in parallel
-            # which calculate the start locations for a smaller set of IDs only.
-            mp_pool = multiprocessing.Pool(len(ids_))
+            # Here, create as many processes at once as there are number of CPUs available in
+            # the system - 1. One CPU is kept free at all times in order to not block up
+            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+            # of the system.).
+            mp_pool = multiprocessing.Pool(NUM_CPU - 1)
             results = mp_pool.starmap(helpers._start_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
@@ -127,9 +133,12 @@ class SpatialFeatures:
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
-            # Now, create a multiprocessing pool and then run processes in parallel
-            # which calculate the end locations for a smaller set of IDs only.
-            mp_pool = multiprocessing.Pool(len(ids_))
+            # Here, create as many processes at once as there are number of CPUs available in
+            # the system - 1. One CPU is kept free at all times in order to not block up
+            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+            # of the system.)
+            mp_pool = multiprocessing.Pool(NUM_CPU - 1)
             results = mp_pool.starmap(helpers._end_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
@@ -171,15 +180,17 @@ class SpatialFeatures:
             result = helpers._distance_between_consecutive_helper(dataframe)
             return NumPandasTraj(result, const.LAT, const.LONG,
                                  const.DateTime, const.TRAJECTORY_ID)
-
         # Case-2: The number unique Trajectory IDs is significant.
         else:
             # splitting the dataframe according to trajectory ids.
             df_chunks = helpers._df_split_helper(dataframe)
 
-            # Now, create a multiprocessing pool and then run processes in parallel
-            # which calculate the end locations for a smaller set of IDs only.
-            multi_pool = multiprocessing.Pool(len(df_chunks))
+            # Here, create as many processes at once as there are number of CPUs available in
+            # the system - 1. One CPU is kept free at all times in order to not block up
+            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+            # of the system.)
+            multi_pool = multiprocessing.Pool(NUM_CPU - 1)
             result = multi_pool.map(helpers._distance_between_consecutive_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
@@ -216,9 +227,12 @@ class SpatialFeatures:
             # splitting the dataframe according to trajectory ids.
             df_chunks = helpers._df_split_helper(dataframe)
 
-            # Now, create a multiprocessing pool and then run processes in parallel
-            # which calculate the end locations for a smaller set of IDs only.
-            multi_pool = multiprocessing.Pool(len(df_chunks))
+            # Here, create as many processes at once as there are number of CPUs available in
+            # the system - 1. One CPU is kept free at all times in order to not block up
+            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+            # of the system.)
+            multi_pool = multiprocessing.Pool(NUM_CPU - 1)
             result = multi_pool.map(helpers._distance_from_start_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
@@ -292,9 +306,12 @@ class SpatialFeatures:
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
-        # Now, lets create a multiprocessing pool of processes and then create as many
-        # number of processes as there are number of partitions and run each process in parallel.
-        pool = multiprocessing.Pool(len(df_chunks))
+        # Here, create as many processes at once as there are number of CPUs available in
+        # the system - 1. One CPU is kept free at all times in order to not block up
+        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+        # of the system.)
+        pool = multiprocessing.Pool(NUM_CPU - 1)
         args = zip(df_chunks, itertools.repeat(coordinates), itertools.repeat(dist_range))
         result = pool.starmap(helpers._point_within_range_helper, args)
 
@@ -324,9 +341,12 @@ class SpatialFeatures:
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
-        # Now, lets create a multiprocessing pool of processes and then create as many
-        # number of processes as there are number of partitions and run each process in parallel.
-        pool = multiprocessing.Pool(len(df_chunks))
+        # Here, create as many processes at once as there are number of CPUs available in
+        # the system - 1. One CPU is kept free at all times in order to not block up
+        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+        # of the system.)
+        pool = multiprocessing.Pool(NUM_CPU - 1)
         answer = pool.starmap(helpers._distance_from_given_point_helper, zip(df_chunks, itertools.repeat(coordinates)))
 
         # Now lets join all the smaller partitions and then add the Distance to the
@@ -496,9 +516,12 @@ class SpatialFeatures:
             # splitting the dataframe according to trajectory ids.
             df_chunks = helpers._df_split_helper(dataframe)
 
-            # Now, create a multiprocessing pool and then run processes in parallel
-            # which calculate the end locations for a smaller set of IDs only.
-            multi_pool = multiprocessing.Pool(len(df_chunks))
+            # Here, create as many processes at once as there are number of CPUs available in
+            # the system - 1. One CPU is kept free at all times in order to not block up
+            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+            # of the system.)
+            multi_pool = multiprocessing.Pool(NUM_CPU - 1)
             result = multi_pool.map(helpers._bearing_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
@@ -651,9 +674,12 @@ class SpatialFeatures:
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
-            # Now, create a multiprocessing pool and then run processes in parallel
-            # which calculate the end times for a smaller set of IDs only.
-            mp_pool = multiprocessing.Pool(len(ids_))
+            # Here, create as many processes at once as there are number of CPUs available in
+            # the system - 1. One CPU is kept free at all times in order to not block up
+            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+            # of the system.)
+            mp_pool = multiprocessing.Pool(NUM_CPU - 1)
             results = mp_pool.starmap(helpers._number_of_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
@@ -664,6 +690,3 @@ class SpatialFeatures:
             filtered_df = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
             return filtered_df.groupby([const.LAT, const.LONG]).ngroups
 
-    @staticmethod
-    def get_radius_of_gyration(dataframe: NumPandasTraj):
-        pass
