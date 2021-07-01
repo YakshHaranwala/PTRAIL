@@ -11,15 +11,21 @@
     @Version: 1.0
 """
 import itertools
+import os
 
 import pandas
 import pandas as pd
+import psutil
+
 import utilities.constants as const
 import multiprocessing as mlp
 
 from preprocessing.helpers import Helpers as helper
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from typing import Optional, Text, Union
+
+NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
+
 
 
 class Interpolation:
@@ -153,9 +159,12 @@ class Interpolation:
         ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
         df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
 
-        # Now, create a pool of processes where number of processes is equal to the total
-        # number of unique Trajectory IDs.
-        small_pool = mlp.Pool(len(ids_))
+        # Here, create as many processes at once as there are number of CPUs available in
+        # the system - 1. One CPU is kept free at all times in order to not block up
+        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+        # of the system.)
+        small_pool = mlp.Pool(NUM_CPU - 1)
         final = small_pool.starmap(helper._linear_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
@@ -200,9 +209,12 @@ class Interpolation:
         ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
         df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
 
-        # Now, create a pool of processes where number of processes is equal to the total
-        # number of unique Trajectory IDs.
-        small_pool = mlp.Pool(len(ids_))
+        # Here, create as many processes at once as there are number of CPUs available in
+        # the system - 1. One CPU is kept free at all times in order to not block up
+        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+        # of the system.).
+        small_pool = mlp.Pool(NUM_CPU - 1)
         final = small_pool.starmap(helper._cubic_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
@@ -246,9 +258,12 @@ class Interpolation:
         ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
         df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
 
-        # Now, create a pool of processes where number of processes is equal to the total
-        # number of unique Trajectory IDs.
-        small_pool = mlp.Pool(len(ids_))
+        # Here, create as many processes at once as there are number of CPUs available in
+        # the system - 1. One CPU is kept free at all times in order to not block up
+        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+        # of the system.).
+        small_pool = mlp.Pool(NUM_CPU - 1)
         final = small_pool.starmap(helper._kinematic_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
@@ -293,9 +308,12 @@ class Interpolation:
         ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
         df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
 
-        # Now, create a pool of processes where number of processes is equal to the total
-        # number of unique Trajectory IDs.
-        small_pool = mlp.Pool(len(ids_))
+        # Here, create as many processes at once as there are number of CPUs available in
+        # the system - 1. One CPU is kept free at all times in order to not block up
+        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+        # of the system.).
+        small_pool = mlp.Pool(NUM_CPU - 1)
         final = small_pool.starmap(helper._random_walk_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 

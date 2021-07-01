@@ -22,33 +22,6 @@ from utilities.exceptions import *
 pd.set_option('mode.chained_assignment', None)
 
 
-# TODO: So basically, the WS-II Repository is performing calculations and
-#       returning a point that is interpolated on the basis of 7 rows of dataframes.
-#       Now, the task for us is to figure out how we interpolate points for
-#       trajectories with less than 7 points. As from what I can see, for Linear,
-#       it is only taking average of coordinates of 2 points as per the formula.
-#       So we need to take that approach as well to go forward with it.
-
-# TODO: The approach that we are going to take is:
-#           1. Instead of passing a fixed number of values, we will just pass a dataframe
-#              with a certain number of trajectories or just a single trajectory.
-#           2. The dataframe will be based on the value count of the trajectory, i.e., maybe
-#              a trajectory just over x number of values.
-
-# TODO: In terms of the algorithm, what I was thinking is this:
-#       1. Pass in a dataframe along with a threshold of maximum distance
-#          between 2 points of a particular trajectory.
-#       2. We then check the consecutive distances between all the points
-#          and determine if the distance between the 2 points is lesser
-#          or greater than the user-given threshold.
-#       3. If the distance is greater than the threshold, we take the certain
-#          number of points and interpolate using a suitable method.
-#       4. We keep repeating the step-3 until the distance between the older
-#          points and the newly interpolated points does not come down below
-#          or equal to the threshold.
-#       5. We interpolate the time in the same way as distance and then append
-#          those points to the dataset where they need to be.
-
 class Interpolate:
     @staticmethod
     def interpolate_position(dataframe: NumTrajDF, distance_threshold: float,
