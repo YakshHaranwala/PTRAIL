@@ -17,10 +17,10 @@ Main Features
 NumMobility Packages
 --------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
-   core
+   core/NumMobility
    examples
    features
    preprocessing
