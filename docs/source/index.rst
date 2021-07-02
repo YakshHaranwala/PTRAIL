@@ -6,6 +6,14 @@
 Welcome to NumMobility's documentation!
 =======================================
 
+NumMobility is a Mobility Data Preprocessing Library.
+It has a very similar syntax to Pandas Library.
+
+Main Features
+-------------
+   1. NumMobility has a specialised DataFrame for representating and storing Trajectory Data.
+   2. NumMobility, in a first, provides several trajectory interpolation techniques built into it.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
