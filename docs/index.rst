@@ -14,10 +14,17 @@ Main Features
    1. NumMobility has a specialised DataFrame for representating and storing Trajectory Data.
    2. NumMobility, in a first, provides several trajectory interpolation techniques built into it.
 
+NumMobility Packages
+--------------------
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   core
+   examples
+   features
+   preprocessing
+   utilities
 
 
 Indices and tables
