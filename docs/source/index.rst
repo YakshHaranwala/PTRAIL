@@ -11,9 +11,8 @@ It has a very similar syntax to Pandas Library.
 
 Main Features
 -------------
-<ol>
-   <li> NumMobility has a specialised DataFrame for representating and storing Trajectory Data. </li>
-   <li> NumMobility, in a first, provides several trajectory interpolation techniques built into it. </li>
+   1. NumMobility has a specialised DataFrame for representating and storing Trajectory Data.
+   2. NumMobility, in a first, provides several trajectory interpolation techniques built into it.
 
 .. toctree::
    :maxdepth: 2
