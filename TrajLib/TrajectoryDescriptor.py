@@ -22,7 +22,7 @@ class TrajectoryDescriptor:
         else:
             print(self.row_data)
             sorted_dic = sorted(self.purity_labels, key=self.purity_labels.get, reverse=True)
-            return list(sorted_dic.keys())[0]  #TODO descobrir erro
+            return list(sorted_dic.keys())[0]
 
     def purity(self):
         label_dic = {}
