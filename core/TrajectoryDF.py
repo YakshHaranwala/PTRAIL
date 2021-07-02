@@ -392,6 +392,8 @@ class NumPandasTraj(DataFrame):
                 folium.folium.Map
                     The map with plotted trajectory.
         """
+        sw = self[['lat', 'lon']].min().values.tolist()
+        ne = self[['lat', 'lon']].max().values.tolist()
         # Create a list of coordinate pairs of the dataframe.
         locations = [zip(self.latitude, self.longitude)]
 
@@ -403,7 +405,7 @@ class NumPandasTraj(DataFrame):
                         color=color,
                         weight=weight,
                         opacity=opacity).add_to(map_)
-
+        map_.fit_bounds([sw, ne])
         return map_
 
 
