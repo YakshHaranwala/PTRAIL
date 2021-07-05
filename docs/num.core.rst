@@ -12,10 +12,7 @@ core.TrajectoryDF module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: core
+.. autoclass:: MyClass
    :members:
-   :undoc-members:
-   :show-inheritance:
+
+   .. automethod:: __init__
