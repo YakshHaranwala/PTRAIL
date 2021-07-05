@@ -1,13 +1,13 @@
 """
-    This module contains all the helper functions for the parallel calculators in
-    the spatial and temporal features classes.
+This module contains all the helper functions for the parallel calculators in
+the spatial and temporal features classes.
 
-    Warning
-    -------
-    These functions may not be used directly as they would result in a
-    slower calculation and execution times. They are meant to be used
-    only as helpers. For calculation of features, use the ones in the
-    features package.
+Warning
+-------
+These functions may not be used directly as they would result in a
+slower calculation and execution times. They are meant to be used
+only as helpers. For calculation of features, use the ones in the
+features package.
 """
 import os
 
@@ -24,18 +24,18 @@ class Helpers:
     @staticmethod
     def _traj_duration_helper(dataframe, ids_):
         """
-            Calculate the duration of the trajectory i.e. subtract the max time of
-            the trajectory by the min time of the trajectory.
+        Calculate the duration of the trajectory i.e. subtract the max time of
+        the trajectory by the min time of the trajectory.
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe containing all the original data.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe containing all the original data.
 
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    The resultant dataframe containing all the trajectory durations.
+        Returns
+        -------
+        pandas.core.dataframe.DataFrame
+            The resultant dataframe containing all the trajectory durations.
         """
         durations = []  # A list for storing results.
 
@@ -58,24 +58,24 @@ class Helpers:
     @staticmethod
     def _start_time_helper(dataframe, ids_):
         """
-            This function is the helper function of the get_start_time(). The get_start_time() function
-            delegates the task of calculating the end location of the trajectories in the dataframe because the
-            original functions runs multiple instances of this function in parallel. This function finds the start
-            time of the specified trajectory IDs the DF and then another returns dataframe containing
-            end latitude, end longitude, DateTime and trajectory ID for each trajectory
+        This function is the helper function of the get_start_time(). The get_start_time() function
+        delegates the task of calculating the end location of the trajectories in the dataframe because the
+        original functions runs multiple instances of this function in parallel. This function finds the start
+        time of the specified trajectory IDs the DF and then another returns dataframe containing
+        end latitude, end longitude, DateTime and trajectory ID for each trajectory
 
-            Parameter
-            ---------
-                dataframe: NumPandasTraj
-                    The dataframe of which the locations are to be found.dataframe
-                ids_: list
-                    List of trajectory ids for which the end locations are to be calculated
+        Parameter
+        ---------
+        dataframe: NumPandasTraj
+            The dataframe of which the locations are to be found.dataframe
+        ids_: list
+            List of trajectory ids for which the end locations are to be calculated
 
-            Returns
-            -------
-                pandas.core.dataframe.Dataframe
-                    New dataframe containing Trajectory ID as index and latitude and longitude
-                    as other 2 columns.
+        Returns
+        -------
+        pandas.core.dataframe.Dataframe
+            New dataframe containing Trajectory ID as index and latitude and longitude
+            as other 2 columns.
         """
         results = []
 
@@ -97,24 +97,24 @@ class Helpers:
     @staticmethod
     def _end_time_helper(dataframe, ids_):
         """
-            This function is the helper function of the get_start_time(). The get_start_time() function
-            delegates the task of calculating the end location of the trajectories in the dataframe because the
-            original functions runs multiple instances of this function in parallel. This function finds the start
-            time of the specified trajectory IDs the DF and then another returns dataframe containing
-            end latitude, end longitude, DateTime and trajectory ID for each trajectory
+        This function is the helper function of the get_start_time(). The get_start_time() function
+        delegates the task of calculating the end location of the trajectories in the dataframe because the
+        original functions runs multiple instances of this function in parallel. This function finds the start
+        time of the specified trajectory IDs the DF and then another returns dataframe containing
+        end latitude, end longitude, DateTime and trajectory ID for each trajectory
 
-            Parameter
-            ---------
-                dataframe: NumPandasTraj
-                    The dataframe of which the locations are to be found.dataframe
-                ids_: list
-                    List of trajectory ids for which the end locations are to be calculated
+        Parameter
+        ---------
+        dataframe: NumPandasTraj
+            The dataframe of which the locations are to be found.dataframe
+        ids_: list
+            List of trajectory ids for which the end locations are to be calculated
 
-            Returns
-            -------
-                pandas.core.dataframe.Dataframe
-                    New dataframe containing Trajectory ID as index and latitude and longitude
-                    as other 2 columns.
+        Returns
+        -------
+        pandas.core.dataframe.Dataframe
+            New dataframe containing Trajectory ID as index and latitude and longitude
+            as other 2 columns.
         """
         results = []
 
@@ -137,26 +137,26 @@ class Helpers:
     @staticmethod
     def _distance_between_consecutive_helper(dataframe):
         """
-            This function is the helper function of the create_distance_between_consecutive_column() function.
-            The create_distance_between_consecutive_column() function delegates the actual task of calculating
-            the distance between 2 consecutive points. This function does the calculation and creates a column
-            called Distance_prev_to_curr and places it in the dataframe and returns it.
+        This function is the helper function of the create_distance_between_consecutive_column() function.
+        The create_distance_between_consecutive_column() function delegates the actual task of calculating
+        the distance between 2 consecutive points. This function does the calculation and creates a column
+        called Distance_prev_to_curr and places it in the dataframe and returns it.
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which calculation is to be performed.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe on which calculation is to be performed.
 
-            Returns
-            -------
-                core.TrajectoryDF.NumPandasTraj
-                    The dataframe containing the resultant Distance_prev_to_curr column.
+        Returns
+        -------
+        core.TrajectoryDF.NumPandasTraj
+            The dataframe containing the resultant Distance_prev_to_curr column.
 
-            References
-            ----------
-                "Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
-                 Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
-                 Universidade Federal Do Cear ́a, 2019."
+        References
+        ----------
+        "Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
+         Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
+         Universidade Federal Do Cear ́a, 2019."
         """
         # Reset the index and set it to trajectory ID in order to iterate
         # over the dataframe based on trajectory ID.
@@ -185,21 +185,21 @@ class Helpers:
     @staticmethod
     def _distance_from_start_helper(dataframe):
         """
-            This function is the helper function of the create_distance_from_start_column() function.
-            The create_distance_from_start_column() function delegates the actual task of calculating
-            the distance between 2 the start point of the trajectory to the current point.This function
-            does the calculation and creates a column called Distance_start_to_curr and places it in the
-            dataframe and returns it.
+        This function is the helper function of the create_distance_from_start_column() function.
+        The create_distance_from_start_column() function delegates the actual task of calculating
+        the distance between 2 the start point of the trajectory to the current point.This function
+        does the calculation and creates a column called Distance_start_to_curr and places it in the
+        dataframe and returns it.
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which calculation is to be performed.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe on which calculation is to be performed.
 
-                Returns
-                -------
-                    pandas.core.dataframe
-                        The dataframe containing the resultant Distance_start_to_curr column.
+        Returns
+        -------
+        pandas.core.dataframe
+            The dataframe containing the resultant Distance_start_to_curr column.
         """
         dataframe = dataframe.reset_index().set_index(const.TRAJECTORY_ID)
         ids_ = dataframe.index.unique()  # Find out all the unique IDs in the dataframe.
@@ -237,22 +237,22 @@ class Helpers:
     @staticmethod
     def _distance_from_given_point_helper(dataframe, coordinates):
         """
-            This function is the helper function of the create_distance_from_point() function. The
-            create_distance_from_point() function delegates the actual task of calculating distance
-            between the given point to all the points in the dataframe to this function. This function
-            calculates the distance and creates another column called 'Distance_to_specified_point'.
+        This function is the helper function of the create_distance_from_point() function. The
+        create_distance_from_point() function delegates the actual task of calculating distance
+        between the given point to all the points in the dataframe to this function. This function
+        calculates the distance and creates another column called 'Distance_to_specified_point'.
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which calculation is to be done.
-                coordinates: tuple
-                    The coordinates from which the distance is to be calculated.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe on which calculation is to be done.
+        coordinates: tuple
+            The coordinates from which the distance is to be calculated.
 
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column.
+        Returns
+        -------
+        pandas.core.dataframe.DataFrame
+            The dataframe containing the resultant column.
         """
         # First, lets fetch the latitude and longitude columns from the dataset and store it
         # in a numpy array.
@@ -272,22 +272,22 @@ class Helpers:
     @staticmethod
     def _point_within_range_helper(dataframe, coordinates, dist_range):
         """
-            This is the helper function for create_point_within_range() function. The
-            create_point_within_range_column()
+        This is the helper function for create_point_within_range() function. The
+        create_point_within_range_column()
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe on which the operation is to be performed.
-                coordinates: tuple
-                    The coordinates from which the distance is to be checked.
-                dist_range:
-                    The range within which the distance from the coordinates should lie.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe on which the operation is to be performed.
+        coordinates: tuple
+            The coordinates from which the distance is to be checked.
+        dist_range:
+            The range within which the distance from the coordinates should lie.
 
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant column.
+        Returns
+        -------
+        pandas.core.dataframe.DataFrame
+            The dataframe containing the resultant column.
         """
         # First, lets fetch the latitude and longitude columns from the dataset and store it
         # in a numpy array.
@@ -310,22 +310,22 @@ class Helpers:
     @staticmethod
     def _bearing_helper(dataframe):
         """
-             This function is the helper function of the create_bearing_column(). The create_bearing_column()
-             delegates the task of calculation of bearing between 2 points to this function because the original
-             functions runs multiple instances of this function in parallel. This function does the calculation
-             of bearing between 2 consecutive points in the entire DF and then creates a column in the dataframe
-             and returns it.
+        This function is the helper function of the create_bearing_column(). The create_bearing_column()
+        delegates the task of calculation of bearing between 2 points to this function because the original
+        functions runs multiple instances of this function in parallel. This function does the calculation
+        of bearing between 2 consecutive points in the entire DF and then creates a column in the dataframe
+        and returns it.
 
-             Parameters
-             ----------
-                 dataframe: NumPandasTraj
-                     The dataframe on which the calculation is to be done.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe on which the calculation is to be done.
 
-             Returns
-             -------
-                 NumPandasTraj:
-                     The dataframe containing the Bearing column.
-         """
+        Returns
+        -------
+        NumPandasTraj:
+            The dataframe containing the Bearing column.
+        """
         # Reset the index and set it to trajectory ID in order to iterate
         # over the dataframe based on trajectory ID.
         dataframe = dataframe.reset_index().set_index(const.TRAJECTORY_ID)
@@ -353,24 +353,24 @@ class Helpers:
     @staticmethod
     def _start_location_helper(dataframe, ids_):
         """
-            This function is the helper function of the get_start_location(). The get_start_location() function
-            delegates the task of calculating the start location of the trajectories in the dataframe because the
-            original functions runs multiple instances of this function in parallel. This function finds the start
-            location of the specified trajectory IDs the DF and then another returns dataframe containing start
-            latitude, start longitude and trajectory ID for each trajectory
+        This function is the helper function of the get_start_location(). The get_start_location() function
+        delegates the task of calculating the start location of the trajectories in the dataframe because the
+        original functions runs multiple instances of this function in parallel. This function finds the start
+        location of the specified trajectory IDs the DF and then another returns dataframe containing start
+        latitude, start longitude and trajectory ID for each trajectory
 
 
-            Parameter
-            ---------
-                dataframe: NumPandasTraj
-                    The dataframe of which the locations are to be found.dataframe
-                ids_: list
-                    List of trajectory ids for which the start locations are to be calculated
+        Parameter
+        ---------
+        dataframe: NumPandasTraj
+            The dataframe of which the locations are to be found.dataframe
+        ids_: list
+            List of trajectory ids for which the start locations are to be calculated
 
-            Returns
-            -------
-                pandas.core.dataframe.Dataframe
-                    New dataframe containing Trajectory as index and latitude and longitude
+        Returns
+        -------
+        pandas.core.dataframe.Dataframe
+            New dataframe containing Trajectory as index and latitude and longitude
         """
         results = []
 
@@ -395,24 +395,24 @@ class Helpers:
     @staticmethod
     def _end_location_helper(dataframe, ids_):
         """
-            This function is the helper function of the get_end_location(). The get_end_location() function
-            delegates the task of calculating the end location of the trajectories in the dataframe because the
-            original functions runs multiple instances of this function in parallel. This function finds the end
-            location of the specified trajectory IDs the DF and then another returns dataframe containing
-            end latitude, end longitude and trajectory ID for each trajectory
+        This function is the helper function of the get_end_location(). The get_end_location() function
+        delegates the task of calculating the end location of the trajectories in the dataframe because the
+        original functions runs multiple instances of this function in parallel. This function finds the end
+        location of the specified trajectory IDs the DF and then another returns dataframe containing
+        end latitude, end longitude and trajectory ID for each trajectory
 
-            Parameter
-            ---------
-                dataframe: NumPandasTraj
-                    The dataframe of which the locations are to be found.dataframe
-                ids_: list
-                    List of trajectory ids for which the end locations are to be calculated
+        Parameter
+        ---------
+        dataframe: NumPandasTraj
+            The dataframe of which the locations are to be found.dataframe
+        ids_: list
+            List of trajectory ids for which the end locations are to be calculated
 
-            Returns
-            -------
-                pandas.core.dataframe.Dataframe
-                    New dataframe containing Trajectory ID as index and latitude and longitude
-                    as other 2 columns.
+        Returns
+        -------
+        pandas.core.dataframe.Dataframe
+            New dataframe containing Trajectory ID as index and latitude and longitude
+            as other 2 columns.
         """
         results = []
 
@@ -436,24 +436,24 @@ class Helpers:
     @staticmethod
     def _number_of_location_helper(dataframe, ids_):
         """
-            This is the helper function for the get_number_of_locations() function. The
-            get_number_of_locations() delegates the actual task of calculating the number of
-            unique locations visited by a particular object to this function. This function
-            calculates the number of unique locations by each of the unique object and returns
-            a dataframe containing the results.
+        This is the helper function for the get_number_of_locations() function. The
+        get_number_of_locations() delegates the actual task of calculating the number of
+        unique locations visited by a particular object to this function. This function
+        calculates the number of unique locations by each of the unique object and returns
+        a dataframe containing the results.
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe containing all the original data.
-                ids_: list
-                    The list of ids for which the number of unique locations visited
-                    is to be calculated.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe containing all the original data.
+        ids_: list
+            The list of ids for which the number of unique locations visited
+            is to be calculated.
 
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame
-                    dataframe containing the results.
+        Returns
+        -------
+        pandas.core.dataframe.DataFrame
+            dataframe containing the results.
         """
         results = []  # A list for storing results.
 
@@ -479,18 +479,18 @@ class Helpers:
     @staticmethod
     def _get_partition_size(size):
         """
-            Takes number of ids and makes use of a formula that gives a factor to makes set of ids
-            according to the number of processors available to work with.
+        Takes number of ids and makes use of a formula that gives a factor to makes set of ids
+        according to the number of processors available to work with.
 
-            Parameters
-            ----------
-                size: int
-                    The total number of trajectory IDs in the dataset.
+        Parameters
+        ----------
+        size: int
+            The total number of trajectory IDs in the dataset.
 
-            Returns
-            -------
-                int
-                    The factor by which the datasets are to be split.
+        Returns
+        -------
+        int
+           The factor by which the datasets are to be split.
         """
         # Based on the Operating system, get the number of CPUs available for
         # multiprocessing.
@@ -510,24 +510,27 @@ class Helpers:
     @staticmethod
     def _df_split_helper(dataframe):
         """
-            This is the helper function for splitting up dataframes into smaller chunks.
-            This function is widely used for main functions to help split the original
-            dataframe into smaller chunks based on a fixed range of IDs. This function
-            splits the dataframes based on a predetermined number, stores them in a list
-            and returns it.
-            NOTE: The dataframe is split based on the number of CPU cores available for.
-                  For more info, take a look at the documentation of the get_partition_size()
-                  function.
+        This is the helper function for splitting up dataframes into smaller chunks.
+        This function is widely used for main functions to help split the original
+        dataframe into smaller chunks based on a fixed range of IDs. This function
+        splits the dataframes based on a predetermined number, stores them in a list
+        and returns it.
 
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                    The dataframe that is to be split.
+        Note
+        ----
+        The dataframe is split based on the number of CPU cores available for.
+        For more info, take a look at the documentation of the get_partition_size()
+        function.
 
-            Returns
-            -------
-                list:
-                    The list containing smaller dataframe chunks.
+        Parameters
+        ----------
+        dataframe: NumPandasTraj
+            The dataframe that is to be split.
+
+        Returns
+        -------
+        list:
+            The list containing smaller dataframe chunks.
         """
         # First, create a list containing all the ids of the data and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
