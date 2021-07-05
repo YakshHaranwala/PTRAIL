@@ -18,7 +18,6 @@ sys.path.insert(0, os.path.abspath("../"))
 sys.path.insert(1, os.path.dirname(os.path.abspath("../")))
 autodoc_mock_imports = ["scipy", 'hampel', 'pandas', 'numpy', 'psutil', 'folium']
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'NumMobility'
@@ -27,7 +26,6 @@ author = 'Yaksh J Haranwala, Salman Haidri'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0'
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -51,7 +49,6 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -64,7 +61,6 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
 
-
 # -- Extension configuration -------------------------------------------------
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
@@ -73,3 +69,13 @@ napoleon_numpy_docstring = True
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+
+def skip(app, what, name, obj, would_skip, options):
+    if name == "__init__":
+        return False
+    return would_skip
+
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip)
