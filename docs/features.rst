@@ -28,4 +28,10 @@ features.temporal\_features module
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
 
+.. automodule:: features
+   :members:
+   :undoc-members:
+   :show-inheritance:
