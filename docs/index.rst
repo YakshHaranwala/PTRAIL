@@ -22,6 +22,7 @@ The main features of NumMobility are:
 References
 ^^^^^^^^^^
 .. toctree::
+   :recursive:
    :maxdepth: 3
    core
    features
