@@ -41,21 +41,26 @@ class Interpolation:
             3. Kinematic Interpolation
             4. Random Walk Interpolation
 
-            WARNING: THE INTERPOLATION METHODS WILL ONLY RETURN THE 4 FUNDAMENTAL LIBRARY
-                     COLUMNS BECAUSE IT IS NOT POSSIBLE TO INTERPOLATE OTHER DATA THAT
-                     MIGHT BE PRESENT IN THE DATASET APART FROM LATITUDE, LONGITUDE AND
-                     DateTime. AS A RESULT, OTHER COLUMNS ARE DROPPED AND LEFT TO USER TO
-                     TAKE CARE OF THAT.
+            Warning
+            -------
+            The Interpolation methods will only return the 4 mandatory library columns
+            because it is not possible to interpolate other data that may or may not be
+            present in the dataset apart from latitude, longitude and datetime. As a
+            result, other columns are dropped.
 
-            NOTE: The time-jump parameter specifies where the new points are to be
-                  inserted based on the time difference between 2 consecutive points.
-                  However, it does not guarantee that the dataset will be brought down
-                  to having difference between 2 consecutive points equal to or
-                  less than the user specified time jump.
+            Note
+            ----
+            The time-jump parameter specifies where the new points are to be
+            inserted based on the time difference between 2 consecutive points.
+            However, it does not guarantee that the dataset will be brought down
+            to having difference between 2 consecutive points equal to or
+            less than the user specified time jump.
 
-            NOTE: The time-jump is specified in seconds. Hence, if the user-specified
-                  time-jump is not sensible, then the execution of the method will take
-                  a very long time.
+            Note
+            ----
+            The time-jump is specified in seconds. Hence, if the user-specified
+            time-jump is not sensible, then the execution of the method will take
+            a very long time.
 
             Parameters
             ----------
