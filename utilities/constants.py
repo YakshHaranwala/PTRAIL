@@ -1,6 +1,4 @@
 """
-    <constants.py>
-
     Contains all the default constants needed for initialization.
     All the constant are of the type string.
 """

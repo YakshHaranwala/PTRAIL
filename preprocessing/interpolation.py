@@ -35,10 +35,11 @@ class Interpolation:
             Interpolate the position of an object and create new points using one of
             the interpolation methods provided by the Library. Currently, the library
             supports the following 4 interpolation methods:
-                1. Linear Interpolation
-                2. Cubic-Spline Interpolation
-                3. Kinematic Interpolation
-                4. Random Walk Interpolation
+
+            1. Linear Interpolation
+            2. Cubic-Spline Interpolation
+            3. Kinematic Interpolation
+            4. Random Walk Interpolation
 
             WARNING: THE INTERPOLATION METHODS WILL ONLY RETURN THE 4 FUNDAMENTAL LIBRARY
                      COLUMNS BECAUSE IT IS NOT POSSIBLE TO INTERPOLATE OTHER DATA THAT

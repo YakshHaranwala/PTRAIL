@@ -2,8 +2,8 @@
     The conversions modules contains various available methods
     that can be used to convert given data into another format.
 
-    @Author Yaksh J Haranwala, Salman Haidri
-    @Date: 1st June, 2021
+    Authors: Yaksh J Haranwala, Salman Haidri
+    Date: 1st June, 2021
 """
 from typing import Text
 

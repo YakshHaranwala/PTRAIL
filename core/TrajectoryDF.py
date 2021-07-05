@@ -122,9 +122,9 @@ class NumPandasTraj(DataFrame):
         """
             Check whether all the data given by the user is of valid type and if it isn't,
             it converts them to the specified data types.
-                1. Trajectory_ID: Any -> str
-                2. LAT and LONG: Any -> float64
-                3. DateTime: Any -> dask.datetime64[ns]
+            1. Trajectory_ID: Any -> str
+            2. LAT and LONG: Any -> float64
+            3. DateTime: Any -> dask.datetime64[ns]
 
             Parameters
             ----------
@@ -189,12 +189,12 @@ class NumPandasTraj(DataFrame):
 
     def get_default_column_names(self, DateTime, traj_id, latitude, longitude) -> dict:
         """
-            Get a dictionary containing the key, value pairs of the library default column names
-            for the following columns:
-                1. Latitude
-                2. Longitude
-                3. DateTime
-                4. Trajectory ID
+            Get a dictionary containing the key, value pairs of the library default
+            column names for the following columns:
+            1. Latitude
+            2. Longitude
+            3. DateTime
+            4. Trajectory ID
 
             Parameters
             ----------
@@ -358,8 +358,8 @@ class NumPandasTraj(DataFrame):
         """
             Sort the trajectory in Ascending or descending order based on the following 2
             columns in order:
-                1. Trajectory ID
-                2. DateTime
+            1. Trajectory ID
+            2. DateTime
 
             Parameters
             ----------

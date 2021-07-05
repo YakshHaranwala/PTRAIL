@@ -2,10 +2,11 @@
     The helpers class has the functionalities that interpolate a point based
     on the given data by the user. The class contains the following 4
     interpolation calculators:
-        1. Linear Interpolation
-        2. Cubic Interpolation
-        3. Random-Walk Interpolation
-        4. Kinematic Interpolation
+
+    1. Linear Interpolation
+    2. Cubic Interpolation
+    3. Random-Walk Interpolation
+    4. Kinematic Interpolation
 
     Besides the interpolation helpers, there are also general utilities which
     are used in splitting up dataframes for running the code in parallel.

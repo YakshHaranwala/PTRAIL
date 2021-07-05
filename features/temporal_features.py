@@ -7,10 +7,10 @@
     these features are inspired from the PyMove library and we are
     crediting the PyMove creators with them.
 
-    @authors Yaksh J Haranwala, Salman Haidri
-    @date 22 May, 2021
-    @version 1.0
-    @credits PyMove creators
+    author: Yaksh J Haranwala, Salman Haidri
+    date: 22 May, 2021
+    version: 1.0
+    credits: PyMove creators
 """
 import itertools
 import multiprocessing
@@ -183,9 +183,12 @@ class TemporalFeatures:
     def get_traj_duration(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
         """
             Accessor method for the duration of a trajectory specified by the user.
-            Note: If no trajectory ID is given by the user, then the duration of the entire
-                  data set is given i.e., the difference between the max time in the dataset
-                  and the min time in the dataset.
+
+            Note
+            ----
+            If no trajectory ID is given by the user, then the duration of the entire
+            data set is given i.e., the difference between the max time in the dataset
+            and the min time in the dataset.
 
             Parameters
             ----------
@@ -222,9 +225,12 @@ class TemporalFeatures:
     def get_start_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
         """
             Get the starting time of the trajectory.
-            NOTE: If the trajectory ID is not specified by the user, then by default,
-                  the starting times of all the trajectory IDs in the data are
-                  returned.
+
+            Note
+            ----
+            If the trajectory ID is not specified by the user, then by default,
+            the starting times of all the trajectory IDs in the data are
+            returned.
 
             Parameters
             ----------
@@ -269,9 +275,12 @@ class TemporalFeatures:
     def get_end_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
         """
             Get the ending time of the trajectory.
-            NOTE: If the trajectory ID is not specified by the user, then by default,
-                  the ending times of all the trajectory IDs in the data are
-                  returned.
+
+            Note
+            ----
+            If the trajectory ID is not specified by the user, then by default,
+            the ending times of all the trajectory IDs in the data are
+            returned.
 
             Parameters
             ----------

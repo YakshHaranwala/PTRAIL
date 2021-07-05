@@ -6,10 +6,10 @@
     be also noted that a lot of these features are inspired from the PyMove
     library and we are crediting the PyMove creators with them.
 
-    @authors Yaksh J Haranwala, Salman Haidri
-    @date 2nd June, 2021
-    @version 1.0
-    @credits PyMove creators
+    authors: Yaksh J Haranwala, Salman Haidri
+    date: 2nd June, 2021
+    version: 1.0
+    credits: PyMove creators
 """
 import itertools
 import multiprocessing
@@ -28,13 +28,15 @@ from utilities.exceptions import *
 
 NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
 
+
 class SpatialFeatures:
     @staticmethod
     def get_bounding_box(dataframe: NumPandasTraj):
         """
             Return the bounding box of the Trajectory data. Essentially, the bounding box is of
             the following format:
-                (min Latitude, min Longitude, max Latitude, max Longitude).
+
+            (min Latitude, min Longitude, max Latitude, max Longitude).
 
             Parameters
             ----------
@@ -158,9 +160,12 @@ class SpatialFeatures:
         """
             Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
             The distance calculated is the Great-Circle distance.
-            NOTE: When the trajectory ID changes in the data, then the distance calculation again starts
-                  from the first point of the new trajectory ID and the first point of the new trajectory
-                  ID will be set to 0.
+
+            Note
+            ----
+            When the trajectory ID changes in the data, then the distance calculation again starts
+            from the first point of the new trajectory ID and the first point of the new trajectory
+            ID will be set to 0.
 
             When converting to NumPandasTraj we see a jump of 140-150ms in execution time but converting the
             dataframe provides the user with the option to use the NumPandasTraj functionalities.
@@ -202,9 +207,12 @@ class SpatialFeatures:
         """
             Create a column containing distance between the start location and the rest of the
             points using Haversine formula. The distance calculated is the Great-Circle distance.
-            NOTE: When the trajectory ID changes in the data, then the distance calculation again
-                  starts from the first point of the new trajectory ID and the first point of the
-                  new trajectory ID will be set to 0.
+
+            Note
+            ----
+            When the trajectory ID changes in the data, then the distance calculation again
+            starts from the first point of the new trajectory ID and the first point of the
+            new trajectory ID will be set to 0.
 
             Parameters
             ----------
@@ -492,8 +500,9 @@ class SpatialFeatures:
             Create a column containing bearing between 2 consecutive points. Bearing is also
             referred as "Forward Azimuth" sometimes. Bearing/Forward Azimuth is defined as
             follows:
-                Bearing is the horizontal angle between the direction of an object and another
-                object, or between the object and the True North.
+
+            "Bearing is the horizontal angle between the direction of an object and another
+            object, or between the object and the True North."
 
             Parameters
             ----------
@@ -652,8 +661,11 @@ class SpatialFeatures:
     def get_number_of_locations(dataframe: NumPandasTraj, traj_id: Text = None):
         """
             Get the number of unique coordinates in the dataframe specific to a trajectory ID.
-            NOTE: If no Trajectory ID is specified, then the number of unique locations in the
-                  entire dataset is calculated.
+
+            Note
+            ----
+            If no Trajectory ID is specified, then the number of unique locations in the
+            entire dataset is calculated.
 
             Parameters
             ----------

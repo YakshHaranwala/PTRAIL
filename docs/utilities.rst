@@ -12,14 +12,6 @@ utilities.DistanceCalculator module
    :undoc-members:
    :show-inheritance:
 
-utilities.constants module
---------------------------
-
-.. automodule:: utilities.constants
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 utilities.conversions module
 ----------------------------
 
@@ -28,10 +20,3 @@ utilities.conversions module
    :undoc-members:
    :show-inheritance:
 
-utilities.exceptions module
----------------------------
-
-.. automodule:: utilities.exceptions
-   :members:
-   :undoc-members:
-   :show-inheritance:

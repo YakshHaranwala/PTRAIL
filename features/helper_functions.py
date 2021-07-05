@@ -1,10 +1,13 @@
 """
     This module contains all the helper functions for the parallel calculators in
     the spatial and temporal features classes.
-    WARNING: These functions may not be used directly as they would result in a
-             slower calculation and execution times. They are meant to be used
-             only as helpers. For calculation of features, use the ones in the
-             features package.
+
+    Warning
+    -------
+    These functions may not be used directly as they would result in a
+    slower calculation and execution times. They are meant to be used
+    only as helpers. For calculation of features, use the ones in the
+    features package.
 """
 import os
 
@@ -18,7 +21,6 @@ from utilities.DistanceCalculator import FormulaLog as calc
 
 class Helpers:
     # ------------------------------------ Temporal Helpers --------------------------------------#
-
     @staticmethod
     def _traj_duration_helper(dataframe, ids_):
         """

@@ -20,12 +20,6 @@ from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from utilities.exceptions import *
 
 
-# TODO: When we filter out the trajectories based o distance and time, i think we need to
-#      calculate the actual distances again as I feel that the distance reported are 
-#      incorrect because there might be some kinematic features which are calculated from the 
-#      points that were removed and those features now would be reported incorrectly.
-
-
 class Filters:
     @staticmethod
     def remove_duplicates(dataframe: NumTrajDF):
@@ -35,6 +29,7 @@ class Filters:
                 2. DateTime
                 3. Latitude
                 4. Longitude
+
             Duplicates will be dropped only when all the values in the above mentioned
             four columns are the same.
 
@@ -154,15 +149,18 @@ class Filters:
     def filter_by_date(dataframe: NumTrajDF, start_date: Optional[Text] = None, end_date: Optional[Text] = None):
         """
             Filter the dataset by user-given time range.
-            NOTE: The following options are to be noted for filtering the data.
-                    1. If the start_date and end_date both are not given, then entire
-                       dataset itself is returned.
-                    2. If only start_date is given, then the trajectory data after
-                       (including the start date) the start date is returned.
-                    3. If only end_date is given, then the trajectory data before
-                       (including the end date) the end date is returned.
-                    4. If start_date and end_date both are given then the data between
-                       the start_date and end_date (included) are returned.
+
+            Note
+            ----
+            The following options are to be noted for filtering the data:
+            1. If the start_date and end_date both are not given, then entire
+            dataset itself is returned.
+            2. If only start_date is given, then the trajectory data after
+            (including the start date) the start date is returned.
+            3. If only end_date is given, then the trajectory data before
+            (including the end date) the end date is returned.
+            4. If start_date and end_date both are given then the data between
+            the start_date and end_date (included) are returned.
 
             Parameters
             ----------
@@ -232,15 +230,17 @@ class Filters:
                            end_dateTime: Optional[Text] = None):
         """
             Filter the dataset by user-given time range.
-            NOTE: The following options are to be noted for filtering the data.
-                    1. If the start_dateTime and end_dateTime both are not given, then entire
-                       dataset itself is returned.
-                    2. If only start_dateTime is given, then the trajectory data after
-                       (including the start datetime) the start date is returned.
-                    3. If only end_dateTime is given, then the trajectory data before
-                       (including the end datetime) the end date is returned.
-                    4. If start_dateTime and end_dateTime both are given then the data between
-                       the start_dateTime and end_dateTime (included) are returned.
+            Note
+            ----
+            The following options are to be noted for filtering the data.
+            1. If the start_dateTime and end_dateTime both are not given, then entire
+            dataset itself is returned.
+            2. If only start_dateTime is given, then the trajectory data after
+            (including the start datetime) the start date is returned.
+            3. If only end_dateTime is given, then the trajectory data before
+            (including the end datetime) the end date is returned.
+            4. If start_dateTime and end_dateTime both are given then the data between
+            the start_dateTime and end_dateTime (included) are returned.
 
             Parameters
             ----------
@@ -537,10 +537,11 @@ class Filters:
         """
             Check the outlier points based on distance between 2 consecutive points.
             Outlier formula:
-                Lower outlier = Q1 - (1.5*IQR)
-                Higher outlier = Q3 + (1.5*IQR)
 
-                IQR = Inter quartile range = Q3 - Q1
+            Lower outlier = Q1 - (1.5*IQR)
+            Higher outlier = Q3 + (1.5*IQR)
+            IQR = Inter quartile range = Q3 - Q1
+
             We need to find points between lower and higher outlier
 
             Parameters
@@ -587,10 +588,11 @@ class Filters:
         """
             Check the outlier points based on distance between 2 consecutive points.
             Outlier formula:
-                Lower outlier = Q1 - (1.5*IQR)
-                Higher outlier = Q3 + (1.5*IQR)
 
-                IQR = Inter quartile range = Q3 - Q1
+            Lower outlier = Q1 - (1.5*IQR)
+            Higher outlier = Q3 + (1.5*IQR)
+            IQR = Inter quartile range = Q3 - Q1
+
             We need to find points between lower and higher outlier
 
             Parameters
