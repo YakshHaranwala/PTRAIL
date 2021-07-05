@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>preprocessing.filters &mdash; NumMobility 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> NumMobility
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">NumMobility</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NumMobility</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>preprocessing.filters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for preprocessing.filters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The filters module contains several data filtering functions like</span>
+<span class="sd">    filtering the data based on time, date, proximity to a point and</span>
+<span class="sd">    several others.</span>
+
+<span class="sd">    @Authors: Yaksh J Haranwala, Salman Haidri</span>
+<span class="sd">    @Date: 8th June, 2021</span>
+<span class="sd">    @Version: 1.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">hampel</span> <span class="kn">import</span> <span class="n">hampel</span>
+
+<span class="kn">import</span> <span class="nn">utilities.constants</span> <span class="k">as</span> <span class="nn">const</span>
+<span class="kn">from</span> <span class="nn">core.TrajectoryDF</span> <span class="kn">import</span> <span class="n">NumPandasTraj</span> <span class="k">as</span> <span class="n">NumTrajDF</span>
+<span class="kn">from</span> <span class="nn">utilities.exceptions</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Filters"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters">[docs]</a><span class="k">class</span> <span class="nc">Filters</span><span class="p">:</span>
+<div class="viewcode-block" id="Filters.remove_duplicates"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.remove_duplicates">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_duplicates</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Drop duplicates based on the four following columns:</span>
+<span class="sd">                1. Trajectory ID</span>
+<span class="sd">                2. DateTime</span>
+<span class="sd">                3. Latitude</span>
+<span class="sd">                4. Longitude</span>
+
+<span class="sd">            Duplicates will be dropped only when all the values in the above mentioned</span>
+<span class="sd">            four columns are the same.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj</span>
+<span class="sd">                    The dataframe with dropped duplicates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+            <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">],</span>
+            <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_traj_id"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_traj_id">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_traj_id</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">,</span> <span class="n">traj_id</span><span class="p">:</span> <span class="n">Text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Extract all the trajectory points of a particular trajectory specified</span>
+<span class="sd">            by the trajectory&#39;s ID.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe on which the filtering by ID is to be done.</span>
+<span class="sd">                traj_id: Text</span>
+<span class="sd">                    The ID of the trajectory which is to be extracted.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                pandas.core.dataframe.DataFrame</span>
+<span class="sd">                    The dataframe containing all the trajectory points of the specified trajectory.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                MissingTrajIDException:</span>
+<span class="sd">                    This exception is raised when the Trajectory ID given by the user does not exist</span>
+<span class="sd">                    in the dataset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">to_return</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">]</span> <span class="o">==</span> <span class="n">traj_id</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_return</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">to_return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingTrajIDException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">traj_id</span><span class="si">}</span><span class="s2"> is not present in the dataset. &quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;Please check Trajectory ID and try again.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.get_bounding_box_by_radius"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.get_bounding_box_by_radius">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_bounding_box_by_radius</span><span class="p">(</span><span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculates bounding box from a point according to the given radius.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                lat: float</span>
+<span class="sd">                    The latitude of centroid point of the bounding box.</span>
+<span class="sd">                lon: float</span>
+<span class="sd">                    The longitude of centroid point of the bounding box.</span>
+<span class="sd">                radius: float</span>
+<span class="sd">                    The max radius of the bounding box.</span>
+<span class="sd">                    The radius is given in metres.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                tuple:</span>
+<span class="sd">                    The bounding box of the user specified size.</span>
+
+<span class="sd">            References</span>
+<span class="sd">            ----------</span>
+<span class="sd">                https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lat</span><span class="p">),</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>  <span class="c1"># Convert latitude, longitude to radians.</span>
+
+        <span class="c1"># Calculate the delta factor for the latitudes and then</span>
+        <span class="c1"># find the minimum and maximum latitudes.</span>
+        <span class="n">latitude_delta</span> <span class="o">=</span> <span class="n">radius</span> <span class="o">/</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">RADIUS_OF_EARTH</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="n">lat_one</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">lat</span> <span class="o">-</span> <span class="n">latitude_delta</span><span class="p">)</span>
+        <span class="n">lat_two</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">lat</span> <span class="o">+</span> <span class="n">latitude_delta</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the delta factor for the longitudes and then</span>
+        <span class="c1"># find the minimum and maximum longitudes.</span>
+        <span class="n">longitude_delta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">asin</span><span class="p">((</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">latitude_delta</span><span class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
+        <span class="n">lon_one</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">lon</span> <span class="o">-</span> <span class="n">longitude_delta</span><span class="p">)</span>
+        <span class="n">lon_two</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">lon</span> <span class="o">+</span> <span class="n">longitude_delta</span><span class="p">)</span>
+        <span class="c1"># Return the bounding box.</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">lat_one</span><span class="p">,</span> <span class="n">lon_one</span><span class="p">,</span>
+                <span class="n">lat_two</span><span class="p">,</span> <span class="n">lon_two</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_bounding_box"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_bounding_box">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_bounding_box</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">,</span> <span class="n">bounding_box</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">inside</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Given a bounding box, filter out all the points that are within/outside</span>
+<span class="sd">            the bounding box and return a dataframe containing the filtered points.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumTrajDF</span>
+<span class="sd">                    The dataframe from which the data is to be filtered out.</span>
+<span class="sd">                bounding_box: tuple</span>
+<span class="sd">                    The bounding box which is to be used to filter the data.</span>
+<span class="sd">                inside: bool</span>
+<span class="sd">                    Indicate whether the data outside the bounding box is required</span>
+<span class="sd">                    or the data inside it.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj</span>
+<span class="sd">                    The filtered dataframe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">bounding_box</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">bounding_box</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounding_box</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounding_box</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span> <span class="k">if</span> <span class="n">inside</span> <span class="k">else</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">filt</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_date"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_date">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_date</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">,</span> <span class="n">start_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Filter the dataset by user-given time range.</span>
+
+<span class="sd">            Note</span>
+<span class="sd">            ----</span>
+<span class="sd">            The following options are to be noted for filtering the data:</span>
+<span class="sd">            1. If the start_date and end_date both are not given, then entire</span>
+<span class="sd">            dataset itself is returned.</span>
+<span class="sd">            2. If only start_date is given, then the trajectory data after</span>
+<span class="sd">            (including the start date) the start date is returned.</span>
+<span class="sd">            3. If only end_date is given, then the trajectory data before</span>
+<span class="sd">            (including the end date) the end date is returned.</span>
+<span class="sd">            4. If start_date and end_date both are given then the data between</span>
+<span class="sd">            the start_date and end_date (included) are returned.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe that is to be filtered.</span>
+<span class="sd">                start_date: Optional[Text]</span>
+<span class="sd">                    The start date from which the points are to be filtered.</span>
+<span class="sd">                end_date: Optional[Text]</span>
+<span class="sd">                    The end date before which the points are to be filtered.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj</span>
+<span class="sd">                    The filtered dataframe containing the resultant data.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                    When the Date column is not present in the data.</span>
+<span class="sd">                ValueError:</span>
+<span class="sd">                    When the start date is later than the end date.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Reset Index and create a variable for storing filtered DataFrame.</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Convert the user-given string dates to pandas datetime format.</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span> <span class="k">if</span> <span class="n">start_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span> <span class="k">if</span> <span class="n">end_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+            <span class="c1"># Case-1: No start and end date are give. Hence just return the original dataframe.</span>
+            <span class="k">if</span> <span class="n">start_date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span>
+
+            <span class="c1"># Case-2: No start_date is given. Hence, return all the points upto and including</span>
+            <span class="c1">#         the points on the end date.</span>
+            <span class="k">elif</span> <span class="n">start_date</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end_date</span>
+                <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+
+            <span class="c1"># Case-3: No end date is given. Hence, return all the point after and including the</span>
+            <span class="c1">#         points on the start date.</span>
+            <span class="k">elif</span> <span class="n">start_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start_date</span>
+                <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+
+            <span class="c1"># Case-4: Both the start date and end date are given. Hence, return the points between</span>
+            <span class="c1">#         and including the points on start and end date.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">end_date</span> <span class="o">&lt;</span> <span class="n">start_date</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;End Date should be later than Start Date.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">filt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end_date</span><span class="p">)</span>
+                    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+            <span class="c1"># Convert the smaller dataframe back to NumPandasTraj and return it.</span>
+            <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># Ask the user first to create a date.</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The Date column is missing in the dataset. Please run the &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;create_date_column() function first before running this filter.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_datetime"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_datetime">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_datetime</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">,</span> <span class="n">start_dateTime</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">end_dateTime</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Filter the dataset by user-given time range.</span>
+<span class="sd">            Note</span>
+<span class="sd">            ----</span>
+<span class="sd">            The following options are to be noted for filtering the data.</span>
+<span class="sd">            1. If the start_dateTime and end_dateTime both are not given, then entire</span>
+<span class="sd">            dataset itself is returned.</span>
+<span class="sd">            2. If only start_dateTime is given, then the trajectory data after</span>
+<span class="sd">            (including the start datetime) the start date is returned.</span>
+<span class="sd">            3. If only end_dateTime is given, then the trajectory data before</span>
+<span class="sd">            (including the end datetime) the end date is returned.</span>
+<span class="sd">            4. If start_dateTime and end_dateTime both are given then the data between</span>
+<span class="sd">            the start_dateTime and end_dateTime (included) are returned.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe that is to be filtered.</span>
+<span class="sd">                start_dateTime: Optional[Text]</span>
+<span class="sd">                    The start dateTime from which the points are to be filtered.</span>
+<span class="sd">                end_dateTime: Optional[Text]</span>
+<span class="sd">                    The end dateTime before which the points are to be filtered.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj</span>
+<span class="sd">                    The filtered dataframe containing the resultant data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Reset Index and create a variable for storing filtered DataFrame.</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">filtered_df</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Convert the user-given string datetime to pandas datetime format.</span>
+        <span class="n">start_dateTime</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">start_dateTime</span><span class="p">)</span> <span class="k">if</span> <span class="n">start_dateTime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">end_dateTime</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">end_dateTime</span><span class="p">)</span> <span class="k">if</span> <span class="n">end_dateTime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># Case-1: No start and end datetime are give. Hence just return the original dataframe.</span>
+        <span class="k">if</span> <span class="n">start_dateTime</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dateTime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span>
+
+        <span class="c1"># Case-2: No start_dateTime is given. Hence, return all the points upto and including</span>
+        <span class="c1">#         the points on the end datetime.</span>
+        <span class="k">elif</span> <span class="n">start_dateTime</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dateTime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end_dateTime</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+
+        <span class="c1"># Case-3: No end datetime is given. Hence, return all the point after and including the</span>
+        <span class="c1">#         points on the start datetime.</span>
+        <span class="k">elif</span> <span class="n">start_dateTime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_dateTime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start_dateTime</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+
+        <span class="c1"># Case-4: Both the start datetime and end datetime are given. Hence, return the points between</span>
+        <span class="c1">#         and including the points on start and end datetime.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">end_dateTime</span> <span class="o">&lt;</span> <span class="n">start_dateTime</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;End Datetime should be later than Start Datetime.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start_dateTime</span><span class="p">,</span>
+                                      <span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end_dateTime</span><span class="p">)</span>
+                <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+        <span class="c1"># Convert the smaller dataframe back to NumPandasTraj and return it.</span>
+        <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_max_speed"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_max_speed">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_max_speed</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">,</span> <span class="n">max_speed</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Remove the data points which have speed more than a user given speed.</span>
+<span class="sd">            NOTE: The max_speed is given in the units m/s (metres per second).</span>
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe which is to be filtered.</span>
+<span class="sd">                max_speed: float</span>
+<span class="sd">                    The speed threshold above which the points are to be removed.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    NumPandasTraj containing the resultant dataframe.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                    The column &#39;Speed_prev_to_curr&#39; is not present in the dataframe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="c1"># Filter out all the values lesser than the max speed</span>
+            <span class="c1"># The NaNs are filled with max_speed+1 to avoid data loss as well as</span>
+            <span class="c1"># to avoid false positives in calculation and comparison.</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">max_speed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_speed</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Convert the smaller dataframe back to NumPandasTraj and return it.</span>
+            <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The column &#39;Speed_prev_to_curr is not present in the dataset. &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;Please run the function create_speed_from_prev_column() before&quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot; running this filter.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_min_speed"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_min_speed">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_min_speed</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">min_speed</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Remove the data points which have speed less than a user given speed.</span>
+<span class="sd">            NOTE: The min_speed is given in the units m/s (metres per second).</span>
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe which is to be filtered.</span>
+<span class="sd">                min_speed: float</span>
+<span class="sd">                    The speed threshold below which the points are to be removed.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    NumPandasTraj containing the resultant dataframe.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                    The column &#39;Speed_prev_to_curr&#39; is not present in the dataframe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="c1"># Filter out all the values lesser than the max speed</span>
+            <span class="c1"># The NaNs are filled with min_speed-1 to avoid data loss as well as</span>
+            <span class="c1"># to avoid false positives in calculation and comparison.</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">min_speed</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">min_speed</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+            <span class="c1"># Convert the smaller dataframe back to NumPandasTraj and return it.</span>
+            <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The column &#39;Speed_prev_to_curr is not present in the dataset. &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;Please run the function create_speed_from_prev_column() before&quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot; running this filter.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_min_consecutive_distance"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_min_consecutive_distance">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_min_consecutive_distance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">min_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Remove the points that have a distance between 2 consecutive points</span>
+<span class="sd">            lesser than a user specified value.</span>
+<span class="sd">            NOTE: min_distance is given in metres.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe which is to be filtered.</span>
+<span class="sd">                min_distance: float</span>
+<span class="sd">                    The consecutive distance threshold below which the points are to</span>
+<span class="sd">                    be removed.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The filtered dataframe.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                    The column &#39;Distance_prev_to_curr&#39; is not present in the dataframe.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="c1"># Filter out all the values lesser than the minimum consecutive distance.</span>
+            <span class="c1"># The NaNs are filled with min_distance-1 to avoid data loss as well as</span>
+            <span class="c1"># to avoid false positives in calculation and comparison.</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">min_distance</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">min_distance</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Convert the smaller dataframe back to NumPandasTraj and return it.</span>
+            <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The column &#39;Distance_prev_to_curr is not present in the dataset. &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;Please run the function create_distance_between_consecutive_column() before&quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot; running this filter.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_max_consecutive_distance"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_max_consecutive_distance">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_max_consecutive_distance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Remove the points that have a distance between 2 consecutive points</span>
+<span class="sd">            greater than a user specified value.</span>
+<span class="sd">            NOTE: max_distance is given in metres.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe which is to be filtered.</span>
+<span class="sd">                max_distance: float</span>
+<span class="sd">                    The consecutive distance threshold above which the points are to</span>
+<span class="sd">                    be removed.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The filtered dataframe.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                    The column &#39;Distance_prev_to_curr&#39; is not present in the dataframe.</span>
+
+<span class="sd">                &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="c1"># Filter out all the values greater than the maximum consecutive distance.</span>
+            <span class="c1"># The NaNs are filled with max_distance+1 to avoid data loss as well as</span>
+            <span class="c1"># to avoid false positives in calculation and comparison.</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">max_distance</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_distance</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+
+            <span class="c1"># Convert the smaller dataframe back to NumPandasTraj and return it.</span>
+            <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The column &#39;Distance_prev_to_curr is not present in the dataset. &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;Please run the function create_distance_between_consecutive_column() before&quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot; running this filter.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_max_distance_and_speed"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_max_distance_and_speed">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_max_distance_and_speed</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">max_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">max_speed</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Filter out values that have distance between consecutive points greater</span>
+<span class="sd">            than a user-given distance speed between consecutive points greater than</span>
+<span class="sd">            a user-given speed.</span>
+<span class="sd">            NOTE: The max_distance is given in metres</span>
+<span class="sd">            NOTE: The max_speed is given in metres/second (m/s).</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            dataframe: NumPandasTraj</span>
+<span class="sd">                The dataframe which is to be filtered.</span>
+<span class="sd">            max_distance: float</span>
+<span class="sd">                The maximum distance between 2 consecutive points.</span>
+<span class="sd">            max_speed: float</span>
+<span class="sd">                The maximum speed between 2 consecutive points.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The filtered dataframe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)</span>
+            <span class="c1"># filtered_df = Filters.filter_by_max_speed(filt, max_speed)</span>
+
+            <span class="c1"># Filter the dataframe based on maximum distance and speed.</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">max_distance</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_distance</span><span class="p">,</span>
+                                  <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">max_speed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_speed</span><span class="p">)</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">filtered_df</span>  <span class="c1"># Return the df filtered on the basis of 2 constraints.</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># The system asks the user to only run create_speed_from_prev_column() function because</span>
+            <span class="c1"># running create_speed_from_prev_column() function create the &#39;Distance_prev_to_curr&#39;</span>
+            <span class="c1"># function automatically if the column is already not present.</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Either of the columns &#39;Distance_prev_to_curr&#39; or &#39;Speed_prev_to_curr&#39;&quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;are missing in the dataset. Please run the function &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;create_speed_from_prev_column() first before running the function.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_by_min_distance_and_speed"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_by_min_distance_and_speed">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_by_min_distance_and_speed</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">min_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">min_speed</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Filter out values that have distance between consecutive points lesser</span>
+<span class="sd">            than a user-given distance speed between consecutive points lesser than</span>
+<span class="sd">            a user-given speed.</span>
+<span class="sd">            NOTE: The min_distance is given in metres</span>
+<span class="sd">            NOTE: The min_speed is given in metres/second (m/s).</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            dataframe: NumPandasTraj</span>
+<span class="sd">                The dataframe which is to be filtered.</span>
+<span class="sd">            min_distance: float</span>
+<span class="sd">                The minimum distance between 2 consecutive points.</span>
+<span class="sd">            min_speed: float</span>
+<span class="sd">                The minimum speed between 2 consecutive points.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The filtered dataframe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)</span>
+            <span class="c1"># filtered_df = Filters.filter_by_max_speed(filt, max_speed)</span>
+
+            <span class="c1"># Filter the dataframe based on minimum distance and speed.</span>
+            <span class="n">filt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_distance</span><span class="p">,</span>
+                                  <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_speed</span><span class="p">)</span>
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+
+            <span class="c1"># Return the df filtered on the basis of 2 constraints.</span>
+            <span class="k">return</span> <span class="n">filtered_df</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># The system asks the user to only run create_speed_from_prev_column() function because</span>
+            <span class="c1"># running create_speed_from_prev_column() function create the &#39;Distance_prev_to_curr&#39;</span>
+            <span class="c1"># function automatically if the column is already not present.</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Either of the columns &#39;Distance_prev_to_curr&#39; or &#39;Speed_prev_to_curr&#39;&quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;are missing in the dataset. Please run the function &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;create_speed_from_prev_column() first before running the function.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_outliers_by_consecutive_distance"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_outliers_by_consecutive_distance">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_outliers_by_consecutive_distance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check the outlier points based on distance between 2 consecutive points.</span>
+<span class="sd">            Outlier formula:</span>
+
+<span class="sd">            Lower outlier = Q1 - (1.5*IQR)</span>
+<span class="sd">            Higher outlier = Q3 + (1.5*IQR)</span>
+<span class="sd">            IQR = Inter quartile range = Q3 - Q1</span>
+
+<span class="sd">            We need to find points between lower and higher outlier</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe which is to be filtered.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The dataframe which has been filtered.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                    The column &#39;Distance_prev_to_curr&#39; is not present in the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Find the lower and higher quantile first along with the inter-quantile range.</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">q_low</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+            <span class="n">q_high</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+            <span class="n">iqr</span> <span class="o">=</span> <span class="n">q_high</span> <span class="o">-</span> <span class="n">q_low</span>
+            <span class="n">cut_off</span> <span class="o">=</span> <span class="n">iqr</span> <span class="o">*</span> <span class="mf">1.5</span>  <span class="c1"># Cut off value.</span>
+
+            <span class="c1"># Now, find the upper limit and the lower limit for the data.</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="n">q_low</span> <span class="o">-</span> <span class="n">cut_off</span>
+            <span class="n">higher</span> <span class="o">=</span> <span class="n">q_high</span> <span class="o">+</span> <span class="n">cut_off</span>
+
+            <span class="c1"># Filter out the dataframe based on the range calculated and return it.</span>
+            <span class="n">df_filt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">lower</span><span class="p">,</span>
+                                     <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">higher</span><span class="p">)</span>
+
+            <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_filt</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">filtered_df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The column &#39;Distance_prev_to_curr&#39; is missing in the dataset. &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;Please run the function create_distance_between_consecutive_column() &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;before running this filter.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.filter_outliers_by_consecutive_speed"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.filter_outliers_by_consecutive_speed">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">filter_outliers_by_consecutive_speed</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Check the outlier points based on distance between 2 consecutive points.</span>
+<span class="sd">            Outlier formula:</span>
+
+<span class="sd">            Lower outlier = Q1 - (1.5*IQR)</span>
+<span class="sd">            Higher outlier = Q3 + (1.5*IQR)</span>
+<span class="sd">            IQR = Inter quartile range = Q3 - Q1</span>
+
+<span class="sd">            We need to find points between lower and higher outlier</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe which is to be filtered.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The dataframe which has been filtered.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                The column &#39;Distance_prev_to_curr&#39; is not present in the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">q_low</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+            <span class="n">q_high</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+            <span class="n">iqr</span> <span class="o">=</span> <span class="n">q_high</span> <span class="o">-</span> <span class="n">q_low</span>
+            <span class="n">cut_off</span> <span class="o">=</span> <span class="n">iqr</span> <span class="o">*</span> <span class="mf">1.5</span>
+
+            <span class="n">lower</span> <span class="o">=</span> <span class="n">q_low</span> <span class="o">-</span> <span class="n">cut_off</span>
+            <span class="n">higher</span> <span class="o">=</span> <span class="n">q_high</span> <span class="o">+</span> <span class="n">cut_off</span>
+
+            <span class="n">df_filt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">lower</span><span class="p">,</span>
+                                     <span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;Speed_prev_to_curr&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">higher</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_filt</span><span class="p">]</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The column &#39;Speed_prev_to_curr&#39; is missing in the dataset. &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;Please run the function create_speed_from_prev_column() &quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;before running this filter.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.remove_trajectories_with_less_points"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.remove_trajectories_with_less_points">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_trajectories_with_less_points</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">num_min_points</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Remove out the trajectories from the dataframe which have few points.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe from which trajectories with few points are to be</span>
+<span class="sd">                    removed.</span>
+<span class="sd">                num_min_points: Optional[int], default = 2</span>
+<span class="sd">                    The minimum number of points that a trajectory should have if it</span>
+<span class="sd">                    is to be retained in the dataset.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The filtered dataframe which does not contain the trajectories</span>
+<span class="sd">                    with few points anymore.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="c1"># Mapping the trajectory id column with only those trajectory ids that contain more</span>
+        <span class="c1"># or equal points than specified by the user.</span>
+        <span class="n">filt</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="n">num_min_points</span>
+
+        <span class="c1"># Apply the filter, convert the resultant dataframe to NumTrajDF and return it.</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">filt</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Filters.hampel_outlier_detection"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.filters.Filters.hampel_outlier_detection">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">hampel_outlier_detection</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">column_name</span><span class="p">:</span> <span class="n">Text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Use the hampel filter to remove outliers from the dataset on the basis</span>
+<span class="sd">            of column specified by the user.</span>
+
+<span class="sd">            WARNING: The execution speed is slower than the other outlier detection methods</span>
+<span class="sd">                     provided in the library.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe from which the outliers are to be removed.</span>
+<span class="sd">                column_name: Text</span>
+<span class="sd">                    The column on te basis of which the outliers are to be detected.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                NumPandasTraj:</span>
+<span class="sd">                    The dataframe with the outliers removed.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">                KeyError:</span>
+<span class="sd">                    The user-specified column is not present in the dataset.</span>
+
+<span class="sd">            References</span>
+<span class="sd">            ----------</span>
+<span class="sd">                &quot;Pedrido, M.O., &quot;Hampel&quot;, (2020), GitHub repository,</span>
+<span class="sd">                https://github.com/MichaelisTrofficus/hampel_filter&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># First, extract the column from the dataframe and then obtain the</span>
+            <span class="c1"># outlier indices which are to be removed.</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span>
+            <span class="n">outlier_indices</span> <span class="o">=</span> <span class="n">hampel</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+            <span class="c1"># Now, drop the indices given out by the hampel filter.</span>
+            <span class="n">to_return</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">outlier_indices</span><span class="p">])</span>
+
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;If kinematic features have been generated on the dataframe, then make &quot;</span>
+                          <span class="s2">&quot;sure to generate them again as outlier detection drops the point from &quot;</span>
+                          <span class="s2">&quot;the dataframe and does not run the kinematic features again.&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">NumTrajDF</span><span class="p">(</span><span class="n">to_return</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The column </span><span class="si">{</span><span class="n">column_name</span><span class="si">}</span><span class="s2"> does not exist in the dataset.&quot;</span>
+                                          <span class="sa">f</span><span class="s2">&quot;Please check the column name and try again.&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yaksh J Haranwala, Salman Haidri.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

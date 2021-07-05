@@ -1,0 +1,825 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>features package &mdash; NumMobility 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="preprocessing package" href="num.preprocessing.html" />
+    <link rel="prev" title="core package" href="num.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> NumMobility
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">NumMobility</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="num.core.html">core package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">features package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-features.helper_functions">features.helper_functions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-features.spatial_features">features.spatial_features module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-features.temporal_features">features.temporal_features module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-features">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="num.preprocessing.html">preprocessing package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="num.utilities.html">utilities package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NumMobility</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">NumMobility</a> &raquo;</li>
+        
+      <li>features package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/num.features.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="features-package">
+<h1>features package<a class="headerlink" href="#features-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-features.helper_functions">
+<span id="features-helper-functions-module"></span><h2>features.helper_functions module<a class="headerlink" href="#module-features.helper_functions" title="Permalink to this headline">¶</a></h2>
+<p>This module contains all the helper functions for the parallel calculators in
+the spatial and temporal features classes.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>These functions may not be used directly as they would result in a
+slower calculation and execution times. They are meant to be used
+only as helpers. For calculation of features, use the ones in the
+features package.</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="features.helper_functions.Helpers">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">features.helper_functions.</span></span><span class="sig-name descname"><span class="pre">Helpers</span></span><a class="reference internal" href="_modules/features/helper_functions.html#Helpers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.helper_functions.Helpers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-features.spatial_features">
+<span id="features-spatial-features-module"></span><h2>features.spatial_features module<a class="headerlink" href="#module-features.spatial_features" title="Permalink to this headline">¶</a></h2>
+<p>The spatial_features  module contains several functions of the library
+that calculates many features based on the DateTime provided in
+the data. This module mostly extracts and modifies data collected from
+some existing dataframe and appends these information to them. It is to
+be also noted that a lot of these features are inspired from the PyMove
+library and we are crediting the PyMove creators with them.</p>
+<p>authors: Yaksh J Haranwala, Salman Haidri
+date: 2nd June, 2021
+version: 1.0</p>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>“Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De</dt><dd><p>Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019”</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">features.spatial_features.</span></span><span class="sig-name descname"><span class="pre">SpatialFeatures</span></span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_acceleration_from_prev_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_acceleration_from_prev_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_acceleration_from_prev_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_acceleration_from_prev_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column containing acceleration of the object from the start to the current
+point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation of acceleration is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_bearing_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_bearing_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_bearing_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_bearing_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column containing bearing between 2 consecutive points. Bearing is also
+referred as “Forward Azimuth” sometimes. Bearing/Forward Azimuth is defined as
+follows:</p>
+<p>“Bearing is the horizontal angle between the direction of an object and another
+object, or between the object and the True North.”</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the bearing is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_bearing_rate_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_bearing_rate_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_bearing_rate_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_bearing_rate_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the bearing rate of the consecutive points. And adding that column into
+the dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the bearing rate is to be calculated</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the Bearing rate column</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_distance_between_consecutive_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_distance_between_consecutive_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_distance_between_consecutive_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_distance_between_consecutive_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
+The distance calculated is the Great-Circle distance.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When the trajectory ID changes in the data, then the distance calculation again starts
+from the first point of the new trajectory ID and the first point of the new trajectory
+ID will be set to 0.</p>
+<p>When converting to NumPandasTraj we see a jump of 140-150ms in execution time but converting the
+dataframe provides the user with the option to use the NumPandasTraj functionalities.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The data where speed is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_distance_from_given_point_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_distance_from_given_point_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_distance_from_given_point_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_distance_from_given_point_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a point, this function calculates the distance between that point and all the
+points present in the dataframe and adds that column into the dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which calculation is to be done.</p></li>
+<li><p><strong>coordinates</strong> (<em>tuple</em>) – The coordinates from which the distance is to be calculated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_distance_from_start_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_distance_from_start_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_distance_from_start_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_distance_from_start_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column containing distance between the start location and the rest of the
+points using Haversine formula. The distance calculated is the Great-Circle distance.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When the trajectory ID changes in the data, then the distance calculation again
+starts from the first point of the new trajectory ID and the first point of the
+new trajectory ID will be set to 0.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The data where speed is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_jerk_from_prev_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_jerk_from_prev_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_jerk_from_prev_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_jerk_from_prev_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column containing jerk of the object from the start to the current
+point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation of jerk is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_point_within_range_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_point_within_range_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_range</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_point_within_range_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_point_within_range_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks how many points are within the range of the given coordinate. By first making a column
+containing the distance between the given coordinate and rest of the points in dataframe by calling
+create_distance_from_point(). And then comparing each point using the condition if it’s within the
+range and appending the values in a column and attaching it to the dataframe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the point within range calculation is to be done.</p></li>
+<li><p><strong>coordinates</strong> (<em>tuple</em>) – The coordinates from which the distance is to be calculated.</p></li>
+<li><p><strong>dist_range</strong> (<em>float</em>) – The range within which the resultant distance from the coordinates should lie.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_rate_of_bearing_rate_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_rate_of_bearing_rate_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_rate_of_bearing_rate_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_rate_of_bearing_rate_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the rate of bearing rate of the consecutive points.
+Add adding that column into the dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the rate of bearing rate is to be calculated</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the rate of Bearing rate column</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.create_speed_from_prev_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_speed_from_prev_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.create_speed_from_prev_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_speed_from_prev_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column containing speed of the object from the start to the current
+point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation of speed is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.get_bounding_box">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.get_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the bounding box of the Trajectory data. Essentially, the bounding box is of
+the following format:</p>
+<p>(min Latitude, min Longitude, max Latitude, max Longitude).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe containing the trajectory data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The bounding box of the trajectory</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.get_distance_travelled_by_date_and_traj_id">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_distance_travelled_by_date_and_traj_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.get_distance_travelled_by_date_and_traj_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_distance_travelled_by_date_and_traj_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a date and trajectory ID, this function calculates the total distance
+covered in the trajectory on that particular date and returns it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe in which teh actual data is stored.</p></li>
+<li><p><strong>date</strong> (<em>Text</em>) – The Date on which the distance covered is to be calculated.</p></li>
+<li><p><strong>traj_id</strong> (<em>Text</em>) – The trajectory ID for which the distance covered is to be calculated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The total distance covered on that date by that trajectory ID.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.get_distance_travelled_by_traj_id">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_distance_travelled_by_traj_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.get_distance_travelled_by_traj_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_distance_travelled_by_traj_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a trajectory ID, calculate the total distance covered by the trajectory.
+NOTE: The distance calculated is in metres.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe containing the entire dataset.</p></li>
+<li><p><strong>traj_id</strong> (<em>Text</em>) – The trajectory ID for which the distance covered is to be calculated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distance covered by the trajectory</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>MissingTrajIDException</strong> – The Trajectory ID given by the user is not present in the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.get_end_location">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_end_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.get_end_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_end_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ending location of an object’s trajectory in the data.
+Note: If the user does not provide a trajectory id, then the last</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<em>DaskTrajectoryDF</em>) – The DaskTrajectoryDF storing the trajectory data.</p></li>
+<li><p><strong>traj_id</strong> – The ID of the trajectory whose end location is to be found.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The (lat, longitude) tuple containing the end location.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.get_number_of_locations">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_number_of_locations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.get_number_of_locations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_number_of_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of unique coordinates in the dataframe specific to a trajectory ID.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If no Trajectory ID is specified, then the number of unique locations in the
+entire dataset is calculated.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe of which the number of locations are to be computed</p></li>
+<li><p><strong>traj_id</strong> (<em>Text</em>) – The trajectory id for which the number of unique locations are to be found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of unique locations in the dataframe/trajectory id.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>integer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.spatial_features.SpatialFeatures.get_start_location">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_start_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/spatial_features.html#SpatialFeatures.get_start_location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_start_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the starting location of an object’s trajectory in the data.</p>
+<dl class="simple">
+<dt>NOTE: If the user does not give in any traj_id, then the library,</dt><dd><p>by default gives out the start locations of all the unique trajectory ids
+present in the data.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The DaskTrajectoryDF storing the trajectory data.</p></li>
+<li><p><strong>traj_id</strong> – The ID of the object whose start location is to be found.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple</em> – The (lat, longitude) tuple containing the start location.</p></li>
+<li><p><em>pandas.core.dataframe.DataFrame</em> – The dataframe containing start locations of all trajectory IDs.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-features.temporal_features">
+<span id="features-temporal-features-module"></span><h2>features.temporal_features module<a class="headerlink" href="#module-features.temporal_features" title="Permalink to this headline">¶</a></h2>
+<p>The datetime_based  module contains all the features of the library
+that calculates several features based on the DateTime provided in
+the data. It is to be noted that most of the functions in this module
+calculate the features and then add the results to an entirely new
+column with a new column header. It is to be also noted that a lot of
+these features are inspired from the PyMove library and we are
+crediting the PyMove creators with them.</p>
+<p>author: Yaksh J Haranwala, Salman Haidri
+date: 22 May, 2021
+version: 1.0
+credits: PyMove creators</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">features.temporal_features.</span></span><span class="sig-name descname"><span class="pre">TemporalFeatures</span></span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.create_date_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_date_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.create_date_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_date_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>From the DateTime column already present in the data, extract only the date
+and then add another column containing just the date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The DaskTrajectoryDF on which the creation of the time column is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.create_day_of_week_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_day_of_week_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.create_day_of_week_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_day_of_week_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column called Day_Of_Week which contains the day of the week
+on which the trajectory point is recorded. This is calculated on the basis
+of timestamp recorded in the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe containing the entire data on which the operation is to be performed</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.create_time_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_time_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.create_time_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_time_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>From the DateTime column already present in the data, extract only the time
+and then add another column containing just the time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The DaskTrajectoryDF on which the creation of the time column is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.create_time_of_day_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_time_of_day_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.create_time_of_day_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_time_of_day_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Time_Of_Day column in the dataframe using parallelization which indicates at what time of the
+day was the point data captured.
+Note: The divisions of the day based on the time are provided in the utilities.constants module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>“Arina De Jesus Amador Monteiro Sanches. ‘Uma Arquitetura E Imple-menta ̧c ̃ao</dt><dd><p>Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove’.Bachelor’s thesis.
+Universidade Federal Do Cear ́a, 2019.”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.create_weekend_indicator_column">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_weekend_indicator_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.create_weekend_indicator_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_weekend_indicator_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a column called Weekend which indicates whether the point data is collected
+on either a Saturday or a Sunday.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the operation is to be performed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column if inplace.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>“Arina De Jesus Amador Monteiro Sanches. ‘Uma Arquitetura E Imple-menta ̧c ̃ao</dt><dd><p>Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove’.Bachelor’s thesis.
+Universidade Federal Do Cear ́a, 2019.”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.get_end_time">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_end_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.get_end_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.get_end_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ending time of the trajectory.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the trajectory ID is not specified by the user, then by default,
+the ending times of all the trajectory IDs in the data are
+returned.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the operations are to be performed.</p></li>
+<li><p><strong>traj_id</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The trajectory for which the end time is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>pandas.DateTime</em> – The end time of a single trajectory.</p></li>
+<li><p><em>pandas.core.dataframe.DataFrame</em> – Pandas dataframe containing the end time of all the trajectories
+present in the data when the user hasn’t asked for a particular
+trajectory’s end time.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.get_start_time">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_start_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.get_start_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.get_start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the starting time of the trajectory.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the trajectory ID is not specified by the user, then by default,
+the starting times of all the trajectory IDs in the data are
+returned.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the operations are to be performed.</p></li>
+<li><p><strong>traj_id</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The trajectory for which the start time is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>pandas.DateTime</em> – The start time of a single trajectory.</p></li>
+<li><p><em>pandas.core.dataframe.DataFrame</em> – Pandas dataframe containing the start time of all the trajectories
+present in the data when the user hasn’t asked for a particular
+trajectory’s start time.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="features.temporal_features.TemporalFeatures.get_traj_duration">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_traj_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/features/temporal_features.html#TemporalFeatures.get_traj_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#features.temporal_features.TemporalFeatures.get_traj_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor method for the duration of a trajectory specified by the user.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If no trajectory ID is given by the user, then the duration of the entire
+data set is given i.e., the difference between the max time in the dataset
+and the min time in the dataset.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="num.core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>core.TrajectoryDF.NumPandasTraj</em></a>) – The dataframe containing the resultant column if inplace is True.</p></li>
+<li><p><strong>traj_id</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The trajectory id for which the duration is required.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The trajectory duration.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.TimeDelta</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-features">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-features" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="num.preprocessing.html" class="btn btn-neutral float-right" title="preprocessing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="num.core.html" class="btn btn-neutral float-left" title="core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yaksh J Haranwala, Salman Haidri.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

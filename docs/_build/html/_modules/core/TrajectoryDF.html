@@ -1,0 +1,612 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>core.TrajectoryDF &mdash; NumMobility 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> NumMobility
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">NumMobility</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NumMobility</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>core.TrajectoryDF</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for core.TrajectoryDF</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">parser</span> <span class="kn">import</span> <span class="n">ParserError</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Text</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pandas.core.dtypes.common</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span> <span class="nn">pandas._libs</span> <span class="kn">import</span> <span class="n">lib</span>
+
+<span class="kn">import</span> <span class="nn">utilities.constants</span> <span class="k">as</span> <span class="nn">const</span>
+<span class="kn">from</span> <span class="nn">utilities.exceptions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">folium</span>
+
+
+<div class="viewcode-block" id="NumPandasTraj"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj">[docs]</a><span class="k">class</span> <span class="nc">NumPandasTraj</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_set</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">latitude</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">longitude</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">datetime</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span>
+                 <span class="n">traj_id</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">rest_of_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Text</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct a trajectory dataframe. Note that the mandatory columns in the dataset are:</span>
+<span class="sd">        Note that the below mentioned columns also need their headers to be provided.</span>
+
+<span class="sd">        1. DateTime (will be converted to pandas DateTime format)</span>
+<span class="sd">        2. Trajectory ID (will be converted to string format)</span>
+<span class="sd">        3. Latitude (will be converted to float64 format)</span>
+<span class="sd">        4. Longitude (will be converted to float64 format)</span>
+
+<span class="sd">        rest_of_columns makes sure that if the data_set is a list, it has appropriate headers</span>
+<span class="sd">        that the user wants instead of the default numerical values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_set: List, Dictionary or pandas DF.</span>
+<span class="sd">            The data provided by the user that needs to be represented and stored.</span>
+<span class="sd">        datetime: str</span>
+<span class="sd">            The header of the datetime column.</span>
+<span class="sd">        traj_id: str</span>
+<span class="sd">            The header of the Trajectory ID column.</span>
+<span class="sd">        latitude: str</span>
+<span class="sd">            The header of the latitude column.</span>
+<span class="sd">        longitude: str</span>
+<span class="sd">            The header of the longitude column.</span>
+<span class="sd">        rest_of_columns: Optional[list[Text]]</span>
+<span class="sd">            A list containing headers of the columns other than the mandatory ones.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Case-1: The data is from a dictionary.</span>
+        <span class="c1"># Here, first check whether the data is in dictionary form and if it is so, then convert into</span>
+        <span class="c1"># pandas DataFrame first.</span>
+        <span class="n">rest_of_columns</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">rest_of_columns</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rest_of_columns</span>
+        <span class="n">column_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">traj_id</span><span class="p">]</span> <span class="o">+</span> <span class="n">rest_of_columns</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">data_set</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
+            <span class="n">data_set</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span>
+                                                                           <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">])))</span>
+
+        <span class="c1"># Case-2: The data is from a list.</span>
+        <span class="c1"># Here, first check whether the data is in list form and if it is so, then convert into</span>
+        <span class="c1"># pandas DataFrame first.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">data_set</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">column_list</span><span class="p">)</span>
+
+        <span class="c1"># Case-3: The data is from a pandas DF.</span>
+        <span class="c1"># Here, all we have to do is to rename the column names from the data to default names.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">data_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_df_col_headers</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">traj_id</span><span class="p">)</span>
+
+        <span class="c1"># Now, renaming the default column names to library default column names.</span>
+        <span class="n">column_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_default_column_names</span><span class="p">(</span><span class="n">DateTime</span><span class="o">=</span><span class="n">datetime</span><span class="p">,</span> <span class="n">traj_id</span><span class="o">=</span><span class="n">traj_id</span><span class="p">,</span>
+                                                     <span class="n">latitude</span><span class="o">=</span><span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">longitude</span><span class="p">)</span>
+        <span class="n">data_set</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Now checking whether all the columns are present in the data and then verifying the data types</span>
+        <span class="c1"># of all the columns abd then calling the super() to create and return the dataframe.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_columns</span><span class="p">(</span><span class="n">data_set</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_data_types</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
+            <span class="n">data_set</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data_set</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">NumPandasTraj</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------ General Utilities ----------------------------- #</span>
+<div class="viewcode-block" id="NumPandasTraj.rename_df_col_headers"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj.rename_df_col_headers">[docs]</a>    <span class="k">def</span> <span class="nf">rename_df_col_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">lat</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span>
+                              <span class="n">datetime</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">traj_id</span><span class="p">:</span> <span class="n">Text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the column headers of the columns when the user given data is in the</span>
+<span class="sd">        form of a pandas DF while creating the NumPandasTraj. This method is mainly</span>
+<span class="sd">        used when the user reads in data from a csv because the CSV file might</span>
+<span class="sd">        contain different names for the columns.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: DataFrame</span>
+<span class="sd">            The dataframe whose column names are to be changed.</span>
+<span class="sd">        lat: Text</span>
+<span class="sd">            The header of the Latitude column.</span>
+<span class="sd">        lon: Text</span>
+<span class="sd">            The header of the Longitude column.</span>
+<span class="sd">        datetime: Text</span>
+<span class="sd">            The header of the DateTime column.</span>
+<span class="sd">        traj_id: Text</span>
+<span class="sd">            The header of the Trajectory ID column.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pandas.DataFrame</span>
+<span class="sd">            The pandas dataframe containing the library default column headers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>  <span class="c1"># List of all column names</span>
+        <span class="c1"># Iterate over the list of column names and check for keywords in the header</span>
+        <span class="c1"># to help renaming with appropriate terms.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">lat</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span>
+            <span class="k">if</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span>
+            <span class="k">if</span> <span class="n">datetime</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span>
+            <span class="k">if</span> <span class="n">traj_id</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_axis</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Change all the column names to modified values.</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="NumPandasTraj.validate_data_types"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj.validate_data_types">[docs]</a>    <span class="k">def</span> <span class="nf">validate_data_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether all the data given by the user is of valid type and if it isn&#39;t,</span>
+<span class="sd">        it converts them to the specified data types.</span>
+<span class="sd">        1. Trajectory_ID: Any -&gt; str</span>
+<span class="sd">        2. LAT and LONG: Any -&gt; float64</span>
+<span class="sd">        3. DateTime: Any -&gt; dask.datetime64[ns]</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: pd.DataFrame</span>
+<span class="sd">            This is the dataframe that contains the data that was passed in by the user.</span>
+<span class="sd">            The data is converted to pandas DF eventually in the import_data function anyway.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError:</span>
+<span class="sd">            Dataframe has one of the mandatory columns missing.</span>
+<span class="sd">        ParserError:</span>
+<span class="sd">            The DateTime format provided is invalid and cannot be parsed as pandas DateTime.</span>
+<span class="sd">        ValueError:</span>
+<span class="sd">            One of the data-types cannot be converted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;float64&#39;</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;float64&#39;</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;datetime64[ns]&#39;</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[ns]&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;dataframe missing one of lat, lon, datetime columns.&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ParserError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParserError</span><span class="p">(</span><span class="s1">&#39;DateTime column cannot be parsed&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;dtypes cannot be converted.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NumPandasTraj.validate_columns"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj.validate_columns">[docs]</a>    <span class="k">def</span> <span class="nf">validate_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check whether all the columns are present in the DataFrame or not.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data</span>
+<span class="sd">            Data is the dask DataFrame containing all the data passed in by the user.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Indicate whether or not all the columns that are mandatory are</span>
+<span class="sd">            present in the Data given by the user.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        MissingColumnsException</span>
+<span class="sd">            One or more of the mandatory columns (Latitude, Longitude, DateTime, Traj_ID)</span>
+<span class="sd">            are missing in the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="s2">&quot;One of the columns are missing. Please check your data and try again.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NumPandasTraj.get_default_column_names"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj.get_default_column_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_default_column_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">,</span> <span class="n">traj_id</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a dictionary containing the key, value pairs of the library default</span>
+<span class="sd">        column names for the following columns:</span>
+<span class="sd">        1. Latitude</span>
+<span class="sd">        2. Longitude</span>
+<span class="sd">        3. DateTime</span>
+<span class="sd">        4. Trajectory ID</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        DateTime: Text</span>
+<span class="sd">            The datetime header of the column already given by the user.</span>
+<span class="sd">        traj_id: Text</span>
+<span class="sd">            The traj_id header of the column already given by the user.</span>
+<span class="sd">        latitude:</span>
+<span class="sd">            The latitude header of the column already given by the user.</span>
+<span class="sd">        longitude:</span>
+<span class="sd">            The longitude header of the column already given by the user.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary of mappings from the given header by the user to the</span>
+<span class="sd">            library default headers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">DateTime</span><span class="p">:</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span>
+            <span class="n">traj_id</span><span class="p">:</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">,</span>
+            <span class="n">latitude</span><span class="p">:</span> <span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span>
+            <span class="n">longitude</span><span class="p">:</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span>
+        <span class="p">}</span></div>
+
+    <span class="k">def</span> <span class="nf">__reset_default_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the Index of the dataframe back to DateTime and traj_id.</span>
+
+<span class="sd">        WARNING</span>
+<span class="sd">        -------</span>
+<span class="sd">        This must be used everytime after the reset_index is called</span>
+<span class="sd">        in order to set the index back to library default values as</span>
+<span class="sd">        it is necessary to perform various other functionalities.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        MissingColumnsException</span>
+<span class="sd">            DateTime/traj_id column is missing from the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Either of </span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="si">}</span><span class="s2"> columns are missing.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------- Properties ---------------------------------- #</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">latitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor method for the latitude column of the DaskTrajectoryDF.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dask.dataframe.core.Series</span>
+<span class="sd">            The Series containing all the latitude values from the DataFrame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        MissingColumnsException</span>
+<span class="sd">            Latitude column is missing from the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="ow">or</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="s2">&quot;The Latitude column is not present in the DataFrame, please verify again.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">longitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor method for the longitude column of the DaskTrajectoryDF.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dask.dataframe.core.Series</span>
+<span class="sd">            The Series containing all the longitude values from the DataFrame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        MissingColumnsException</span>
+<span class="sd">            Longitude column is missing from the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="ow">or</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="s2">&quot;The Longitude column is not present in the DataFrame, please verify again.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor method for the DateTime column of the DaskTrajectoryDF.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dask.dataframe.core.Series</span>
+<span class="sd">            The Series containing all the DateTime values from the DataFrame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        MissingColumnsException</span>
+<span class="sd">            DateTime column is missing from the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">)</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="ow">or</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="s2">&quot;The DateTime column is not present in the DataFrame, please verify again.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">traj_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accessor method for the Trajectory_ID column of the DaskTrajectoryDF.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dask.dataframe.core.Series</span>
+<span class="sd">            The Series containing all the Trajectory_ID values from the DataFrame.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        MissingColumnsException</span>
+<span class="sd">            traj_id column is missing from the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">)</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="ow">or</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingColumnsException</span><span class="p">(</span><span class="s2">&quot;The Trajectory_ID column is not present in the DataFrame, please verify &quot;</span>
+                                          <span class="s2">&quot;again.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;------------------------ Dataset Facts ------------------------------</span><span class="se">\n\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;Number of unique Trajectories in the data: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">traj_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;Number of points in the data: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;Dataset time range: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;Datatype of the DataFrame: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;Dataset Bounding Box: </span><span class="si">{</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;---------------------------------------------------------------------&quot;</span>
+
+    <span class="c1"># ------------------------------- File and DF Operations ----------------------------- #</span>
+
+<div class="viewcode-block" id="NumPandasTraj.to_numpy"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj.to_numpy">[docs]</a>    <span class="k">def</span> <span class="nf">to_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">na_value</span><span class="o">=</span><span class="n">lib</span><span class="o">.</span><span class="n">no_default</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the DataFrame to a NumPy array.By default, the dtype of the returned array will</span>
+<span class="sd">        be the common dtype of all types in the DataFrame. For example, if the dtypes are float16</span>
+<span class="sd">        and float32, the results dtype will be float32. This may require copying data and coercing</span>
+<span class="sd">        values, which may be expensive</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dtype:</span>
+<span class="sd">            The dtype to pass to :meth:`numpy.asarray`.</span>
+<span class="sd">        copy:</span>
+<span class="sd">            Whether to ensure that the returned value is not a view on another array.</span>
+<span class="sd">            Note that ``copy=False`` does not *ensure* that ``to_numpy()`` is no-copy.</span>
+<span class="sd">            Rather, ``copy=True`` ensure that a copy is made, even if not strictly necessary.</span>
+<span class="sd">        na_value:</span>
+<span class="sd">            The value to use for missing values. The default value depends on `dtype` and the</span>
+<span class="sd">            dtypes of the DataFrame columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NumPandasTraj.sort_by_traj_id_and_datetime"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj.sort_by_traj_id_and_datetime">[docs]</a>    <span class="k">def</span> <span class="nf">sort_by_traj_id_and_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sort the trajectory in Ascending or descending order based on the following 2</span>
+<span class="sd">        columns in order:</span>
+<span class="sd">        1. Trajectory ID</span>
+<span class="sd">        2. DateTime</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ascending: bool</span>
+<span class="sd">            Whether to sort the values in ascending order or descending order.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        NumPandasTraj</span>
+<span class="sd">            The sorted dataframe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="n">ascending</span><span class="p">)</span></div>
+
+    <span class="c1"># ------------------------------------- Visualization ----------------------------------- #</span>
+<div class="viewcode-block" id="NumPandasTraj.plot_folium_traj"><a class="viewcode-back" href="../../num.core.html#core.TrajectoryDF.NumPandasTraj.plot_folium_traj">[docs]</a>    <span class="k">def</span> <span class="nf">plot_folium_traj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="n">Text</span> <span class="o">=</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use folium to plot the trajectory on a map.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        color: Text</span>
+<span class="sd">            The color of the trajectory line on the map.</span>
+<span class="sd">        weight: float</span>
+<span class="sd">            The weight of the trajectory line on the map.</span>
+<span class="sd">        opacity: float</span>
+<span class="sd">            The opacity of the trajectory line on the map.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        folium.folium.Map</span>
+<span class="sd">            The map with plotted trajectory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sw</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[[</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">ne</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[[</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="c1"># Create a list of coordinate pairs of the dataframe.</span>
+        <span class="n">locations</span> <span class="o">=</span> <span class="p">[</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">)]</span>
+
+        <span class="c1"># Create a map with the initial point.</span>
+        <span class="n">map_</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">zoom_start</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+        <span class="c1"># Add the trajectory line to the map and then return the map.</span>
+        <span class="n">folium</span><span class="o">.</span><span class="n">PolyLine</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span>
+                        <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                        <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
+                        <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">map_</span><span class="p">)</span>
+        <span class="n">map_</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">([</span><span class="n">sw</span><span class="p">,</span> <span class="n">ne</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">map_</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yaksh J Haranwala, Salman Haidri.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

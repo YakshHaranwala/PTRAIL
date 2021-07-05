@@ -1,0 +1,595 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>preprocessing.helpers &mdash; NumMobility 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> NumMobility
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">NumMobility</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NumMobility</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>preprocessing.helpers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for preprocessing.helpers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The helpers class has the functionalities that interpolate a point based</span>
+<span class="sd">    on the given data by the user. The class contains the following 4</span>
+<span class="sd">    interpolation calculators:</span>
+
+<span class="sd">    1. Linear Interpolation</span>
+<span class="sd">    2. Cubic Interpolation</span>
+<span class="sd">    3. Random-Walk Interpolation</span>
+<span class="sd">    4. Kinematic Interpolation</span>
+
+<span class="sd">    Besides the interpolation helpers, there are also general utilities which</span>
+<span class="sd">    are used in splitting up dataframes for running the code in parallel.</span>
+
+<span class="sd">    @Authors: Yaksh J Haranwala, Salman Haidri</span>
+<span class="sd">    @Version: 1.0</span>
+<span class="sd">    @Date: 16th June, 2021</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">utilities.constants</span> <span class="k">as</span> <span class="nn">const</span>
+
+<span class="kn">from</span> <span class="nn">features.spatial_features</span> <span class="kn">import</span> <span class="n">SpatialFeatures</span> <span class="k">as</span> <span class="n">spatial</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">CubicSpline</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Text</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">core.TrajectoryDF</span> <span class="kn">import</span> <span class="n">NumPandasTraj</span> <span class="k">as</span> <span class="n">NumTrajDF</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">truncnorm</span>
+
+
+<div class="viewcode-block" id="Helpers"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.helpers.Helpers">[docs]</a><span class="k">class</span> <span class="nc">Helpers</span><span class="p">:</span>
+    <span class="c1"># ------------------------------------ Interpolation Helpers --------------------------------------- #</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_linear_help</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">NumTrajDF</span><span class="p">],</span> <span class="n">id_</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">time_jump</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This method takes a dataframe and uses linear interpolation to determine coordinates</span>
+<span class="sd">            of location on Datetime where the time difference between 2 consecutive points exceeds</span>
+<span class="sd">            the user-specified time_jump and inserts the interpolated point those between 2 points.</span>
+
+<span class="sd">            WARNING: Private Helper method</span>
+<span class="sd">                Can&#39;t be used for dataframes with multiple trajectory ids and there might be a significant</span>
+<span class="sd">                drop in performance.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: Union[pd.DataFrame, NumTrajDF]</span>
+<span class="sd">                     The dataframe containing the original trajectory data.</span>
+<span class="sd">                id_: Text</span>
+<span class="sd">                    The Trajectory ID of the points in the dataframe.</span>
+<span class="sd">                time_jump: float</span>
+<span class="sd">                    The maximum time difference between 2 points greater than which</span>
+<span class="sd">                    a point will be inserted between 2 points.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                pandas.core.dataframe.DataFrame</span>
+<span class="sd">                    The dataframe containing the trajectory enhanced with interpolated</span>
+<span class="sd">                    points.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Now, for each unique ID in the dataframe, interpolate the points.</span>
+        <span class="c1"># Create a Series containing new times which are calculated as follows:</span>
+        <span class="c1">#    new_time[i] = original_time[i] + time_jump.</span>
+        <span class="n">new_times</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">time_jump</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;seconds&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Now, interpolate the latitudes using numpy based on the new times calculated above.</span>
+        <span class="n">ip_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">new_times</span><span class="p">,</span>
+                           <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">],</span>
+                           <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">])</span>
+
+        <span class="c1"># Now, interpolate the longitudes using numpy based on the new times calculated above.</span>
+        <span class="n">ip_long</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">new_times</span><span class="p">,</span>
+                            <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">],</span>
+                            <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">])</span>
+
+        <span class="c1"># Here, store the time difference between all the consecutive points in an array.</span>
+        <span class="n">time_deltas</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+        <span class="c1"># Now, for each point in the trajectory, check whether the time difference between</span>
+        <span class="c1"># 2 consecutive points is greater than the user-specified time_jump, and if so then</span>
+        <span class="c1"># insert a new point that is linearly interpolated between the 2 original points.</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_deltas</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">time_deltas</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">time_jump</span><span class="p">:</span>
+                <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_times</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_</span><span class="p">,</span> <span class="n">ip_lat</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">ip_long</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="n">dataframe</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_cubic_help</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">NumTrajDF</span><span class="p">],</span> <span class="n">id_</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">time_jump</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This method takes a dataframe and uses cubic interpolation to determine coordinates</span>
+<span class="sd">            of location on Datetime where the time difference between 2 consecutive points exceeds</span>
+<span class="sd">            the user-specified time_jump and inserts the interpolated point those between 2 points.</span>
+
+<span class="sd">            WARNING: Private Helper method</span>
+<span class="sd">                Can&#39;t be used for dataframes with multiple trajectory ids and there might be a significant</span>
+<span class="sd">                drop in performance.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                df: Union[pd.DataFrame, NumTrajDF]</span>
+<span class="sd">                     The dataframe containing the original trajectory data.</span>
+<span class="sd">                id_: Text</span>
+<span class="sd">                    The Trajectory ID of the points in the dataframe.</span>
+<span class="sd">                time_jump: float</span>
+<span class="sd">                    The maximum time difference between 2 points greater than which</span>
+<span class="sd">                    a point will be inserted between 2 points.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                pandas.core.dataframe.DataFrame</span>
+<span class="sd">                    The dataframe containing the trajectory enhanced with interpolated</span>
+<span class="sd">                    points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create a Series containing new times which are calculated as follows:</span>
+        <span class="c1">#    new_time[i] = original_time[i] + time_jump.</span>
+        <span class="n">new_times</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">time_jump</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;seconds&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Extract the Latitude, Longitude pairs for each point and store it in a</span>
+        <span class="c1"># numpy array.</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+        <span class="c1"># Now, using Scipy&#39;s Cubic spline, create a spline object for interpolation of</span>
+        <span class="c1"># points for the dataframes which have a length greater than 3 else CubicSpline</span>
+        <span class="c1"># doesn&#39;t execute.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">cubic_spline</span> <span class="o">=</span> <span class="n">CubicSpline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">],</span>
+                                       <span class="n">y</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span>
+                                       <span class="n">extrapolate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bc_type</span><span class="o">=</span><span class="s1">&#39;not-a-knot&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Now, calculate the interpolated position of the points at all the new_times</span>
+            <span class="c1">#    calculated above.</span>
+            <span class="n">ip_coords</span> <span class="o">=</span> <span class="n">cubic_spline</span><span class="p">(</span><span class="n">new_times</span><span class="p">)</span>
+
+        <span class="c1"># Here, store the time difference between all the consecutive points in an array.</span>
+        <span class="n">time_deltas</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+        <span class="c1"># Now, for each point in the trajectory, check whether the time difference between</span>
+        <span class="c1"># 2 consecutive points is greater than the user-specified time_jump, and if so then</span>
+        <span class="c1"># insert a new point that is cubic-spline interpolated between the 2 original points.</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_deltas</span><span class="p">)):</span>
+            <span class="c1"># If the trajectory has less than 3 points, then skip the trajectory</span>
+            <span class="c1"># from the interpolation.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">time_deltas</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">time_jump</span><span class="p">:</span>
+                    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_times</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_</span><span class="p">,</span> <span class="n">ip_coords</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">ip_coords</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_random_walk_help</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">NumTrajDF</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">time_jump</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This method takes a dataframe and uses random-walk interpolation to determine coordinates</span>
+<span class="sd">            of location on Datetime where the time difference between 2 consecutive points exceeds</span>
+<span class="sd">            the user-specified time_jump and inserts the interpolated point those between 2 points.</span>
+
+<span class="sd">            WARNING: Private Helper method</span>
+<span class="sd">                Can&#39;t be used for dataframes with multiple trajectory ids and there might be a significant</span>
+<span class="sd">                drop in performance.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: Union[pd.DataFrame, NumTrajDF]</span>
+<span class="sd">                     The dataframe containing the original trajectory data.</span>
+<span class="sd">                id_: Text</span>
+<span class="sd">                    The Trajectory ID of the points in the dataframe.</span>
+<span class="sd">                time_jump: float</span>
+<span class="sd">                    The maximum time difference between 2 points greater than which</span>
+<span class="sd">                    a point will be inserted between 2 points.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                pandas.core.dataframe.DataFrame</span>
+<span class="sd">                    The dataframe containing the trajectory enhanced with interpolated</span>
+<span class="sd">                    points.</span>
+
+<span class="sd">            References</span>
+<span class="sd">            ----------</span>
+<span class="sd">                &quot;Etemad, M., Soares, A., Etemad, E. et al. SWS: an unsupervised trajectory</span>
+<span class="sd">                segmentation algorithm based on change detection with interpolation kernels.</span>
+<span class="sd">                Geoinformatica (2020)&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create a Series containing new times which are calculated as follows:</span>
+        <span class="c1">#    new_time[i] = original_time[i] + time_jump.</span>
+        <span class="n">new_times</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">time_jump</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;seconds&#39;</span><span class="p">)</span>
+
+        <span class="c1"># First, create a distance between the consecutive points of the dataframe,</span>
+        <span class="c1"># then, calculate the mean and standard deviation of all the distances between</span>
+        <span class="c1"># consecutive points.</span>
+        <span class="n">df1</span> <span class="o">=</span> <span class="n">spatial</span><span class="o">.</span><span class="n">create_distance_between_consecutive_column</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="n">d_mean</span> <span class="o">=</span> <span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">d_std</span> <span class="o">=</span> <span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;Distance_prev_to_curr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+        <span class="c1"># Now, create a bearing between the consecutive points of the dataframe,</span>
+        <span class="c1"># then, calculate the mean and standard deviation of all the bearings between</span>
+        <span class="c1"># consecutive points.</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">spatial</span><span class="o">.</span><span class="n">create_bearing_column</span><span class="p">(</span><span class="n">df1</span><span class="p">)</span>
+        <span class="n">b_mean</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Bearing_between_consecutive&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">b_std</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Bearing_between_consecutive&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">calc_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">d_mean</span><span class="p">,</span> <span class="n">d_std</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span>
+        <span class="n">calc_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">b_mean</span><span class="p">,</span> <span class="n">b_std</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># print(f&quot;Calc: {calc_a, calc_b}&quot;)</span>
+        <span class="c1"># if d_std == 0 or b_std == 0:</span>
+        <span class="c1">#     return dataframe</span>
+        <span class="c1">#</span>
+        <span class="c1"># # Here, using Scipy&#39;s truncnorm() function, create an object that gives out random</span>
+        <span class="c1"># # values. It is to be noted that the values are restricted between latitude.min()</span>
+        <span class="c1"># # and latitude.max().</span>
+        <span class="c1"># d_mean = truncnorm((df1[&#39;lat&#39;].min() - d_mean) / d_std,</span>
+        <span class="c1">#                    (df1[&#39;lat&#39;].max() - d_mean) / d_std,</span>
+        <span class="c1">#                    loc=d_mean,</span>
+        <span class="c1">#                    scale=d_std)</span>
+        <span class="c1">#</span>
+        <span class="c1"># # Here, using Scipy&#39;s truncnorm() function, create an object that gives out random</span>
+        <span class="c1"># # values. It is to be noted that the values are restricted between longitude.min()</span>
+        <span class="c1"># # and longitude.max().</span>
+        <span class="c1"># b_mean = truncnorm((df[&#39;lon&#39;].min() - b_mean) / b_std,</span>
+        <span class="c1">#                    (df[&#39;lon&#39;].max() - b_mean) / b_std,</span>
+        <span class="c1">#                    loc=b_mean,</span>
+        <span class="c1">#                    scale=b_std)</span>
+        <span class="c1">#</span>
+        <span class="c1"># # Using the 2 objects created above, generate a random value from them. The value</span>
+        <span class="c1"># # is selected randomly from a uniformly distributed sample</span>
+        <span class="c1"># calc_a = d_mean.rvs()</span>
+        <span class="c1"># calc_b = math.radians(b_mean.rvs())</span>
+
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">calc_a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">calc_b</span><span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">calc_a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">calc_b</span><span class="p">)</span>
+
+        <span class="c1"># Here, store the time difference between all the consecutive points in an array.</span>
+        <span class="n">time_deltas</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+        <span class="c1"># Look for a time diff that exceeds the time_jump and if one is found, calculate the</span>
+        <span class="c1"># latitude and longitude and then append them to the dataframe at the location where</span>
+        <span class="c1"># the threshold is crossed.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_deltas</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">time_jump</span><span class="p">:</span>
+                    <span class="n">new_lat</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> \
+                              <span class="p">(</span><span class="n">dy</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">RADIUS_OF_EARTH</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">180</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                    <span class="n">new_lon</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> \
+                              <span class="p">(</span><span class="n">dx</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">RADIUS_OF_EARTH</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">180</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span>
+                        <span class="n">df</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span><span class="p">)</span>
+                    <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_times</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_</span><span class="p">,</span> <span class="n">new_lat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_lon</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+        <span class="c1"># Return the new dataframe</span>
+        <span class="k">return</span> <span class="n">dataframe</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_kinematic_help</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">NumTrajDF</span><span class="p">],</span> <span class="n">id_</span><span class="p">:</span> <span class="n">Text</span><span class="p">,</span> <span class="n">time_jump</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This method takes a dataframe and uses kinematic interpolation to determine coordinates</span>
+<span class="sd">            of location on Datetime where the time difference between 2 consecutive points exceeds</span>
+<span class="sd">            the user-specified time_jump and inserts the interpolated point those between 2 points.</span>
+
+<span class="sd">            WARNING: Private Helper method</span>
+<span class="sd">                Can&#39;t be used for dataframes with multiple trajectory ids and there might be a significant</span>
+<span class="sd">                drop in performance.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: Union[pd.DataFrame, NumTrajDF]</span>
+<span class="sd">                     The dataframe containing the original trajectory data.</span>
+<span class="sd">                id_: Text</span>
+<span class="sd">                    The Trajectory ID of the points in the dataframe.</span>
+<span class="sd">                time_jump: float</span>
+<span class="sd">                    The maximum time difference between 2 points greater than which</span>
+<span class="sd">                    a point will be inserted between 2 points.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                pandas.core.dataframe.DataFrame</span>
+<span class="sd">                    The dataframe containing the trajectory enhanced with interpolated</span>
+<span class="sd">                    points.</span>
+
+<span class="sd">            References</span>
+<span class="sd">            ----------</span>
+<span class="sd">                &quot;Nogueira, T.O., &quot;kinematic_interpolation.py&quot;, (2016), GitHub repository,</span>
+<span class="sd">                &quot;https://gist.github.com/talespaiva/128980e3608f9bc5083b.js&quot; &quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create a Series containing new times which are calculated as follows:</span>
+        <span class="c1">#    new_time[i] = original_time[i] + time_jump.</span>
+        <span class="n">new_times</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_timedelta</span><span class="p">(</span><span class="n">time_jump</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;seconds&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Here, store the time difference between all the consecutive points in an array.</span>
+        <span class="n">time_deltas</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">DateTime</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+        <span class="n">lat_diff</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span>
+        <span class="n">lon_diff</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span>
+        
+        <span class="n">lat_velocity</span> <span class="o">=</span> <span class="n">lat_diff</span><span class="o">/</span><span class="n">time_deltas</span>
+        <span class="n">lon_velocity</span> <span class="o">=</span> <span class="n">lon_diff</span><span class="o">/</span><span class="n">time_deltas</span>
+
+        <span class="n">lat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">LAT</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span><span class="n">const</span><span class="o">.</span><span class="n">LONG</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="c1"># Look for a time diff that exceeds the time_jump and if one is found, calculate the</span>
+        <span class="c1"># latitude and longitude and then append them to the dataframe at the location where</span>
+        <span class="c1"># the threshold is crossed.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_deltas</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">time_jump</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lat_velocity</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="p">[(</span><span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span>
+                                <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="p">(</span><span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span> <span class="p">])</span>
+                <span class="n">bx</span> <span class="o">=</span> <span class="p">[</span><span class="n">lat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">lat</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">lat_velocity</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">lat_velocity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">lat_velocity</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="n">coef_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">bx</span><span class="p">)</span>
+
+                <span class="n">ay</span> <span class="o">=</span> <span class="n">ax</span>
+                <span class="n">by</span> <span class="o">=</span> <span class="p">[</span><span class="n">lon</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">lon</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">lon_velocity</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">time_deltas</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">lon_velocity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">lon_velocity</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="n">coef_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">ay</span><span class="p">,</span> <span class="n">by</span><span class="p">)</span>
+
+                <span class="n">td</span> <span class="o">=</span> <span class="n">new_times</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span><span class="o">/</span><span class="mf">10e9</span>
+                <span class="c1"># x = lat[i-1] + lat_velocity[i-1] * td + \</span>
+                <span class="c1">#     (td**2)*coef_x[0]/2 + (td**3)*coef_x[1]/6</span>
+                <span class="c1"># y = lon[i-1] + lon_velocity[i-1] * td + \</span>
+                <span class="c1">#     (td ** 2) * coef_y[0] / 2 + (td ** 3) * coef_y[1] / 6</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">Helpers</span><span class="o">.</span><span class="n">pos</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">td</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">lat</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">v1</span><span class="o">=</span><span class="n">lat_velocity</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">coef_x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">coef_x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">Helpers</span><span class="o">.</span><span class="n">pos</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">td</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="n">lon</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">v1</span><span class="o">=</span><span class="n">lon_velocity</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">coef_y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">coef_y</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_times</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">dataframe</span>
+
+<div class="viewcode-block" id="Helpers.pos"><a class="viewcode-back" href="../../num.preprocessing.html#preprocessing.helpers.Helpers.pos">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">pos</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">v1</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">b</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="mi">6</span></div>
+                
+    <span class="c1"># -------------------------------------- General Utilities ---------------------------------- #</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_partition_size</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Takes number of ids and makes use of a formula that gives a factor to makes set of ids</span>
+<span class="sd">            according to the number of processors available to work with.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                size: int</span>
+<span class="sd">                    The total number of trajectory IDs in the dataset.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                int</span>
+<span class="sd">                    The factor by which the datasets are to be split.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Based on the Operating system, get the number of CPUs available for</span>
+        <span class="c1"># multiprocessing.</span>
+        <span class="n">available_cpus</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sched_getaffinity</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;posix&#39;</span> \
+            <span class="k">else</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>  <span class="c1"># Number of available CPUs.</span>
+
+        <span class="c1"># Integer divide the total number of Trajectory IDs by the number of available CPUs</span>
+        <span class="c1"># The factor of 1 is added to avoid errors when the integer division yields a 0.</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span> <span class="o">//</span> <span class="n">available_cpus</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Return the factor if it is less than 100 otherwise return 100.</span>
+        <span class="c1"># This factor hence is capped at 100.</span>
+        <span class="k">return</span> <span class="n">factor</span> <span class="k">if</span> <span class="n">factor</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="mi">100</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_df_split_helper</span><span class="p">(</span><span class="n">dataframe</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            This is the helper function for splitting up dataframes into smaller chunks.</span>
+<span class="sd">            This function is widely used for main functions to help split the original</span>
+<span class="sd">            dataframe into smaller chunks based on a fixed range of IDs. This function</span>
+<span class="sd">            splits the dataframes based on a predetermined number, stores them in a list</span>
+<span class="sd">            and returns it.</span>
+<span class="sd">            NOTE: The dataframe is split based on the number of CPU cores available for.</span>
+<span class="sd">                  For more info, take a look at the documentation of the get_partition_size()</span>
+<span class="sd">                  function.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                dataframe: NumPandasTraj</span>
+<span class="sd">                    The dataframe that is to be split.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                list:</span>
+<span class="sd">                    The list containing smaller dataframe chunks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># First, create a list containing all the ids of the data and then further divide that</span>
+        <span class="c1"># list items and split it into sub-lists of ids equal to split_factor.</span>
+        <span class="n">ids_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">traj_id</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># Get the ideal number of IDs by which the dataframe is to be split.</span>
+        <span class="n">split_factor</span> <span class="o">=</span> <span class="n">Helpers</span><span class="o">.</span><span class="n">_get_partition_size</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ids_</span><span class="p">))</span>
+        <span class="n">ids_</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids_</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">split_factor</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_</span><span class="p">),</span> <span class="n">split_factor</span><span class="p">)]</span>
+
+        <span class="c1"># Now split the dataframes based on set of Trajectory ids.</span>
+        <span class="c1"># As of now, each smaller chunk is supposed to have data of 100</span>
+        <span class="c1"># trajectory IDs max</span>
+        <span class="n">df_chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">TRAJECTORY_ID</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">ids_</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ids_</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="n">df_chunks</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Yaksh J Haranwala, Salman Haidri.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
