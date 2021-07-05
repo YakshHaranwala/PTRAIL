@@ -1,13 +1,13 @@
 """
-This module contains all the helper functions for the parallel calculators in
-the spatial and temporal features classes.
+    This module contains all the helper functions for the parallel calculators in
+    the spatial and temporal features classes.
 
-Warning
--------
-These functions may not be used directly as they would result in a
-slower calculation and execution times. They are meant to be used
-only as helpers. For calculation of features, use the ones in the
-features package.
+    Warning
+    -------
+    These functions may not be used directly as they would result in a
+    slower calculation and execution times. They are meant to be used
+    only as helpers. For calculation of features, use the ones in the
+    features package.
 """
 import os
 
