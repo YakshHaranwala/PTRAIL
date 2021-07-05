@@ -12,7 +12,12 @@ class Conversions:
     @staticmethod
     def convert_directions_to_degree_lat_lon(data, latitude: Text, longitude: Text):
         """
-            Cite: PyMove
+        Convert the latitude and longitude format from degrees to float values.
+
+        References
+        ----------
+            "Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
+            Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019"
         """
 
         def decimal_degree_to_decimal(col):
