@@ -3,3 +3,4 @@ numpy
 psutil
 folium
 hampel
+scipy
