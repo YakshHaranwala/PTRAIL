@@ -1,14 +1,32 @@
-.. NumMobility documentation master file, created by
-   sphinx-quickstart on Mon Jul  5 11:50:14 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+NumMobility: A Mobility Data PreProcessing Library
+==================================================
 
-Welcome to NumMobility's documentation!
-=======================================
+Introduction
+============
 
+NumMobility is a state-of-the art Mobility Data Preprocessing
+Library that mainly deals with filtering data, generating
+features and interpolation of Trajectory Data.
+
+The main features of NumMobility are:
+    1. NumMobility use primarily parallel computation based
+       on python Pandas and numpy which makes it very fast
+       as compared to other comparable libraries available.
+    2. NumMobility harnesses the full power of the machine
+       that it is running on by using all the cores available
+       in the computer.
+    3. Four different kinds of Trajectory Interpolation
+       techniques are offered by NumMobility which is
+       a first in the community.
+
+References
+^^^^^^^^^^
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
+   core
+   features
+   preprocessing
+   utilities
 
 
 

@@ -20,9 +20,9 @@ The main features of NumMobility are:
        a first in the community.
 
 References
-==========
+^^^^^^^^^^
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    core
    features
    preprocessing
