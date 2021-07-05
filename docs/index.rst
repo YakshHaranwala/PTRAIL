@@ -23,7 +23,10 @@ References
 ==========
 .. toctree::
    :maxdepth: 2
-   :caption: References:
+    core
+    features
+    preprocessing
+    utilities
 
 
 
