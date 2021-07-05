@@ -16,30 +16,31 @@ class NumPandasTraj(DataFrame):
     def __init__(self, data_set: Union[DataFrame, List, Dict], latitude: Text, longitude: Text, datetime: Text,
                  traj_id: Text, rest_of_columns: Optional[List[Text]] = None):
         """
-            Construct a trajectory dataframe. Note that the mandatory columns in the dataset are:
-            Note that the below mentioned columns also need their headers to be provided.
-                1. DateTime (will be converted to pandas DateTime format)
-                2. Trajectory ID (will be converted to string format)
-                3. Latitude (will be converted to float64 format)
-                4. Longitude (will be converted to float64 format)
+        Construct a trajectory dataframe. Note that the mandatory columns in the dataset are:
+        Note that the below mentioned columns also need their headers to be provided.
 
-            rest_of_columns makes sure that if the data_set is a list, it has appropriate headers
-            that the user wants instead of the default numerical values.
+        1. DateTime (will be converted to pandas DateTime format)
+        2. Trajectory ID (will be converted to string format)
+        3. Latitude (will be converted to float64 format)
+        4. Longitude (will be converted to float64 format)
 
-            Parameters
-            ----------
-                data_set: List, Dictionary or pandas DF.
-                    The data provided by the user that needs to be represented and stored.
-                datetime: str
-                    The header of the datetime column.
-                traj_id: str
-                    The header of the Trajectory ID column.
-                latitude: str
-                    The header of the latitude column.
-                longitude: str
-                    The header of the longitude column.
-                rest_of_columns: Optional[list[Text]]
-                    A list containing headers of the columns other than the mandatory ones.
+        rest_of_columns makes sure that if the data_set is a list, it has appropriate headers
+        that the user wants instead of the default numerical values.
+
+        Parameters
+        ----------
+            data_set: List, Dictionary or pandas DF.
+                The data provided by the user that needs to be represented and stored.
+            datetime: str
+                The header of the datetime column.
+            traj_id: str
+                The header of the Trajectory ID column.
+            latitude: str
+                The header of the latitude column.
+            longitude: str
+                The header of the longitude column.
+            rest_of_columns: Optional[list[Text]]
+                A list containing headers of the columns other than the mandatory ones.
         """
         # Case-1: The data is from a dictionary.
         # Here, first check whether the data is in dictionary form and if it is so, then convert into
@@ -79,28 +80,28 @@ class NumPandasTraj(DataFrame):
     def rename_df_col_headers(self, data: DataFrame, lat: Text, lon: Text,
                               datetime: Text, traj_id: Text):
         """
-            Change the column headers of the columns when the user given data is in the
-            form of a pandas DF while creating the NumPandasTraj. This method is mainly
-            used when the user reads in data from a csv because the CSV file might
-            contain different names for the columns.
+        Change the column headers of the columns when the user given data is in the
+        form of a pandas DF while creating the NumPandasTraj. This method is mainly
+        used when the user reads in data from a csv because the CSV file might
+        contain different names for the columns.
 
-            Parameters
-            ----------
-                data: DataFrame
-                    The dataframe whose column names are to be changed.
-                lat: Text
-                    The header of the Latitude column.
-                lon: Text
-                    The header of the Longitude column.
-                datetime: Text
-                    The header of the DateTime column.
-                traj_id: Text
-                    The header of the Trajectory ID column.
+        Parameters
+        ----------
+            data: DataFrame
+                The dataframe whose column names are to be changed.
+            lat: Text
+                The header of the Latitude column.
+            lon: Text
+                The header of the Longitude column.
+            datetime: Text
+                The header of the DateTime column.
+            traj_id: Text
+                The header of the Trajectory ID column.
 
-            Returns
-            -------
-                pandas.DataFrame
-                    The pandas dataframe containing the library default column headers.
+        Returns
+        -------
+            pandas.DataFrame
+                The pandas dataframe containing the library default column headers.
         """
         cols = data.columns.to_list()  # List of all column names
         # Iterate over the list of column names and check for keywords in the header
@@ -120,26 +121,26 @@ class NumPandasTraj(DataFrame):
 
     def validate_data_types(self, data: DataFrame):
         """
-            Check whether all the data given by the user is of valid type and if it isn't,
-            it converts them to the specified data types.
-            1. Trajectory_ID: Any -> str
-            2. LAT and LONG: Any -> float64
-            3. DateTime: Any -> dask.datetime64[ns]
+        Check whether all the data given by the user is of valid type and if it isn't,
+        it converts them to the specified data types.
+        1. Trajectory_ID: Any -> str
+        2. LAT and LONG: Any -> float64
+        3. DateTime: Any -> dask.datetime64[ns]
 
-            Parameters
-            ----------
-                data: pd.DataFrame
-                    This is the dataframe that contains the data that was passed in by the user.
-                    The data is converted to pandas DF eventually in the import_data function anyway.
+        Parameters
+        ----------
+            data: pd.DataFrame
+                This is the dataframe that contains the data that was passed in by the user.
+                The data is converted to pandas DF eventually in the import_data function anyway.
 
-            Raises
-            ------
-                KeyError:
-                    Dataframe has one of the mandatory columns missing.
-                ParserError:
-                    The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
-                ValueError:
-                    One of the data-types cannot be converted.
+        Raises
+        ------
+            KeyError:
+                Dataframe has one of the mandatory columns missing.
+            ParserError:
+                The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
+            ValueError:
+                One of the data-types cannot be converted.
         """
         try:
             if data.dtypes[const.LAT] != 'float64':

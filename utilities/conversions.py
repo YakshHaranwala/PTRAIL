@@ -12,7 +12,10 @@ class Conversions:
     @staticmethod
     def convert_directions_to_degree_lat_lon(data, latitude: Text, longitude: Text):
         """
-        Convert the latitude and longitude format from degrees to float values.
+        Convert the latitude and longitude format from degrees (NSEW)
+        to float values. This is used for datasets like the Atlantic Hurricane dataset
+        where the coordinates are not given as float values but are instead given as
+        degrees.
 
         References
         ----------
