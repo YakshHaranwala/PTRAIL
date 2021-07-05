@@ -38,17 +38,584 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="preprocessing-filters-module">
-<h2>preprocessing.filters module<a class="headerlink" href="#preprocessing-filters-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-preprocessing.filters">
+<span id="preprocessing-filters-module"></span><h2>preprocessing.filters module<a class="headerlink" href="#module-preprocessing.filters" title="Permalink to this headline">¶</a></h2>
+<p>The filters module contains several data filtering functions like
+filtering the data based on time, date, proximity to a point and
+several others.</p>
+<p>&#64;Authors: Yaksh J Haranwala, Salman Haidri
+&#64;Date: 8th June, 2021
+&#64;Version: 1.0</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">preprocessing.filters.</span></span><span class="sig-name descname"><span class="pre">Filters</span></span><a class="headerlink" href="#preprocessing.filters.Filters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_bounding_box">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounding_box</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inside</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a bounding box, filter out all the points that are within/outside
+the bounding box and return a dataframe containing the filtered points.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumTrajDF</dt><dd><p>The dataframe from which the data is to be filtered out.</p>
+</dd>
+<dt>bounding_box: tuple</dt><dd><p>The bounding box which is to be used to filter the data.</p>
+</dd>
+<dt>inside: bool</dt><dd><p>Indicate whether the data outside the bounding box is required
+or the data inside it.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj</dt><dd><p>The filtered dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_date">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the dataset by user-given time range.
+NOTE: The following options are to be noted for filtering the data.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>If the start_date and end_date both are not given, then entire
+dataset itself is returned.</p></li>
+<li><p>If only start_date is given, then the trajectory data after
+(including the start date) the start date is returned.</p></li>
+<li><p>If only end_date is given, then the trajectory data before
+(including the end date) the end date is returned.</p></li>
+<li><p>If start_date and end_date both are given then the data between
+the start_date and end_date (included) are returned.</p></li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe that is to be filtered.</p>
+</dd>
+<dt>start_date: Optional[Text]</dt><dd><p>The start date from which the points are to be filtered.</p>
+</dd>
+<dt>end_date: Optional[Text]</dt><dd><p>The end date before which the points are to be filtered.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj</dt><dd><p>The filtered dataframe containing the resultant data.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>When the Date column is not present in the data.</p>
+</dd>
+<dt>ValueError:</dt><dd><p>When the start date is later than the end date.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_datetime">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_dateTime</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_dateTime</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the dataset by user-given time range.
+NOTE: The following options are to be noted for filtering the data.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>If the start_dateTime and end_dateTime both are not given, then entire
+dataset itself is returned.</p></li>
+<li><p>If only start_dateTime is given, then the trajectory data after
+(including the start datetime) the start date is returned.</p></li>
+<li><p>If only end_dateTime is given, then the trajectory data before
+(including the end datetime) the end date is returned.</p></li>
+<li><p>If start_dateTime and end_dateTime both are given then the data between
+the start_dateTime and end_dateTime (included) are returned.</p></li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe that is to be filtered.</p>
+</dd>
+<dt>start_dateTime: Optional[Text]</dt><dd><p>The start dateTime from which the points are to be filtered.</p>
+</dd>
+<dt>end_dateTime: Optional[Text]</dt><dd><p>The end dateTime before which the points are to be filtered.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj</dt><dd><p>The filtered dataframe containing the resultant data.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_max_consecutive_distance">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_max_consecutive_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_max_consecutive_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the points that have a distance between 2 consecutive points
+greater than a user specified value.
+NOTE: max_distance is given in metres.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+<dt>max_distance: float</dt><dd><p>The consecutive distance threshold above which the points are to
+be removed.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>The column ‘Distance_prev_to_curr’ is not present in the dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_max_distance_and_speed">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_max_distance_and_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_speed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_max_distance_and_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter out values that have distance between consecutive points greater
+than a user-given distance speed between consecutive points greater than
+a user-given speed.
+NOTE: The max_distance is given in metres
+NOTE: The max_speed is given in metres/second (m/s).</p>
+<dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+<dt>max_distance: float</dt><dd><p>The maximum distance between 2 consecutive points.</p>
+</dd>
+<dt>max_speed: float</dt><dd><p>The maximum speed between 2 consecutive points.</p>
+</dd>
+</dl>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_max_speed">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_max_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_speed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_max_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the data points which have speed more than a user given speed.
+NOTE: The max_speed is given in the units m/s (metres per second).
+Parameters
+———-</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+<dt>max_speed: float</dt><dd><p>The speed threshold above which the points are to be removed.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>NumPandasTraj containing the resultant dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>The column ‘Speed_prev_to_curr’ is not present in the dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_min_consecutive_distance">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_min_consecutive_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_min_consecutive_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the points that have a distance between 2 consecutive points
+lesser than a user specified value.
+NOTE: min_distance is given in metres.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+<dt>min_distance: float</dt><dd><p>The consecutive distance threshold below which the points are to
+be removed.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>The column ‘Distance_prev_to_curr’ is not present in the dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_min_distance_and_speed">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_min_distance_and_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_speed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_min_distance_and_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter out values that have distance between consecutive points lesser
+than a user-given distance speed between consecutive points lesser than
+a user-given speed.
+NOTE: The min_distance is given in metres
+NOTE: The min_speed is given in metres/second (m/s).</p>
+<dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+<dt>min_distance: float</dt><dd><p>The minimum distance between 2 consecutive points.</p>
+</dd>
+<dt>min_speed: float</dt><dd><p>The minimum speed between 2 consecutive points.</p>
+</dd>
+</dl>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_min_speed">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_min_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_speed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_min_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the data points which have speed less than a user given speed.
+NOTE: The min_speed is given in the units m/s (metres per second).
+Parameters
+———-</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+<dt>min_speed: float</dt><dd><p>The speed threshold below which the points are to be removed.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>NumPandasTraj containing the resultant dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>The column ‘Speed_prev_to_curr’ is not present in the dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_by_traj_id">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_traj_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_traj_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract all the trajectory points of a particular trajectory specified
+by the trajectory’s ID.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the filtering by ID is to be done.</p>
+</dd>
+<dt>traj_id: Text</dt><dd><p>The ID of the trajectory which is to be extracted.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>pandas.core.dataframe.DataFrame</dt><dd><p>The dataframe containing all the trajectory points of the specified trajectory.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>MissingTrajIDException:</dt><dd><p>This exception is raised when the Trajectory ID given by the user does not exist
+in the dataset.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_outliers_by_consecutive_distance">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_outliers_by_consecutive_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_outliers_by_consecutive_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the outlier points based on distance between 2 consecutive points.
+Outlier formula:</p>
+<blockquote>
+<div><p>Lower outlier = Q1 - (1.5*IQR)
+Higher outlier = Q3 + (1.5*IQR)</p>
+<p>IQR = Inter quartile range = Q3 - Q1</p>
+</div></blockquote>
+<p>We need to find points between lower and higher outlier</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The dataframe which has been filtered.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>The column ‘Distance_prev_to_curr’ is not present in the dataset.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.filter_outliers_by_consecutive_speed">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_outliers_by_consecutive_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_outliers_by_consecutive_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the outlier points based on distance between 2 consecutive points.
+Outlier formula:</p>
+<blockquote>
+<div><p>Lower outlier = Q1 - (1.5*IQR)
+Higher outlier = Q3 + (1.5*IQR)</p>
+<p>IQR = Inter quartile range = Q3 - Q1</p>
+</div></blockquote>
+<p>We need to find points between lower and higher outlier</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The dataframe which has been filtered.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><p>KeyError:
+The column ‘Distance_prev_to_curr’ is not present in the dataset.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.get_bounding_box_by_radius">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_bounding_box_by_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.get_bounding_box_by_radius" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates bounding box from a point according to the given radius.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>lat: float</dt><dd><p>The latitude of centroid point of the bounding box.</p>
+</dd>
+<dt>lon: float</dt><dd><p>The longitude of centroid point of the bounding box.</p>
+</dd>
+<dt>radius: float</dt><dd><p>The max radius of the bounding box.
+The radius is given in metres.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>tuple:</dt><dd><p>The bounding box of the user specified size.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><p><a class="reference external" href="https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html">https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html</a></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.hampel_outlier_detection">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">hampel_outlier_detection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.hampel_outlier_detection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the hampel filter to remove outliers from the dataset on the basis
+of column specified by the user.</p>
+<dl class="simple">
+<dt>WARNING: The execution speed is slower than the other outlier detection methods</dt><dd><p>provided in the library.</p>
+</dd>
+</dl>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe from which the outliers are to be removed.</p>
+</dd>
+<dt>column_name: Text</dt><dd><p>The column on te basis of which the outliers are to be detected.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The dataframe with the outliers removed.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>The user-specified column is not present in the dataset.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><p>“Pedrido, M.O., “Hampel”, (2020), GitHub repository,
+<a class="reference external" href="https://github.com/MichaelisTrofficus/hampel_filter">https://github.com/MichaelisTrofficus/hampel_filter</a>”</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.remove_duplicates">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">remove_duplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.remove_duplicates" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Drop duplicates based on the four following columns:</dt><dd><ol class="arabic simple">
+<li><p>Trajectory ID</p></li>
+<li><p>DateTime</p></li>
+<li><p>Latitude</p></li>
+<li><p>Longitude</p></li>
+</ol>
+</dd>
+</dl>
+<p>Duplicates will be dropped only when all the values in the above mentioned
+four columns are the same.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj</dt><dd><p>The dataframe with dropped duplicates.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.filters.Filters.remove_trajectories_with_less_points">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">remove_trajectories_with_less_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_min_points</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.remove_trajectories_with_less_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove out the trajectories from the dataframe which have few points.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe from which trajectories with few points are to be
+removed.</p>
+</dd>
+<dt>num_min_points: Optional[int], default = 2</dt><dd><p>The minimum number of points that a trajectory should have if it
+is to be retained in the dataset.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe which does not contain the trajectories
+with few points anymore.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="preprocessing-helpers-module">
-<h2>preprocessing.helpers module<a class="headerlink" href="#preprocessing-helpers-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-preprocessing.helpers">
+<span id="preprocessing-helpers-module"></span><h2>preprocessing.helpers module<a class="headerlink" href="#module-preprocessing.helpers" title="Permalink to this headline">¶</a></h2>
+<p>The helpers class has the functionalities that interpolate a point based
+on the given data by the user. The class contains the following 4
+interpolation calculators:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Linear Interpolation</p></li>
+<li><p>Cubic Interpolation</p></li>
+<li><p>Random-Walk Interpolation</p></li>
+<li><p>Kinematic Interpolation</p></li>
+</ol>
+</div></blockquote>
+<p>Besides the interpolation helpers, there are also general utilities which
+are used in splitting up dataframes for running the code in parallel.</p>
+<p>&#64;Authors: Yaksh J Haranwala, Salman Haidri
+&#64;Version: 1.0
+&#64;Date: 16th June, 2021</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="preprocessing.helpers.Helpers">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">preprocessing.helpers.</span></span><span class="sig-name descname"><span class="pre">Helpers</span></span><a class="headerlink" href="#preprocessing.helpers.Helpers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.helpers.Helpers.pos">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.helpers.Helpers.pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="preprocessing-interpolation-module">
-<h2>preprocessing.interpolation module<a class="headerlink" href="#preprocessing-interpolation-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-preprocessing.interpolation">
+<span id="preprocessing-interpolation-module"></span><h2>preprocessing.interpolation module<a class="headerlink" href="#module-preprocessing.interpolation" title="Permalink to this headline">¶</a></h2>
+<p>This class interpolates dataframe positions based on Datetime.
+It provides the user with the flexibility to use linear or cubic interpolation.
+In general, the user passes the dataframe, time jum and the interpolation type,
+based on the type the proper function is mapped. And if the time difference
+exceeds the time jump, the interpolated point is added to the position with large jump
+with a time increase of time jump. This interpolated row is added to the dataframe.</p>
+<p>&#64;Authors: Yaksh J Haranwala, Salman Haidri
+&#64;Date: 21st June, 2021
+&#64;Version: 1.0</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="preprocessing.interpolation.Interpolation">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">preprocessing.interpolation.</span></span><span class="sig-name descname"><span class="pre">Interpolation</span></span><a class="headerlink" href="#preprocessing.interpolation.Interpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.interpolation.Interpolation.interpolate_at_time">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">interpolate_at_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a><span class="p"><span class="pre">,</span> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.interpolation.Interpolation.interpolate_at_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocessing.interpolation.Interpolation.interpolate_position">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">interpolate_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_jump</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.interpolation.Interpolation.interpolate_position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpolate the position of an object and create new points using one of
+the interpolation methods provided by the Library. Currently, the library
+supports the following 4 interpolation methods:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Linear Interpolation</p></li>
+<li><p>Cubic-Spline Interpolation</p></li>
+<li><p>Kinematic Interpolation</p></li>
+<li><p>Random Walk Interpolation</p></li>
+</ol>
+</div></blockquote>
+<dl class="simple">
+<dt>WARNING: THE INTERPOLATION METHODS WILL ONLY RETURN THE 4 FUNDAMENTAL LIBRARY</dt><dd><p>COLUMNS BECAUSE IT IS NOT POSSIBLE TO INTERPOLATE OTHER DATA THAT
+MIGHT BE PRESENT IN THE DATASET APART FROM LATITUDE, LONGITUDE AND
+DateTime. AS A RESULT, OTHER COLUMNS ARE DROPPED AND LEFT TO USER TO
+TAKE CARE OF THAT.</p>
+</dd>
+<dt>NOTE: The time-jump parameter specifies where the new points are to be</dt><dd><p>inserted based on the time difference between 2 consecutive points.
+However, it does not guarantee that the dataset will be brought down
+to having difference between 2 consecutive points equal to or
+less than the user specified time jump.</p>
+</dd>
+<dt>NOTE: The time-jump is specified in seconds. Hence, if the user-specified</dt><dd><p>time-jump is not sensible, then the execution of the method will take
+a very long time.</p>
+</dd>
+</dl>
+<blockquote>
+<div><dl class="simple">
+<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe containing the original dataset.</p>
+</dd>
+<dt>time_jump: float</dt><dd><p>The maximum time difference between 2 consecutive points.</p>
+</dd>
+<dt>ip_type: Optional[Text], default = linear</dt><dd><p>The type of interpolation that is to be used.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj:</dt><dd><p>The dataframe containing the interpolated trajectory points.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<section id="module-preprocessing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-preprocessing" title="Permalink to this headline">¶</a></h2>
+<p>The preprocessing package contains several modules for preprocessing of data.</p>
 </section>
 </section>
 
@@ -74,10 +641,10 @@
 <li class="toctree-l1"><a class="reference internal" href="features.html">features package</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">preprocessing package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#preprocessing-filters-module">preprocessing.filters module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#preprocessing-helpers-module">preprocessing.helpers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#preprocessing-interpolation-module">preprocessing.interpolation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-preprocessing.filters">preprocessing.filters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-preprocessing.helpers">preprocessing.helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-preprocessing.interpolation">preprocessing.interpolation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-preprocessing">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">utilities package</a></li>

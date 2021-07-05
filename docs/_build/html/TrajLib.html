@@ -36,32 +36,516 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="trajlib-cbsmot-module">
-<h2>TrajLib.CBSmot module<a class="headerlink" href="#trajlib-cbsmot-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.CBSmot">
+<span id="trajlib-cbsmot-module"></span><h2>TrajLib.CBSmot module<a class="headerlink" href="#module-TrajLib.CBSmot" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.CBSmot.</span></span><span class="sig-name descname"><span class="pre">CBSmot</span></span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.centroid">
+<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subtraj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.centroid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.clean_stops">
+<span class="sig-name descname"><span class="pre">clean_stops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.clean_stops" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.clean_stops_segment">
+<span class="sig-name descname"><span class="pre">clean_stops_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.clean_stops_segment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.count_neighbors">
+<span class="sig-name descname"><span class="pre">count_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.count_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.find_stops">
+<span class="sig-name descname"><span class="pre">find_stops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.find_stops" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.merge_stop">
+<span class="sig-name descname"><span class="pre">merge_stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.merge_stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.merge_stop_segment">
+<span class="sig-name descname"><span class="pre">merge_stop_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.merge_stop_segment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.CBSmot.CBSmot.segment_stops_moves">
+<span class="sig-name descname"><span class="pre">segment_stops_moves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.CBSmot.CBSmot.segment_stops_moves" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="trajlib-distances-module">
-<h2>TrajLib.Distances module<a class="headerlink" href="#trajlib-distances-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.Distances">
+<span id="trajlib-distances-module"></span><h2>TrajLib.Distances module<a class="headerlink" href="#module-TrajLib.Distances" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.Distances.Distances">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.Distances.</span></span><span class="sig-name descname"><span class="pre">Distances</span></span><a class="headerlink" href="#TrajLib.Distances.Distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Distances.Distances.calculate_two_point_distance">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">calculate_two_point_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Distances.Distances.calculate_two_point_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Distances.Distances.distance_array">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">distance_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Distances.Distances.distance_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="trajlib-trajectory-module">
-<h2>TrajLib.Trajectory module<a class="headerlink" href="#trajlib-trajectory-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.Trajectory">
+<span id="trajlib-trajectory-module"></span><h2>TrajLib.Trajectory module<a class="headerlink" href="#module-TrajLib.Trajectory" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.Trajectory.</span></span><span class="sig-name descname"><span class="pre">Trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.check_header">
+<span class="sig-name descname"><span class="pre">check_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.check_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.discretization_by_records">
+<span class="sig-name descname"><span class="pre">discretization_by_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.discretization_by_records" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.g_hample">
+<span class="sig-name descname"><span class="pre">g_hample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_error_bound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.g_hample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.get_full_features_column_name">
+<span class="sig-name descname"><span class="pre">get_full_features_column_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.get_full_features_column_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>other = [‘isInValid’, ‘isPure’, ‘target’]</p>
+<p>a2 = np.array([’<a href="#id1"><span class="problematic" id="id2">min_</span></a>’, ‘<a href="#id3"><span class="problematic" id="id4">max_</span></a>’, ‘mean’, ‘median’, ‘std’, ‘p10’, ‘p25’, ‘p50’, ‘p75’, ‘p90’])
+a1 = np.array([’<a href="#id5"><span class="problematic" id="id6">speed_</span></a>’] * len(a2))
+speed_features = map(‘’.join, zip(a1, a2))</p>
+<p>a2 = np.array([’<a href="#id7"><span class="problematic" id="id8">min_</span></a>’, ‘<a href="#id9"><span class="problematic" id="id10">max_</span></a>’, ‘mean’, ‘median’, ‘std’, ‘p10’, ‘p25’, ‘p50’, ‘p75’, ‘p90’])
+a1 = np.array([’<a href="#id11"><span class="problematic" id="id12">distance_</span></a>’] * len(a2))
+distance_features = map(‘’.join, zip(a1, a2))</p>
+<p>a2 = np.array([’<a href="#id13"><span class="problematic" id="id14">min_</span></a>’, ‘<a href="#id15"><span class="problematic" id="id16">max_</span></a>’, ‘mean’, ‘median’, ‘std’, ‘p10’, ‘p25’, ‘p50’, ‘p75’, ‘p90’])
+a1 = np.array([’<a href="#id17"><span class="problematic" id="id18">acc_</span></a>’] * len(a2))
+acc_features = map(‘’.join, zip(a1, a2))</p>
+<p>a2 = np.array([’<a href="#id19"><span class="problematic" id="id20">min_</span></a>’, ‘<a href="#id21"><span class="problematic" id="id22">max_</span></a>’, ‘mean’, ‘median’, ‘std’, ‘p10’, ‘p25’, ‘p50’, ‘p75’, ‘p90’])
+a1 = np.array([’<a href="#id23"><span class="problematic" id="id24">bearing_</span></a>’] * len(a2))
+bearing_features = map(‘’.join, zip(a1, a2))</p>
+<p>a2 = np.array([’<a href="#id25"><span class="problematic" id="id26">min_</span></a>’, ‘<a href="#id27"><span class="problematic" id="id28">max_</span></a>’, ‘mean’, ‘median’, ‘std’, ‘p10’, ‘p25’, ‘p50’, ‘p75’, ‘p90’])
+a1 = np.array([’<a href="#id29"><span class="problematic" id="id30">jerk_</span></a>’] * len(a2))
+jerk_features = map(‘’.join, zip(a1, a2))</p>
+<p>a2 = np.array([’<a href="#id31"><span class="problematic" id="id32">min_</span></a>’, ‘<a href="#id33"><span class="problematic" id="id34">max_</span></a>’, ‘mean’, ‘median’, ‘std’, ‘p10’, ‘p25’, ‘p50’, ‘p75’, ‘p90’])
+a1 = np.array([’<a href="#id35"><span class="problematic" id="id36">brate_</span></a>’] * len(a2))
+brate_features = map(‘’.join, zip(a1, a2))</p>
+<p>a2 = np.array([’<a href="#id37"><span class="problematic" id="id38">min_</span></a>’, ‘<a href="#id39"><span class="problematic" id="id40">max_</span></a>’, ‘mean’, ‘median’, ‘std’, ‘p10’, ‘p25’, ‘p50’, ‘p75’, ‘p90’])
+a1 = np.array([’<a href="#id41"><span class="problematic" id="id42">brate_rate_</span></a>’] * len(a2))
+brate_rate__features = map(‘’.join, zip(a1, a2))</p>
+<dl class="simple">
+<dt>ret = map(‘’.join, zip(distance_features, speed_features, acc_features, bearing_features,</dt><dd><p>jerk_features, brate_features, brate_rate__features, other))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.load_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.load_data_frame">
+<span class="sig-name descname"><span class="pre">load_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.load_data_frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.load_trajectory_from_CSV">
+<span class="sig-name descname"><span class="pre">load_trajectory_from_CSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csvFile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'~/gps_fe/bigdata2_8696/ex_traj/5428_walk_790.csv'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.load_trajectory_from_CSV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.load_trajectory_from_dataframe">
+<span class="sig-name descname"><span class="pre">load_trajectory_from_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.load_trajectory_from_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.point_features">
+<span class="sig-name descname"><span class="pre">point_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgn_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.point_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.pre_processing">
+<span class="sig-name descname"><span class="pre">pre_processing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.pre_processing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.prediction_actual">
+<span class="sig-name descname"><span class="pre">prediction_actual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.prediction_actual" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.process_acc_sub_traj">
+<span class="sig-name descname"><span class="pre">process_acc_sub_traj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.process_acc_sub_traj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.process_bearing_sub_traj">
+<span class="sig-name descname"><span class="pre">process_bearing_sub_traj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.process_bearing_sub_traj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.process_speed_sub_traj">
+<span class="sig-name descname"><span class="pre">process_speed_sub_traj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.process_speed_sub_traj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.process_sub_traj">
+<span class="sig-name descname"><span class="pre">process_sub_traj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.process_sub_traj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.return_row_data">
+<span class="sig-name descname"><span class="pre">return_row_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.return_row_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.rows">
+<span class="sig-name descname"><span class="pre">rows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.rows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.segment_features">
+<span class="sig-name descname"><span class="pre">segment_features</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.segment_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.sub_trajectory_acc_token">
+<span class="sig-name descname"><span class="pre">sub_trajectory_acc_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.sub_trajectory_acc_token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.sub_trajectory_bearing_token">
+<span class="sig-name descname"><span class="pre">sub_trajectory_bearing_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.sub_trajectory_bearing_token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.sub_trajectory_speed_token">
+<span class="sig-name descname"><span class="pre">sub_trajectory_speed_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.sub_trajectory_speed_token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.sub_trajectory_token">
+<span class="sig-name descname"><span class="pre">sub_trajectory_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.sub_trajectory_token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.toCSV">
+<span class="sig-name descname"><span class="pre">toCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.toCSV" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.to_geojson">
+<span class="sig-name descname"><span class="pre">to_geojson</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.to_geojson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.Trajectory.Trajectory.tokenize_sub_trajectory">
+<span class="sig-name descname"><span class="pre">tokenize_sub_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_word</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_word</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dic_speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed_intr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invalid_word</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.Trajectory.Trajectory.tokenize_sub_trajectory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="trajlib-trajectorydescriptor-module">
-<h2>TrajLib.TrajectoryDescriptor module<a class="headerlink" href="#trajlib-trajectorydescriptor-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.TrajectoryDescriptor">
+<span id="trajlib-trajectorydescriptor-module"></span><h2>TrajLib.TrajectoryDescriptor module<a class="headerlink" href="#module-TrajLib.TrajectoryDescriptor" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptor.TrajectoryDescriptor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.TrajectoryDescriptor.</span></span><span class="sig-name descname"><span class="pre">TrajectoryDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryDescriptor.TrajectoryDescriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.describe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.get_full_features_column_name">
+<span class="sig-name descname"><span class="pre">get_full_features_column_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.get_full_features_column_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.get_target">
+<span class="sig-name descname"><span class="pre">get_target</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.get_target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.purity">
+<span class="sig-name descname"><span class="pre">purity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryDescriptor.TrajectoryDescriptor.purity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="trajlib-trajectorydescriptorfeature-module">
-<h2>TrajLib.TrajectoryDescriptorFeature module<a class="headerlink" href="#trajlib-trajectorydescriptorfeature-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.TrajectoryDescriptorFeature">
+<span id="trajlib-trajectorydescriptorfeature-module"></span><h2>TrajLib.TrajectoryDescriptorFeature module<a class="headerlink" href="#module-TrajLib.TrajectoryDescriptorFeature" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptorFeature.TrajectoryDescriptorFeature">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.TrajectoryDescriptorFeature.</span></span><span class="sig-name descname"><span class="pre">TrajectoryDescriptorFeature</span></span><a class="headerlink" href="#TrajLib.TrajectoryDescriptorFeature.TrajectoryDescriptorFeature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptorFeature.TrajectoryDescriptorFeature.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectory_feature</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryDescriptorFeature.TrajectoryDescriptorFeature.describe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryDescriptorFeature.TrajectoryDescriptorFeature.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryDescriptorFeature.TrajectoryDescriptorFeature.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="trajlib-trajectoryfeatureextractor-module">
-<h2>TrajLib.TrajectoryFeatureExtractor module<a class="headerlink" href="#trajlib-trajectoryfeatureextractor-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.TrajectoryFeatureExtractor">
+<span id="trajlib-trajectoryfeatureextractor-module"></span><h2>TrajLib.TrajectoryFeatureExtractor module<a class="headerlink" href="#module-TrajLib.TrajectoryFeatureExtractor" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.TrajectoryFeatureExtractor.</span></span><span class="sig-name descname"><span class="pre">TrajectoryFeatureExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_day_of_week">
+<span class="sig-name descname"><span class="pre">get_day_of_week</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_day_of_week" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_distance_by_day">
+<span class="sig-name descname"><span class="pre">get_distance_by_day</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">day</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_distance_by_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_distance_travelled">
+<span class="sig-name descname"><span class="pre">get_distance_travelled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_distance_travelled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_duration_in_second">
+<span class="sig-name descname"><span class="pre">get_duration_in_second</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_duration_in_second" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_end_lat">
+<span class="sig-name descname"><span class="pre">get_end_lat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_end_lat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_end_lon">
+<span class="sig-name descname"><span class="pre">get_end_lon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_end_lon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_end_time">
+<span class="sig-name descname"><span class="pre">get_end_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_end_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_is_week_day">
+<span class="sig-name descname"><span class="pre">get_is_week_day</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_is_week_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_list_of_features">
+<span class="sig-name descname"><span class="pre">get_list_of_features</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_list_of_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_number_self_intersect">
+<span class="sig-name descname"><span class="pre">get_number_self_intersect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_number_self_intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_end_distance">
+<span class="sig-name descname"><span class="pre">get_start_end_distance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_end_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_lat">
+<span class="sig-name descname"><span class="pre">get_start_lat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_lat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_lon">
+<span class="sig-name descname"><span class="pre">get_start_lon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_lon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_time">
+<span class="sig-name descname"><span class="pre">get_start_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_start_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_stop_over_total">
+<span class="sig-name descname"><span class="pre">get_stop_over_total</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_stop_over_total" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_stop_times">
+<span class="sig-name descname"><span class="pre">get_stop_times</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_stop_times" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_stop_total">
+<span class="sig-name descname"><span class="pre">get_stop_total</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatureExtractor.TrajectoryFeatureExtractor.get_stop_total" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="trajlib-trajectoryfeatures-module">
-<h2>TrajLib.TrajectoryFeatures module<a class="headerlink" href="#trajlib-trajectoryfeatures-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.TrajectoryFeatures">
+<span id="trajlib-trajectoryfeatures-module"></span><h2>TrajLib.TrajectoryFeatures module<a class="headerlink" href="#module-TrajLib.TrajectoryFeatures" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.TrajectoryFeatures.</span></span><span class="sig-name descname"><span class="pre">TrajectoryFeatures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_acc">
+<span class="sig-name descname"><span class="pre">get_acc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_acc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_bearing">
+<span class="sig-name descname"><span class="pre">get_bearing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_bearing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_brate">
+<span class="sig-name descname"><span class="pre">get_brate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_brate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_brrate">
+<span class="sig-name descname"><span class="pre">get_brrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_brrate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_distance">
+<span class="sig-name descname"><span class="pre">get_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_duration">
+<span class="sig-name descname"><span class="pre">get_duration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_jerk">
+<span class="sig-name descname"><span class="pre">get_jerk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sgn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_jerk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_r">
+<span class="sig-name descname"><span class="pre">get_r</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_r" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_speed">
+<span class="sig-name descname"><span class="pre">get_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_theta">
+<span class="sig-name descname"><span class="pre">get_theta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.get_theta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.TrajectoryFeatures.smoother">
+<span class="sig-name descname"><span class="pre">smoother</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.TrajectoryFeatures.smoother" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.mad">
+<span class="sig-prename descclassname"><span class="pre">TrajLib.TrajectoryFeatures.</span></span><span class="sig-name descname"><span class="pre">mad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.mad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="TrajLib.TrajectoryFeatures.wavelet_smoother">
+<span class="sig-prename descclassname"><span class="pre">TrajLib.TrajectoryFeatures.</span></span><span class="sig-name descname"><span class="pre">wavelet_smoother</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavelet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'db4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectoryFeatures.wavelet_smoother" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="trajlib-trajectoryprocessor-module">
 <h2>TrajLib.TrajectoryProcessor module<a class="headerlink" href="#trajlib-trajectoryprocessor-module" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="trajlib-trajectorysegmentation-module">
-<h2>TrajLib.TrajectorySegmentation module<a class="headerlink" href="#trajlib-trajectorysegmentation-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib.TrajectorySegmentation">
+<span id="trajlib-trajectorysegmentation-module"></span><h2>TrajLib.TrajectorySegmentation module<a class="headerlink" href="#module-TrajLib.TrajectorySegmentation" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">TrajLib.TrajectorySegmentation.</span></span><span class="sig-name descname"><span class="pre">TrajectorySegmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">rowData=Empty</span> <span class="pre">DataFrame</span> <span class="pre">Columns:</span> <span class="pre">[]</span> <span class="pre">Index:</span> <span class="pre">[]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>note that raw_data input should be indexed by the timeDate of trajectory
+meanTime:</p>
+<blockquote>
+<div><p>is the indicator for split sequence of data to sub trajectories
+meanTime default is the mean of duration of the input trajectory</p>
+</div></blockquote>
+<dl class="simple">
+<dt>minimumNumberOfitemsInTraj:</dt><dd><p>is the minimum number of records allowed to make a subtrajectory</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.load_data">
+<span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.load_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.load_dataframe">
+<span class="sig-name descname"><span class="pre">load_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.multi_label_segmentation">
+<span class="sig-name descname"><span class="pre">multi_label_segmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['t_user_id',</span> <span class="pre">'transportation_mode']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.multi_label_segmentation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.onelabelsegmentation">
+<span class="sig-name descname"><span class="pre">onelabelsegmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'transportation_mode'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.onelabelsegmentation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.return_row_data">
+<span class="sig-name descname"><span class="pre">return_row_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.return_row_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.segmentByLabel">
+<span class="sig-name descname"><span class="pre">segmentByLabel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'transportation_mode'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.segmentByLabel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.segmentByStopMove">
+<span class="sig-name descname"><span class="pre">segmentByStopMove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.segmentByStopMove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="TrajLib.TrajectorySegmentation.TrajectorySegmentation.segmentByTime">
+<span class="sig-name descname"><span class="pre">segmentByTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meanTime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimumNumberOfitemsInTraj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#TrajLib.TrajectorySegmentation.TrajectorySegmentation.segmentByTime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="trajlib-trajectorytools-module">
 <h2>TrajLib.TrajectoryTools module<a class="headerlink" href="#trajlib-trajectorytools-module" title="Permalink to this headline">¶</a></h2>
@@ -69,8 +553,20 @@
 <section id="trajlib-fe-module">
 <h2>TrajLib.fe module<a class="headerlink" href="#trajlib-fe-module" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<section id="module-TrajLib">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-TrajLib" title="Permalink to this headline">¶</a></h2>
+<p>PLEASE DO NOT MODIFY THIS LIBRARY AS TrajLib IS PUT HERE SPECIALLY FOR COMPARISON
+PURPOSES ONLY. DO NOT MODIFY THIS LIBRARY.</p>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>“Etemad, M., Soares, A., Etemad, E. et al. SWS: an unsupervised trajectory</dt><dd><p>segmentation algorithm based on change detection with interpolation kernels.
+Geoinformatica (2020)”</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
 </section>
 </section>
 

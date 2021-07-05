@@ -38,11 +38,280 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="core-trajectorydf-module">
-<h2>core.TrajectoryDF module<a class="headerlink" href="#core-trajectorydf-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-core.TrajectoryDF">
+<span id="core-trajectorydf-module"></span><h2>core.TrajectoryDF module<a class="headerlink" href="#module-core.TrajectoryDF" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">core.TrajectoryDF.</span></span><span class="sig-name descname"><span class="pre">NumPandasTraj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_set</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">,</span> </span><span class="pre">List</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rest_of_columns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.datetime">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">datetime</span></span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor method for the DateTime column of the DaskTrajectoryDF.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dask.dataframe.core.Series</dt><dd><p>The Series containing all the DateTime values from the DataFrame.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>MissingColumnsException</dt><dd><p>DateTime column is missing from the data.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.get_default_column_names">
+<span class="sig-name descname"><span class="pre">get_default_column_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DateTime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">dict</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.get_default_column_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a dictionary containing the key, value pairs of the library default column names
+for the following columns:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Latitude</p></li>
+<li><p>Longitude</p></li>
+<li><p>DateTime</p></li>
+<li><p>Trajectory ID</p></li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>DateTime: Text</dt><dd><p>The datetime header of the column already given by the user.</p>
+</dd>
+<dt>traj_id: Text</dt><dd><p>The traj_id header of the column already given by the user.</p>
+</dd>
+<dt>latitude:</dt><dd><p>The latitude header of the column already given by the user.</p>
+</dd>
+<dt>longitude:</dt><dd><p>The longitude header of the column already given by the user.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>dict</dt><dd><p>A dictionary of mappings from the given header by the user to the
+library default headers.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.latitude">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">latitude</span></span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.latitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor method for the latitude column of the DaskTrajectoryDF.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dask.dataframe.core.Series</dt><dd><p>The Series containing all the latitude values from the DataFrame.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>MissingColumnsException</dt><dd><p>Latitude column is missing from the data.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.longitude">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">longitude</span></span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.longitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor method for the longitude column of the DaskTrajectoryDF.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dask.dataframe.core.Series</dt><dd><p>The Series containing all the longitude values from the DataFrame.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>MissingColumnsException</dt><dd><p>Longitude column is missing from the data</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.plot_folium_traj">
+<span class="sig-name descname"><span class="pre">plot_folium_traj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'blue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.plot_folium_traj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use folium to plot the trajectory on a map.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>color: Text</dt><dd><p>The color of the trajectory line on the map.</p>
+</dd>
+<dt>weight: float</dt><dd><p>The weight of the trajectory line on the map.</p>
+</dd>
+<dt>opacity: float</dt><dd><p>The opacity of the trajectory line on the map.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>folium.folium.Map</dt><dd><p>The map with plotted trajectory.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.rename_df_col_headers">
+<span class="sig-name descname"><span class="pre">rename_df_col_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.rename_df_col_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the column headers of the columns when the user given data is in the
+form of a pandas DF while creating the NumPandasTraj. This method is mainly
+used when the user reads in data from a csv because the CSV file might
+contain different names for the columns.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>data: DataFrame</dt><dd><p>The dataframe whose column names are to be changed.</p>
+</dd>
+<dt>lat: Text</dt><dd><p>The header of the Latitude column.</p>
+</dd>
+<dt>lon: Text</dt><dd><p>The header of the Longitude column.</p>
+</dd>
+<dt>datetime: Text</dt><dd><p>The header of the DateTime column.</p>
+</dd>
+<dt>traj_id: Text</dt><dd><p>The header of the Trajectory ID column.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>pandas.DataFrame</dt><dd><p>The pandas dataframe containing the library default column headers.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.sort_by_traj_id_and_datetime">
+<span class="sig-name descname"><span class="pre">sort_by_traj_id_and_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ascending</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.sort_by_traj_id_and_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort the trajectory in Ascending or descending order based on the following 2
+columns in order:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Trajectory ID</p></li>
+<li><p>DateTime</p></li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>ascending: bool</dt><dd><p>Whether to sort the values in ascending order or descending order.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>NumPandasTraj</dt><dd><p>The sorted dataframe.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.to_numpy">
+<span class="sig-name descname"><span class="pre">to_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">dtype=None</span></em>, <em class="sig-param"><span class="pre">copy:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em>, <em class="sig-param"><span class="pre">na_value=&lt;object</span> <span class="pre">object&gt;</span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">numpy.ndarray</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.to_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the DataFrame to a NumPy array.By default, the dtype of the returned array will
+be the common dtype of all types in the DataFrame. For example, if the dtypes are float16
+and float32, the results dtype will be float32. This may require copying data and coercing
+values, which may be expensive</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dtype:</dt><dd><p>The dtype to pass to <code class="xref py py-meth docutils literal notranslate"><span class="pre">numpy.asarray()</span></code>.</p>
+</dd>
+<dt>copy:</dt><dd><p>Whether to ensure that the returned value is not a view on another array.
+Note that <code class="docutils literal notranslate"><span class="pre">copy=False</span></code> does not <em>ensure</em> that <code class="docutils literal notranslate"><span class="pre">to_numpy()</span></code> is no-copy.
+Rather, <code class="docutils literal notranslate"><span class="pre">copy=True</span></code> ensure that a copy is made, even if not strictly necessary.</p>
+</dd>
+<dt>na_value:</dt><dd><p>The value to use for missing values. The default value depends on <cite>dtype</cite> and the
+dtypes of the DataFrame columns.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.traj_id">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">traj_id</span></span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.traj_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor method for the Trajectory_ID column of the DaskTrajectoryDF.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>dask.dataframe.core.Series</dt><dd><p>The Series containing all the Trajectory_ID values from the DataFrame.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>MissingColumnsException</dt><dd><p>traj_id column is missing from the data.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.validate_columns">
+<span class="sig-name descname"><span class="pre">validate_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.validate_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether all the columns are present in the DataFrame or not.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>data</dt><dd><p>Data is the dask DataFrame containing all the data passed in by the user.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>bool</dt><dd><p>Indicate whether or not all the columns that are mandatory are
+present in the Data given by the user.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>MissingColumnsException</dt><dd><p>One or more of the mandatory columns (Latitude, Longitude, DateTime, Traj_ID)
+are missing in the data.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="core.TrajectoryDF.NumPandasTraj.validate_data_types">
+<span class="sig-name descname"><span class="pre">validate_data_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.TrajectoryDF.NumPandasTraj.validate_data_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether all the data given by the user is of valid type and if it isn’t,
+it converts them to the specified data types.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Trajectory_ID: Any -&gt; str</p></li>
+<li><p>LAT and LONG: Any -&gt; float64</p></li>
+<li><p>DateTime: Any -&gt; dask.datetime64[ns]</p></li>
+</ol>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>data: pd.DataFrame</dt><dd><p>This is the dataframe that contains the data that was passed in by the user.
+The data is converted to pandas DF eventually in the import_data function anyway.</p>
+</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="simple">
+<dt>KeyError:</dt><dd><p>Dataframe has one of the mandatory columns missing.</p>
+</dd>
+<dt>ParserError:</dt><dd><p>The DateTime format provided is invalid and cannot be parsed as pandas DateTime.</p>
+</dd>
+<dt>ValueError:</dt><dd><p>One of the data-types cannot be converted.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<section id="module-core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-core" title="Permalink to this headline">¶</a></h2>
+<p>The NumMobility Library is a Mobility Data Preprocessing Library.
+git ls-files | xargs wc -l</p>
 </section>
 </section>
 
@@ -66,8 +335,8 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">core package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#core-trajectorydf-module">core.TrajectoryDF module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core.TrajectoryDF">core.TrajectoryDF module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-core">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">features package</a></li>
