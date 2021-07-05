@@ -27,11 +27,3 @@ features.temporal\_features module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: features
-   :members:
-   :undoc-members:
-   :show-inheritance:
