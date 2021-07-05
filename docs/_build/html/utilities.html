@@ -41,9 +41,9 @@
 <span id="utilities-distancecalculator-module"></span><h2>utilities.DistanceCalculator module<a class="headerlink" href="#module-utilities.DistanceCalculator" title="Permalink to this headline">¶</a></h2>
 <p>DistanceCalculator module contains various types of distance formulas that can be used to calculate
 distance between 2 points on the surface of earth depending on the CRS being used.</p>
-<p>&#64;Authors: Salman Haidri, Yaksh J Haranwala
-&#64;Date: 28th May, 2021
-&#64;Version 1.0</p>
+<p>Authors: Salman Haidri, Yaksh J Haranwala
+Date: 28th May, 2021
+Version 1.0</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="utilities.DistanceCalculator.FormulaLog">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">utilities.DistanceCalculator.</span></span><span class="sig-name descname"><span class="pre">FormulaLog</span></span><a class="headerlink" href="#utilities.DistanceCalculator.FormulaLog" title="Permalink to this definition">¶</a></dt>
@@ -54,24 +54,22 @@ distance between 2 points on the surface of earth depending on the CRS being use
 <dd><p>Calculates bearing between 2 points. Bearing can be defined as direction or
 an angle, between the north-south line of earth or meridian and the line connecting
 the target and the reference point.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>lat1:</dt><dd><p>The latitude value of point 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat1</strong> – The latitude value of point 1.</p></li>
+<li><p><strong>lon1</strong> – The longitude value of point 1.</p></li>
+<li><p><strong>lat2</strong> – The latitude value of point 2.</p></li>
+<li><p><strong>lon2</strong> – The longitude value of point 2.</p></li>
+</ul>
 </dd>
-<dt>lon1:</dt><dd><p>The longitude value of point 1.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bearing between 2 points</p>
 </dd>
-<dt>lat2:</dt><dd><p>The latitude value of point 2.</p>
-</dd>
-<dt>lon2:</dt><dd><p>The longitude value of point 2.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>float</dt><dd><p>Bearing between 2 points</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -79,24 +77,22 @@ the target and the reference point.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">haversine_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#utilities.DistanceCalculator.FormulaLog.haversine_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>The haversine formula calculates the great-circle distance between 2 points.
 The great-circle distance is the shortest distance over the earth’s surface.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>lat1: float</dt><dd><p>The latitude value of point 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat1</strong> (<em>float</em>) – The latitude value of point 1.</p></li>
+<li><p><strong>lon1</strong> (<em>float</em>) – The longitude value of point 1.</p></li>
+<li><p><strong>lat2</strong> (<em>float</em>) – The latitude value of point 2.</p></li>
+<li><p><strong>lon2</strong> (<em>float</em>) – The longitude value of point 2.</p></li>
+</ul>
 </dd>
-<dt>lon1: float</dt><dd><p>The longitude value of point 1.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The great-circle distance between the 2 points.</p>
 </dd>
-<dt>lat2: float</dt><dd><p>The latitude value of point 2.</p>
-</dd>
-<dt>lon2: float</dt><dd><p>The longitude value of point 2.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>float</dt><dd><p>The great-circle distance between the 2 points.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>

@@ -76,18 +76,17 @@ library and we are crediting the PyMove creators with them.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_acceleration_from_prev_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_acceleration_from_prev_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a column containing acceleration of the object from the start to the current
 point.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the calculation of acceleration is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation of acceleration is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -100,18 +99,17 @@ follows:</p>
 <div><p>Bearing is the horizontal angle between the direction of an object and another
 object, or between the object and the True North.</p>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the bearing is to be calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the bearing is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -119,18 +117,17 @@ object, or between the object and the True North.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_bearing_rate_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_bearing_rate_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the bearing rate of the consecutive points. And adding that column into
 the dataframe</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the bearing rate is to be calculated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the bearing rate is to be calculated</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the Bearing rate column</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj</dt><dd><p>The dataframe containing the Bearing rate column</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -145,18 +142,17 @@ ID will be set to 0.</p>
 </div></blockquote>
 <p>When converting to NumPandasTraj we see a jump of 140-150ms in execution time but converting the
 dataframe provides the user with the option to use the NumPandasTraj functionalities.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The data where speed is to be calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The data where speed is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -164,20 +160,20 @@ dataframe provides the user with the option to use the NumPandasTraj functionali
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_distance_from_given_point_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_distance_from_given_point_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a point, this function calculates the distance between that point and all the
 points present in the dataframe and adds that column into the dataframe.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which calculation is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which calculation is to be done.</p></li>
+<li><p><strong>coordinates</strong> (<em>tuple</em>) – The coordinates from which the distance is to be calculated.</p></li>
+</ul>
 </dd>
-<dt>coordinates: tuple</dt><dd><p>The coordinates from which the distance is to be calculated.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -190,18 +186,17 @@ NOTE: When the trajectory ID changes in the data, then the distance calculation 
 <div><p>starts from the first point of the new trajectory ID and the first point of the
 new trajectory ID will be set to 0.</p>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The data where speed is to be calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The data where speed is to be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -209,18 +204,17 @@ new trajectory ID will be set to 0.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_jerk_from_prev_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_jerk_from_prev_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a column containing jerk of the object from the start to the current
 point.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the calculation of jerk is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation of jerk is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -230,22 +224,21 @@ point.</p>
 containing the distance between the given coordinate and rest of the points in dataframe by calling
 create_distance_from_point(). And then comparing each point using the condition if it’s within the
 range and appending the values in a column and attaching it to the dataframe.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the point within range calculation is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the point within range calculation is to be done.</p></li>
+<li><p><strong>coordinates</strong> (<em>tuple</em>) – The coordinates from which the distance is to be calculated.</p></li>
+<li><p><strong>dist_range</strong> (<em>float</em>) – The range within which the resultant distance from the coordinates should lie.</p></li>
+</ul>
 </dd>
-<dt>coordinates: tuple</dt><dd><p>The coordinates from which the distance is to be calculated.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
 </dd>
-<dt>dist_range: float</dt><dd><p>The range within which the resultant distance from the coordinates should lie.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -253,18 +246,17 @@ range and appending the values in a column and attaching it to the dataframe.</p
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_rate_of_bearing_rate_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_rate_of_bearing_rate_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the rate of bearing rate of the consecutive points.
 Add adding that column into the dataframe</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the rate of bearing rate is to be calculated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the rate of bearing rate is to be calculated</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the rate of Bearing rate column</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj</dt><dd><p>The dataframe containing the rate of Bearing rate column</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -272,18 +264,17 @@ Add adding that column into the dataframe</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_speed_from_prev_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.create_speed_from_prev_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a column containing speed of the object from the start to the current
 point.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the calculation of speed is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation of speed is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -294,18 +285,17 @@ the following format:</p>
 <blockquote>
 <div><p>(min Latitude, min Longitude, max Latitude, max Longitude).</p>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe containing the trajectory data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe containing the trajectory data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The bounding box of the trajectory</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>tuple</dt><dd><p>The bounding box of the trajectory</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -313,22 +303,21 @@ the following format:</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_distance_travelled_by_date_and_traj_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_distance_travelled_by_date_and_traj_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a date and trajectory ID, this function calculates the total distance
 covered in the trajectory on that particular date and returns it.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe in which teh actual data is stored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe in which teh actual data is stored.</p></li>
+<li><p><strong>date</strong> (<em>Text</em>) – The Date on which the distance covered is to be calculated.</p></li>
+<li><p><strong>traj_id</strong> (<em>Text</em>) – The trajectory ID for which the distance covered is to be calculated.</p></li>
+</ul>
 </dd>
-<dt>date: Text</dt><dd><p>The Date on which the distance covered is to be calculated.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The total distance covered on that date by that trajectory ID.</p>
 </dd>
-<dt>traj_id: Text</dt><dd><p>The trajectory ID for which the distance covered is to be calculated.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>float</dt><dd><p>The total distance covered on that date by that trajectory ID.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -336,26 +325,23 @@ covered in the trajectory on that particular date and returns it.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_distance_travelled_by_traj_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_distance_travelled_by_traj_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a trajectory ID, calculate the total distance covered by the trajectory.
 NOTE: The distance calculated is in metres.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe containing the entire dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe containing the entire dataset.</p></li>
+<li><p><strong>traj_id</strong> (<em>Text</em>) – The trajectory ID for which the distance covered is to be calculated.</p></li>
+</ul>
 </dd>
-<dt>traj_id: Text</dt><dd><p>The trajectory ID for which the distance covered is to be calculated.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distance covered by the trajectory</p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>float</dt><dd><p>The distance covered by the trajectory</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>MissingTrajIDException</dt><dd><p>The Trajectory ID given by the user is not present in the dataset.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference internal" href="utilities.html#utilities.exceptions.MissingTrajIDException" title="utilities.exceptions.MissingTrajIDException"><strong>MissingTrajIDException</strong></a> – The Trajectory ID given by the user is not present in the dataset.</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -363,22 +349,17 @@ NOTE: The distance calculated is in metres.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_end_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.spatial_features.SpatialFeatures.get_end_location" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the ending location of an object’s trajectory in the data.
 Note: If the user does not provide a trajectory id, then the last
-Parameters
-———-</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: DaskTrajectoryDF</dt><dd><p>The DaskTrajectoryDF storing the trajectory data.</p>
+:param dataframe: The DaskTrajectoryDF storing the trajectory data.
+:type dataframe: DaskTrajectoryDF
+:param traj_id: The ID of the trajectory whose end location is to be found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The (lat, longitude) tuple containing the end location.</p>
 </dd>
-<dt>traj_id</dt><dd><p>The ID of the trajectory whose end location is to be found.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>tuple</dt><dd><p>The (lat, longitude) tuple containing the end location.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -389,20 +370,20 @@ NOTE: If no Trajectory ID is specified, then the number of unique locations in t
 <blockquote>
 <div><p>entire dataset is calculated.</p>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe of which the number of locations are to be computed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe of which the number of locations are to be computed</p></li>
+<li><p><strong>traj_id</strong> (<em>Text</em>) – The trajectory id for which the number of unique locations are to be found</p></li>
+</ul>
 </dd>
-<dt>traj_id: Text</dt><dd><p>The trajectory id for which the number of unique locations are to be found</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of unique locations in the dataframe/trajectory id.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>integer</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>integer</dt><dd><p>The number of unique locations in the dataframe/trajectory id.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -414,22 +395,21 @@ NOTE: If no Trajectory ID is specified, then the number of unique locations in t
 present in the data.</p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The DaskTrajectoryDF storing the trajectory data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The DaskTrajectoryDF storing the trajectory data.</p></li>
+<li><p><strong>traj_id</strong> – The ID of the object whose start location is to be found.</p></li>
+</ul>
 </dd>
-<dt>traj_id</dt><dd><p>The ID of the object whose start location is to be found.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple</em> – The (lat, longitude) tuple containing the start location.</p></li>
+<li><p><em>pandas.core.dataframe.DataFrame</em> – The dataframe containing start locations of all trajectory IDs.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>tuple</dt><dd><p>The (lat, longitude) tuple containing the start location.</p>
-</dd>
-<dt>pandas.core.dataframe.DataFrame</dt><dd><p>The dataframe containing start locations of all trajectory IDs.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -457,18 +437,17 @@ crediting the PyMove creators with them.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_date_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_date_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>From the DateTime column already present in the data, extract only the date
 and then add another column containing just the date.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The DaskTrajectoryDF on which the creation of the time column is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The DaskTrajectoryDF on which the creation of the time column is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -477,18 +456,17 @@ and then add another column containing just the date.</p>
 <dd><p>Create a column called Day_Of_Week which contains the day of the week
 on which the trajectory point is recorded. This is calculated on the basis
 of timestamp recorded in the data.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe containing the entire data on which the operation is to be performed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe containing the entire data on which the operation is to be performed</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -496,18 +474,17 @@ of timestamp recorded in the data.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_time_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_time_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>From the DateTime column already present in the data, extract only the time
 and then add another column containing just the time.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The DaskTrajectoryDF on which the creation of the time column is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The DaskTrajectoryDF on which the creation of the time column is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -516,25 +493,23 @@ and then add another column containing just the time.</p>
 <dd><p>Create a Time_Of_Day column in the dataframe using parallelization which indicates at what time of the
 day was the point data captured.
 Note: The divisions of the day based on the time are provided in the utilities.constants module.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the calculation is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the calculation is to be done.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
+<p class="rubric">References</p>
+<dl class="simple">
 <dt>“Arina De Jesus Amador Monteiro Sanches. ‘Uma Arquitetura E Imple-menta ̧c ̃ao</dt><dd><p>Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove’.Bachelor’s thesis.
 Universidade Federal Do Cear ́a, 2019.”</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -542,25 +517,23 @@ Universidade Federal Do Cear ́a, 2019.”</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_weekend_indicator_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#features.temporal_features.TemporalFeatures.create_weekend_indicator_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a column called Weekend which indicates whether the point data is collected
 on either a Saturday or a Sunday.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the operation is to be performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the operation is to be performed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the resultant column if inplace.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">core.TrajectoryDF.NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column if inplace.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
+<p class="rubric">References</p>
+<dl class="simple">
 <dt>“Arina De Jesus Amador Monteiro Sanches. ‘Uma Arquitetura E Imple-menta ̧c ̃ao</dt><dd><p>Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove’.Bachelor’s thesis.
 Universidade Federal Do Cear ́a, 2019.”</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -572,24 +545,23 @@ NOTE: If the trajectory ID is not specified by the user, then by default,</p>
 <div><p>the ending times of all the trajectory IDs in the data are
 returned.</p>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the operations are to be performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the operations are to be performed.</p></li>
+<li><p><strong>traj_id</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The trajectory for which the end time is required.</p></li>
+</ul>
 </dd>
-<dt>traj_id: Optional[Text]</dt><dd><p>The trajectory for which the end time is required.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>pandas.DateTime:</dt><dd><p>The end time of a single trajectory.</p>
-</dd>
-<dt>pandas.core.dataframe.DataFrame</dt><dd><p>Pandas dataframe containing the end time of all the trajectories
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>pandas.DateTime</em> – The end time of a single trajectory.</p></li>
+<li><p><em>pandas.core.dataframe.DataFrame</em> – Pandas dataframe containing the end time of all the trajectories
 present in the data when the user hasn’t asked for a particular
-trajectory’s end time.</p>
+trajectory’s end time.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -601,24 +573,23 @@ NOTE: If the trajectory ID is not specified by the user, then by default,</p>
 <div><p>the starting times of all the trajectory IDs in the data are
 returned.</p>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the operations are to be performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the operations are to be performed.</p></li>
+<li><p><strong>traj_id</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The trajectory for which the start time is required.</p></li>
+</ul>
 </dd>
-<dt>traj_id: Optional[Text]</dt><dd><p>The trajectory for which the start time is required.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>pandas.DateTime:</dt><dd><p>The start time of a single trajectory.</p>
-</dd>
-<dt>pandas.core.dataframe.DataFrame</dt><dd><p>Pandas dataframe containing the start time of all the trajectories
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>pandas.DateTime</em> – The start time of a single trajectory.</p></li>
+<li><p><em>pandas.core.dataframe.DataFrame</em> – Pandas dataframe containing the start time of all the trajectories
 present in the data when the user hasn’t asked for a particular
-trajectory’s start time.</p>
+trajectory’s start time.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -630,20 +601,20 @@ Note: If no trajectory ID is given by the user, then the duration of the entire<
 <div><p>data set is given i.e., the difference between the max time in the dataset
 and the min time in the dataset.</p>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: core.TrajectoryDF.NumPandasTraj</dt><dd><p>The dataframe containing the resultant column if inplace is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>core.TrajectoryDF.NumPandasTraj</em></a>) – The dataframe containing the resultant column if inplace is True.</p></li>
+<li><p><strong>traj_id</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The trajectory id for which the duration is required.</p></li>
+</ul>
 </dd>
-<dt>traj_id: Optional[Text]</dt><dd><p>The trajectory id for which the duration is required.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The trajectory duration.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.TimeDelta</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>pandas.TimeDelta</dt><dd><p>The trajectory duration.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -651,8 +622,6 @@ and the min time in the dataset.</p>
 </section>
 <section id="module-features">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-features" title="Permalink to this headline">¶</a></h2>
-<p>Change the algorithm from 75000 rows at a time to a set of ids
-And then filter out a dataframe for each id and calculate .diff() for them</p>
 </section>
 </section>
 

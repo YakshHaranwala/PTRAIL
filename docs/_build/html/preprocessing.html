@@ -55,23 +55,22 @@ several others.</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounding_box</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inside</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a bounding box, filter out all the points that are within/outside
 the bounding box and return a dataframe containing the filtered points.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumTrajDF</dt><dd><p>The dataframe from which the data is to be filtered out.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<em>NumTrajDF</em>) – The dataframe from which the data is to be filtered out.</p></li>
+<li><p><strong>bounding_box</strong> (<em>tuple</em>) – The bounding box which is to be used to filter the data.</p></li>
+<li><p><strong>inside</strong> (<em>bool</em>) – Indicate whether the data outside the bounding box is required
+or the data inside it.</p></li>
+</ul>
 </dd>
-<dt>bounding_box: tuple</dt><dd><p>The bounding box which is to be used to filter the data.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe.</p>
 </dd>
-<dt>inside: bool</dt><dd><p>Indicate whether the data outside the bounding box is required
-or the data inside it.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj</dt><dd><p>The filtered dataframe.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -91,30 +90,27 @@ dataset itself is returned.</p></li>
 the start_date and end_date (included) are returned.</p></li>
 </ol>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe that is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe that is to be filtered.</p></li>
+<li><p><strong>start_date</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The start date from which the points are to be filtered.</p></li>
+<li><p><strong>end_date</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The end date before which the points are to be filtered.</p></li>
+</ul>
 </dd>
-<dt>start_date: Optional[Text]</dt><dd><p>The start date from which the points are to be filtered.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe containing the resultant data.</p>
 </dd>
-<dt>end_date: Optional[Text]</dt><dd><p>The end date before which the points are to be filtered.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj</dt><dd><p>The filtered dataframe containing the resultant data.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>KeyError:</dt><dd><p>When the Date column is not present in the data.</p>
-</dd>
-<dt>ValueError:</dt><dd><p>When the start date is later than the end date.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError:</strong> – When the Date column is not present in the data.</p></li>
+<li><p><strong>ValueError:</strong> – When the start date is later than the end date.</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -134,22 +130,21 @@ dataset itself is returned.</p></li>
 the start_dateTime and end_dateTime (included) are returned.</p></li>
 </ol>
 </div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe that is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe that is to be filtered.</p></li>
+<li><p><strong>start_dateTime</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The start dateTime from which the points are to be filtered.</p></li>
+<li><p><strong>end_dateTime</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em>) – The end dateTime before which the points are to be filtered.</p></li>
+</ul>
 </dd>
-<dt>start_dateTime: Optional[Text]</dt><dd><p>The start dateTime from which the points are to be filtered.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe containing the resultant data.</p>
 </dd>
-<dt>end_dateTime: Optional[Text]</dt><dd><p>The end dateTime before which the points are to be filtered.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj</dt><dd><p>The filtered dataframe containing the resultant data.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -158,27 +153,24 @@ the start_dateTime and end_dateTime (included) are returned.</p></li>
 <dd><p>Remove the points that have a distance between 2 consecutive points
 greater than a user specified value.
 NOTE: max_distance is given in metres.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe which is to be filtered.</p></li>
+<li><p><strong>max_distance</strong> (<em>float</em>) – The consecutive distance threshold above which the points are to
+be removed.</p></li>
+</ul>
 </dd>
-<dt>max_distance: float</dt><dd><p>The consecutive distance threshold above which the points are to
-be removed.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe.</p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>KeyError:</dt><dd><p>The column ‘Distance_prev_to_curr’ is not present in the dataframe.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>KeyError:</strong> – The column ‘Distance_prev_to_curr’ is not present in the dataframe.</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -189,20 +181,21 @@ than a user-given distance speed between consecutive points greater than
 a user-given speed.
 NOTE: The max_distance is given in metres
 NOTE: The max_speed is given in metres/second (m/s).</p>
-<dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe which is to be filtered.</p></li>
+<li><p><strong>max_distance</strong> (<em>float</em>) – The maximum distance between 2 consecutive points.</p></li>
+<li><p><strong>max_speed</strong> (<em>float</em>) – The maximum speed between 2 consecutive points.</p></li>
+</ul>
 </dd>
-<dt>max_distance: float</dt><dd><p>The maximum distance between 2 consecutive points.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe.</p>
 </dd>
-<dt>max_speed: float</dt><dd><p>The maximum speed between 2 consecutive points.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -210,28 +203,21 @@ NOTE: The max_speed is given in metres/second (m/s).</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_max_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_speed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_max_speed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the data points which have speed more than a user given speed.
 NOTE: The max_speed is given in the units m/s (metres per second).
-Parameters
-———-</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+:param dataframe: The dataframe which is to be filtered.
+:type dataframe: NumPandasTraj
+:param max_speed: The speed threshold above which the points are to be removed.
+:type max_speed: float</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>NumPandasTraj containing the resultant dataframe.</p>
 </dd>
-<dt>max_speed: float</dt><dd><p>The speed threshold above which the points are to be removed.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>NumPandasTraj containing the resultant dataframe.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>KeyError:</dt><dd><p>The column ‘Speed_prev_to_curr’ is not present in the dataframe.</p>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>KeyError:</strong> – The column ‘Speed_prev_to_curr’ is not present in the dataframe.</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -240,27 +226,24 @@ Parameters
 <dd><p>Remove the points that have a distance between 2 consecutive points
 lesser than a user specified value.
 NOTE: min_distance is given in metres.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe which is to be filtered.</p></li>
+<li><p><strong>min_distance</strong> (<em>float</em>) – The consecutive distance threshold below which the points are to
+be removed.</p></li>
+</ul>
 </dd>
-<dt>min_distance: float</dt><dd><p>The consecutive distance threshold below which the points are to
-be removed.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe.</p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>KeyError:</dt><dd><p>The column ‘Distance_prev_to_curr’ is not present in the dataframe.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>KeyError:</strong> – The column ‘Distance_prev_to_curr’ is not present in the dataframe.</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -271,20 +254,21 @@ than a user-given distance speed between consecutive points lesser than
 a user-given speed.
 NOTE: The min_distance is given in metres
 NOTE: The min_speed is given in metres/second (m/s).</p>
-<dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe which is to be filtered.</p></li>
+<li><p><strong>min_distance</strong> (<em>float</em>) – The minimum distance between 2 consecutive points.</p></li>
+<li><p><strong>min_speed</strong> (<em>float</em>) – The minimum speed between 2 consecutive points.</p></li>
+</ul>
 </dd>
-<dt>min_distance: float</dt><dd><p>The minimum distance between 2 consecutive points.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe.</p>
 </dd>
-<dt>min_speed: float</dt><dd><p>The minimum speed between 2 consecutive points.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -292,28 +276,21 @@ NOTE: The min_speed is given in metres/second (m/s).</p>
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_min_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_speed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_min_speed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the data points which have speed less than a user given speed.
 NOTE: The min_speed is given in the units m/s (metres per second).
-Parameters
-———-</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+:param dataframe: The dataframe which is to be filtered.
+:type dataframe: NumPandasTraj
+:param min_speed: The speed threshold below which the points are to be removed.
+:type min_speed: float</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>NumPandasTraj containing the resultant dataframe.</p>
 </dd>
-<dt>min_speed: float</dt><dd><p>The speed threshold below which the points are to be removed.</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>NumPandasTraj containing the resultant dataframe.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>KeyError:</dt><dd><p>The column ‘Speed_prev_to_curr’ is not present in the dataframe.</p>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>KeyError:</strong> – The column ‘Speed_prev_to_curr’ is not present in the dataframe.</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -321,27 +298,24 @@ Parameters
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">filter_by_traj_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><span class="pre">core.TrajectoryDF.NumPandasTraj</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_id</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.filter_by_traj_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract all the trajectory points of a particular trajectory specified
 by the trajectory’s ID.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe on which the filtering by ID is to be done.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe on which the filtering by ID is to be done.</p></li>
+<li><p><strong>traj_id</strong> (<em>Text</em>) – The ID of the trajectory which is to be extracted.</p></li>
+</ul>
 </dd>
-<dt>traj_id: Text</dt><dd><p>The ID of the trajectory which is to be extracted.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing all the trajectory points of the specified trajectory.</p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>pandas.core.dataframe.DataFrame</dt><dd><p>The dataframe containing all the trajectory points of the specified trajectory.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pandas.core.dataframe.DataFrame</p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>MissingTrajIDException:</dt><dd><p>This exception is raised when the Trajectory ID given by the user does not exist
-in the dataset.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>MissingTrajIDException:</strong> – This exception is raised when the Trajectory ID given by the user does not exist
+    in the dataset.</p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -355,24 +329,20 @@ Higher outlier = Q3 + (1.5*IQR)</p>
 <p>IQR = Inter quartile range = Q3 - Q1</p>
 </div></blockquote>
 <p>We need to find points between lower and higher outlier</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe which is to be filtered.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe which has been filtered.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>KeyError:</strong> – The column ‘Distance_prev_to_curr’ is not present in the dataset.</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The dataframe which has been filtered.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>KeyError:</dt><dd><p>The column ‘Distance_prev_to_curr’ is not present in the dataset.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -386,48 +356,47 @@ Higher outlier = Q3 + (1.5*IQR)</p>
 <p>IQR = Inter quartile range = Q3 - Q1</p>
 </div></blockquote>
 <p>We need to find points between lower and higher outlier</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe which is to be filtered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe which is to be filtered.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe which has been filtered.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError:</strong> – </p></li>
+<li><p><strong>The column 'Distance_prev_to_curr' is not present in the dataset.</strong> – </p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The dataframe which has been filtered.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><p>KeyError:
-The column ‘Distance_prev_to_curr’ is not present in the dataset.</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="preprocessing.filters.Filters.get_bounding_box_by_radius">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_bounding_box_by_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.get_bounding_box_by_radius" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates bounding box from a point according to the given radius.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>lat: float</dt><dd><p>The latitude of centroid point of the bounding box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>float</em>) – The latitude of centroid point of the bounding box.</p></li>
+<li><p><strong>lon</strong> (<em>float</em>) – The longitude of centroid point of the bounding box.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – The max radius of the bounding box.
+The radius is given in metres.</p></li>
+</ul>
 </dd>
-<dt>lon: float</dt><dd><p>The longitude of centroid point of the bounding box.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The bounding box of the user specified size.</p>
 </dd>
-<dt>radius: float</dt><dd><p>The max radius of the bounding box.
-The radius is given in metres.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>tuple:</dt><dd><p>The bounding box of the user specified size.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><p><a class="reference external" href="https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html">https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html</a></p>
-</div></blockquote>
+<p class="rubric">References</p>
+<p><a class="reference external" href="https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html">https://mathmesquita.dev/2017/01/16/filtrando-localizacao-em-um-raio.html</a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -439,30 +408,26 @@ of column specified by the user.</p>
 <dt>WARNING: The execution speed is slower than the other outlier detection methods</dt><dd><p>provided in the library.</p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe from which the outliers are to be removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe from which the outliers are to be removed.</p></li>
+<li><p><strong>column_name</strong> (<em>Text</em>) – The column on te basis of which the outliers are to be detected.</p></li>
+</ul>
 </dd>
-<dt>column_name: Text</dt><dd><p>The column on te basis of which the outliers are to be detected.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe with the outliers removed.</p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The dataframe with the outliers removed.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>KeyError:</dt><dd><p>The user-specified column is not present in the dataset.</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>KeyError:</strong> – The user-specified column is not present in the dataset.</p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><p>“Pedrido, M.O., “Hampel”, (2020), GitHub repository,
+<p class="rubric">References</p>
+<p>“Pedrido, M.O., “Hampel”, (2020), GitHub repository,
 <a class="reference external" href="https://github.com/MichaelisTrofficus/hampel_filter">https://github.com/MichaelisTrofficus/hampel_filter</a>”</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -479,35 +444,37 @@ of column specified by the user.</p>
 </dl>
 <p>Duplicates will be dropped only when all the values in the above mentioned
 four columns are the same.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj</dt><dd><p>The dataframe with dropped duplicates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dataframe with dropped duplicates.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="preprocessing.filters.Filters.remove_trajectories_with_less_points">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">remove_trajectories_with_less_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_min_points</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing.filters.Filters.remove_trajectories_with_less_points" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove out the trajectories from the dataframe which have few points.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe from which trajectories with few points are to be
-removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe from which trajectories with few points are to be
+removed.</p></li>
+<li><p><strong>num_min_points</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em><em>, </em><em>default = 2</em>) – The minimum number of points that a trajectory should have if it
+is to be retained in the dataset.</p></li>
+</ul>
 </dd>
-<dt>num_min_points: Optional[int], default = 2</dt><dd><p>The minimum number of points that a trajectory should have if it
-is to be retained in the dataset.</p>
-</dd>
-</dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The filtered dataframe which does not contain the trajectories
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered dataframe which does not contain the trajectories
 with few points anymore.</p>
 </dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
+</dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -592,22 +559,21 @@ less than the user specified time jump.</p>
 a very long time.</p>
 </dd>
 </dl>
-<blockquote>
-<div><dl class="simple">
-<dt>dataframe: NumPandasTraj</dt><dd><p>The dataframe containing the original dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> (<a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj"><em>NumPandasTraj</em></a>) – The dataframe containing the original dataset.</p></li>
+<li><p><strong>time_jump</strong> (<em>float</em>) – The maximum time difference between 2 consecutive points.</p></li>
+<li><p><strong>ip_type</strong> (<em>Optional</em><em>[</em><em>Text</em><em>]</em><em>, </em><em>default = linear</em>) – The type of interpolation that is to be used.</p></li>
+</ul>
 </dd>
-<dt>time_jump: float</dt><dd><p>The maximum time difference between 2 consecutive points.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The dataframe containing the interpolated trajectory points.</p>
 </dd>
-<dt>ip_type: Optional[Text], default = linear</dt><dd><p>The type of interpolation that is to be used.</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="core.html#core.TrajectoryDF.NumPandasTraj" title="core.TrajectoryDF.NumPandasTraj">NumPandasTraj</a></p>
 </dd>
 </dl>
-</div></blockquote>
-<blockquote>
-<div><dl class="simple">
-<dt>NumPandasTraj:</dt><dd><p>The dataframe containing the interpolated trajectory points.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
