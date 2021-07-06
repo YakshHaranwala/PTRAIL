@@ -36,10 +36,10 @@ class Interpolation:
             the interpolation methods provided by the Library. Currently, the library
             supports the following 4 interpolation methods:
 
-            1. Linear Interpolation
-            2. Cubic-Spline Interpolation
-            3. Kinematic Interpolation
-            4. Random Walk Interpolation
+                1. Linear Interpolation
+                2. Cubic-Spline Interpolation
+                3. Kinematic Interpolation
+                4. Random Walk Interpolation
 
             Warning
             -------
