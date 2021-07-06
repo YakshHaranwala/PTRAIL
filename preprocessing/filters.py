@@ -25,10 +25,10 @@ class Filters:
     def remove_duplicates(dataframe: NumTrajDF):
         """
         Drop duplicates based on the four following columns:
-            | 1. Trajectory ID
-            | 2. DateTime
-            | 3. Latitude
-            | 4. Longitude
+            1. Trajectory ID
+            2. DateTime
+            3. Latitude
+            4. Longitude
 
         Duplicates will be dropped only when all the values in the above mentioned
         four columns are the same.
@@ -152,7 +152,7 @@ class Filters:
 
             Note
             ----
-            The following options are to be noted for filtering the data:
+            | The following options are to be noted for filtering the data:
             | 1. If the start_date and end_date both are not given, then entire
                  dataset itself is returned.
             | 2. If only start_date is given, then the trajectory data after
@@ -233,7 +233,7 @@ class Filters:
 
             Note
             ----
-            The following options are to be noted for filtering the data.
+            | The following options are to be noted for filtering the data.
             | 1. If the start_dateTime and end_dateTime both are not given, then entire
                  dataset itself is returned.
             | 2. If only start_dateTime is given, then the trajectory data after
