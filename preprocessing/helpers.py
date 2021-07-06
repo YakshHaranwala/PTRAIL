@@ -3,17 +3,17 @@
     on the given data by the user. The class contains the following 4
     interpolation calculators:
 
-    1. Linear Interpolation
-    2. Cubic Interpolation
-    3. Random-Walk Interpolation
-    4. Kinematic Interpolation
+        1. Linear Interpolation
+        2. Cubic Interpolation
+        3. Random-Walk Interpolation
+        4. Kinematic Interpolation
 
     Besides the interpolation helpers, there are also general utilities which
     are used in splitting up dataframes for running the code in parallel.
 
-    @Authors: Yaksh J Haranwala, Salman Haidri
-    @Version: 1.0
-    @Date: 16th June, 2021
+    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Version: 1.0
+    | Date: 16th June, 2021
 """
 import math
 import os
@@ -32,13 +32,15 @@ from scipy.stats import truncnorm
 class Helpers:
     # ------------------------------------ Interpolation Helpers --------------------------------------- #
     @staticmethod
-    def _linear_help(dataframe: Union[pd.DataFrame, NumTrajDF], id_: Text, time_jump: float):
+    def linear_help(dataframe: Union[pd.DataFrame, NumTrajDF], id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses linear interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
             the user-specified time_jump and inserts the interpolated point those between 2 points.
 
-            WARNING: Private Helper method
+            Warning
+            -------
+                Private Helper method
                 Can't be used for dataframes with multiple trajectory ids and there might be a significant
                 drop in performance.
 

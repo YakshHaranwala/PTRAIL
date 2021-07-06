@@ -170,7 +170,7 @@ class Interpolation:
         # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
         # of the system.)
         small_pool = mlp.Pool(NUM_CPU - 1)
-        final = small_pool.starmap(helper._linear_help,
+        final = small_pool.starmap(helper.linear_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
         # Append the smaller dataframe to process manager list so that result
