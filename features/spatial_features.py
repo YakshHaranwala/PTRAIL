@@ -37,20 +37,19 @@ class SpatialFeatures:
     @staticmethod
     def get_bounding_box(dataframe: NumPandasTraj):
         """
-        Return the bounding box of the Trajectory data. Essentially, the bounding box is of
-        the following format:
+            Return the bounding box of the Trajectory data. Essentially, the bounding box is of
+            the following format:
+                (min Latitude, min Longitude, max Latitude, max Longitude).
 
-            (min Latitude, min Longitude, max Latitude, max Longitude).
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe containing the trajectory data.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe containing the trajectory data.
-
-        Returns
-        -------
-        tuple:
-            The bounding box of the trajectory
+            Returns
+            -------
+                tuple:
+                    The bounding box of the trajectory
         """
         return (
             dataframe[const.LAT].min(),
@@ -62,27 +61,27 @@ class SpatialFeatures:
     @staticmethod
     def get_start_location(dataframe: NumPandasTraj, traj_id=None):
         """
-        Get the starting location of an object's trajectory in the data.
+            Get the starting location of an object's trajectory in the data.
 
-        Note
-        ----
-            If the user does not give in any traj_id, then the library,
-            by default gives out the start locations of all the unique trajectory ids
-            present in the data.
+            Note
+            ----
+                If the user does not give in any traj_id, then the library,
+                by default gives out the start locations of all the unique trajectory ids
+                present in the data.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The DaskTrajectoryDF storing the trajectory data.
-        traj_id
-            The ID of the object whose start location is to be found.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The DaskTrajectoryDF storing the trajectory data.
+                traj_id
+                    The ID of the object whose start location is to be found.
 
-        Returns
-        -------
-        tuple:
-            The (lat, longitude) tuple containing the start location.
-        pandas.core.dataframe.DataFrame:
-            The dataframe containing start locations of all trajectory IDs.
+            Returns
+            -------
+                tuple:
+                    The (lat, longitude) tuple containing the start location.
+                pandas.core.dataframe.DataFrame:
+                    The dataframe containing start locations of all trajectory IDs.
         """
         # If traj_id is None, find the start times of all the unique trajectories present in the data.
         # Else first filter out a dataframe containing the given traj_id and then return the start
@@ -118,27 +117,27 @@ class SpatialFeatures:
     @staticmethod
     def get_end_location(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
         """
-        Get the ending location of an object's trajectory in the data.
+            Get the ending location of an object's trajectory in the data.
 
-        Note
-        ----
-            If the user does not give in any traj_id, then the library,
-            by default gives out the end locations of all the unique trajectory ids
-            present in the data.
+            Note
+            ----
+                If the user does not give in any traj_id, then the library,
+                by default gives out the end locations of all the unique trajectory ids
+                present in the data.
 
-        Parameters
-        ----------
-        dataframe: DaskTrajectoryDF
-            The DaskTrajectoryDF storing the trajectory data.
-        traj_id
-            The ID of the trajectory whose end location is to be found.
+            Parameters
+            ----------
+                dataframe: DaskTrajectoryDF
+                    The DaskTrajectoryDF storing the trajectory data.
+                traj_id
+                    The ID of the trajectory whose end location is to be found.
 
-        Returns
-        -------
-        tuple:
-            The (lat, longitude) tuple containing the end location.
-        pandas.core.dataframe.DataFrame:
-            The dataframe containing start locations of all trajectory IDs.
+            Returns
+            -------
+                tuple:
+                    The (lat, longitude) tuple containing the end location.
+                pandas.core.dataframe.DataFrame:
+                    The dataframe containing start locations of all trajectory IDs.
         """
         # If traj_id is None, find the end times of all the unique trajectories present in the data.
         # Else first filter out a dataframe containing the given traj_id and then return the end
@@ -173,27 +172,24 @@ class SpatialFeatures:
     @staticmethod
     def create_distance_between_consecutive_column(dataframe: NumPandasTraj):
         """
-        Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
-        The distance calculated is the Great-Circle distance.
+            Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
+            The distance calculated is the Great-Circle distance.
 
-        Note
-        ----
-        When the trajectory ID changes in the data, then the distance calculation again starts
-        from the first point of the new trajectory ID and the first point of the new trajectory
-        ID will be set to 0.
+            Note
+            ----
+                When the trajectory ID changes in the data, then the distance calculation again starts
+                from the first point of the new trajectory ID and the first point of the new trajectory
+                ID will be set to 0.
 
-        When converting to NumPandasTraj we see a jump of 140-150ms in execution time but converting the
-        dataframe provides the user with the option to use the NumPandasTraj functionalities.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The data where speed is to be calculated.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The data where speed is to be calculated.
-
-        Returns
-        -------
-        core.TrajectoryDF.NumPandasTraj:
-            The dataframe containing the resultant column.
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj:
+                    The dataframe containing the resultant column.
         """
         # Case-1: The number of unique Trajectory IDs is less than x.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
@@ -220,24 +216,24 @@ class SpatialFeatures:
     @staticmethod
     def create_distance_from_start_column(dataframe: NumPandasTraj):
         """
-        Create a column containing distance between the start location and the rest of the
-        points using Haversine formula. The distance calculated is the Great-Circle distance.
+            Create a column containing distance between the start location and the rest of the
+            points using Haversine formula. The distance calculated is the Great-Circle distance.
 
-        Note
-        ----
-        When the trajectory ID changes in the data, then the distance calculation again
-        starts from the first point of the new trajectory ID and the first point of the
-        new trajectory ID will be set to 0.
+            Note
+            ----
+                When the trajectory ID changes in the data, then the distance calculation again
+                starts from the first point of the new trajectory ID and the first point of the
+                new trajectory ID will be set to 0.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The data where speed is to be calculated.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The data where speed is to be calculated.
 
-        Returns
-        -------
-        core.TrajectoryDF.NumPandasTraj:
-            The dataframe containing the resultant column.
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj:
+                    The dataframe containing the resultant column.
         """
         # Case-1: The number of unique Trajectory IDs is less than x.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
@@ -265,22 +261,22 @@ class SpatialFeatures:
     @staticmethod
     def get_distance_travelled_by_date_and_traj_id(dataframe: NumPandasTraj, date, traj_id=None):
         """
-        Given a date and trajectory ID, this function calculates the total distance
-        covered in the trajectory on that particular date and returns it.
+            Given a date and trajectory ID, this function calculates the total distance
+            covered in the trajectory on that particular date and returns it.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe in which teh actual data is stored.
-        date: Text
-            The Date on which the distance covered is to be calculated.
-        traj_id: Text
-            The trajectory ID for which the distance covered is to be calculated.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe in which teh actual data is stored.
+                date: Text
+                    The Date on which the distance covered is to be calculated.
+                traj_id: Text
+                    The trajectory ID for which the distance covered is to be calculated.
 
-        Returns
-        -------
-        float:
-            The total distance covered on that date by that trajectory ID.
+            Returns
+            -------
+                float:
+                    The total distance covered on that date by that trajectory ID.
         """
         # First, reset the index of the dataframe.
         # Then, filter the dataframe based on Date and Trajectory ID if given by user.
@@ -306,24 +302,24 @@ class SpatialFeatures:
     def create_point_within_range_column(dataframe: NumPandasTraj, coordinates: tuple,
                                          dist_range: float):
         """
-        Checks how many points are within the range of the given coordinate. By first making a column
-        containing the distance between the given coordinate and rest of the points in dataframe by calling
-        create_distance_from_point() and then comparing each point using the condition if it's within the
-        range and appending the values in a column and attaching it to the dataframe.
+            Checks how many points are within the range of the given coordinate. By first making a column
+            containing the distance between the given coordinate and rest of the points in dataframe by calling
+            create_distance_from_point() and then comparing each point using the condition if it's within the
+            range and appending the values in a column and attaching it to the dataframe.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which the point within range calculation is to be done.
-        coordinates: tuple
-            The coordinates from which the distance is to be calculated.
-        dist_range: float
-            The range within which the resultant distance from the coordinates should lie.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the point within range calculation is to be done.
+                coordinates: tuple
+                    The coordinates from which the distance is to be calculated.
+                dist_range: float
+                    The range within which the resultant distance from the coordinates should lie.
 
-        Returns
-        -------
-        core.TrajectoryDF.NumPandasTraj:
-            The dataframe containing the resultant column.
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj:
+                    The dataframe containing the resultant column.
         """
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
@@ -344,20 +340,20 @@ class SpatialFeatures:
     @staticmethod
     def create_distance_from_given_point_column(dataframe: NumPandasTraj, coordinates: tuple):
         """
-        Given a point, this function calculates the distance between that point and all the
-        points present in the dataframe and adds that column into the dataframe.
+            Given a point, this function calculates the distance between that point and all the
+            points present in the dataframe and adds that column into the dataframe.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which calculation is to be done.
-        coordinates: tuple
-            The coordinates from which the distance is to be calculated.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which calculation is to be done.
+                coordinates: tuple
+                    The coordinates from which the distance is to be calculated.
 
-        Returns
-        -------
-        core.TrajectoryDF.NumPandasTraj:
-            The dataframe containing the resultant column.
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj:
+                    The dataframe containing the resultant column.
         """
         # dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
@@ -381,18 +377,18 @@ class SpatialFeatures:
     @staticmethod
     def create_speed_from_prev_column(dataframe: NumPandasTraj):
         """
-        Create a column containing speed of the object from the start to the current
-        point.
+            Create a column containing speed of the object from the start to the current
+            point.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which the calculation of speed is to be done.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation of speed is to be done.
 
-        Returns
-        -------
-        core.TrajectoryDF.NumPandasTraj:
-            The dataframe containing the resultant column.
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj:
+                    The dataframe containing the resultant column.
         """
         # Here, we are using try and catch blocks to check whether the DataFrame has the
         # Distance_prev_to_curr column.
@@ -429,18 +425,18 @@ class SpatialFeatures:
     @staticmethod
     def create_acceleration_from_prev_column(dataframe: NumPandasTraj):
         """
-        Create a column containing acceleration of the object from the start to the current
-        point.
+            Create a column containing acceleration of the object from the start to the current
+            point.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which the calculation of acceleration is to be done.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation of acceleration is to be done.
 
-        Returns
-        -------
-        core.TrajectoryDF.NumPandasTraj:
-            The dataframe containing the resultant column.
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj:
+                    The dataframe containing the resultant column.
         """
         # Try catch is used to check if speed column is present or not
         try:
@@ -470,18 +466,18 @@ class SpatialFeatures:
     @staticmethod
     def create_jerk_from_prev_column(dataframe: NumPandasTraj):
         """
-        Create a column containing jerk of the object from the start to the current
-        point.
+            Create a column containing jerk of the object from the start to the current
+            point.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which the calculation of jerk is to be done.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the calculation of jerk is to be done.
 
-        Returns
-        -------
-        core.TrajectoryDF.NumPandasTraj:
-            The dataframe containing the resultant column.
+            Returns
+            -------
+                core.TrajectoryDF.NumPandasTraj:
+                    The dataframe containing the resultant column.
         """
         # Try catch is used to check if acceleration column is present or not
         try:
@@ -511,22 +507,21 @@ class SpatialFeatures:
     @staticmethod
     def create_bearing_column(dataframe: NumPandasTraj):
         """
-        Create a column containing bearing between 2 consecutive points. Bearing is also
-        referred as "Forward Azimuth" sometimes. Bearing/Forward Azimuth is defined as
-        follows:
+            Create a column containing bearing between 2 consecutive points. Bearing is also
+            referred as "Forward Azimuth" sometimes. Bearing/Forward Azimuth is defined as
+            follows:
+                "Bearing is the horizontal angle between the direction of an object and another
+                object, or between the object and the True North."
 
-        "Bearing is the horizontal angle between the direction of an object and another
-        object, or between the object and the True North."
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the bearing is to be calculated.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which the bearing is to be calculated.
-
-        Returns
-        -------
-        NumPandasTraj:
-                The dataframe containing the resultant column.
+            Returns
+            -------
+                NumPandasTraj:
+                        The dataframe containing the resultant column.
         """
         # Case-1: The number of unique Trajectory IDs is less than x.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
@@ -554,18 +549,18 @@ class SpatialFeatures:
     @staticmethod
     def create_bearing_rate_column(dataframe: NumPandasTraj):
         """
-        Calculates the bearing rate of the consecutive points. And adding that column into
-        the dataframe
+            Calculates the bearing rate of the consecutive points. And adding that column into
+            the dataframe
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which the bearing rate is to be calculated
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the bearing rate is to be calculated
 
-        Returns
-        -------
-        NumPandasTraj:
-            The dataframe containing the Bearing rate column
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe containing the Bearing rate column
         """
         # Try catch to check for Bearing column
         try:
@@ -593,18 +588,18 @@ class SpatialFeatures:
     @staticmethod
     def create_rate_of_bearing_rate_column(dataframe: NumPandasTraj):
         """
-        Calculates the rate of bearing rate of the consecutive points.
-        Add adding that column into the dataframe
+            Calculates the rate of bearing rate of the consecutive points.
+            Add adding that column into the dataframe
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe on which the rate of bearing rate is to be calculated
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe on which the rate of bearing rate is to be calculated
 
-        Returns
-        -------
-        NumPandasTraj:
-            The dataframe containing the rate of Bearing rate column
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe containing the rate of Bearing rate column
         """
         # Try catch to check for Bearing Rate column
         try:
@@ -632,25 +627,25 @@ class SpatialFeatures:
     @staticmethod
     def get_distance_travelled_by_traj_id(dataframe: NumPandasTraj, traj_id: Text):
         """
-        Given a trajectory ID, calculate the total distance covered by the trajectory.
-        NOTE: The distance calculated is in metres.
+            Given a trajectory ID, calculate the total distance covered by the trajectory.
+            NOTE: The distance calculated is in metres.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe containing the entire dataset.
-        traj_id: Text
-            The trajectory ID for which the distance covered is to be calculated.
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe containing the entire dataset.
+                traj_id: Text
+                    The trajectory ID for which the distance covered is to be calculated.
 
-        Returns
-        -------
-        float:
-            The distance covered by the trajectory
+            Returns
+            -------
+                float:
+                    The distance covered by the trajectory
 
-        Raises
-        ------
-        MissingTrajIDException:
-            The Trajectory ID given by the user is not present in the dataset.
+            Raises
+            ------
+                MissingTrajIDException:
+                    The Trajectory ID given by the user is not present in the dataset.
         """
         # First, filter the dataframe and create a smaller dataframe containing only the
         # trajectory points of the specified trajectory ID.
@@ -674,26 +669,26 @@ class SpatialFeatures:
     @staticmethod
     def get_number_of_locations(dataframe: NumPandasTraj, traj_id: Text = None):
         """
-        Get the number of unique coordinates in the dataframe specific to a trajectory ID.
+            Get the number of unique coordinates in the dataframe specific to a trajectory ID.
 
-        Note
-        ----
-        If no Trajectory ID is specified, then the number of unique locations in the
-        visited by each trajectory in the dataset is calculated.
+            Note
+            ----
+                If no Trajectory ID is specified, then the number of unique locations in the
+                visited by each trajectory in the dataset is calculated.
 
-        Parameters
-        ----------
-        dataframe: NumPandasTraj
-            The dataframe of which the number of locations are to be computed
-        traj_id: Text
-            The trajectory id for which the number of unique locations are to be found
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe of which the number of locations are to be computed
+                traj_id: Text
+                    The trajectory id for which the number of unique locations are to be found
 
-        Returns
-        -------
-        int:
-            The number of unique locations in the dataframe/trajectory id.
-        pandas.core.dataframe.DataFrame:
-            The dataframe containing start locations of all trajectory IDs.
+            Returns
+            -------
+                int:
+                    The number of unique locations in the dataframe/trajectory id.
+                pandas.core.dataframe.DataFrame:
+                    The dataframe containing start locations of all trajectory IDs.
         """
         dataframe = dataframe.reset_index()
         if traj_id is None:
