@@ -1,16 +1,22 @@
 """
-    The datetime_based  module contains all the features of the library
+    | 1. The temporal_features module contains all the features of the library
     that calculates several features based on the DateTime provided in
-    the data. It is to be noted that most of the functions in this module
-    calculate the features and then add the results to an entirely new
-    column with a new column header. It is to be also noted that a lot of
-    these features are inspired from the PyMove library and we are
-    crediting the PyMove creators with them.
+    the data.
+    | 2. It is to be noted that most of the functions in this module
+         calculate the features and then add the results to an entirely new
+         column with a new column header.
+    | 3. It is to be also noted that a lot of
+         these features are inspired from the PyMove library and we are
+         crediting the PyMove creators with them.
 
-    author: Yaksh J Haranwala, Salman Haidri
-    date: 22 May, 2021
-    version: 1.0
-    credits: PyMove creators
+    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Date: 22 May, 2021
+    | Version: 1.0
+
+     References
+    ----------
+        "Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
+         Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019"
 """
 import itertools
 import multiprocessing
@@ -38,7 +44,7 @@ class TemporalFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj
+                core.TrajectoryDF.NumPandasTraj:
                     The dataframe containing the resultant column.
 
         """

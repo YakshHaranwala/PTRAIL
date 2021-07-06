@@ -1,19 +1,19 @@
 """
-The spatial_features  module contains several functions of the library
-that calculates many features based on the DateTime provided in
-the data. This module mostly extracts and modifies data collected from
-some existing dataframe and appends these information to them. It is to
-be also noted that a lot of these features are inspired from the PyMove
-library and we are crediting the PyMove creators with them.
+    The spatial_features  module contains several functions of the library
+    that calculates many features based on the DateTime provided in
+    the data. This module mostly extracts and modifies data collected from
+    some existing dataframe and appends these information to them. It is to
+    be also noted that a lot of these features are inspired from the PyMove
+    library and we are crediting the PyMove creators with them.
 
-| Authors: Yaksh J Haranwala, Salman Haidri
-| Date: 2nd June, 2021
-| Version: 1.0
+    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Date: 2nd June, 2021
+    | Version: 1.0
 
-References
-----------
-"Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
- Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019"
+    References
+    ----------
+        "Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
+         Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019"
 """
 import itertools
 import multiprocessing
