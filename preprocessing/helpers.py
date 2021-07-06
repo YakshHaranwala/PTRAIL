@@ -1,13 +1,12 @@
 """
     Warning
     -------
-        | 1. None of the methods in this module should be used directly while performing operations
-        on data.
+        | 1. None of the methods in this module should be used directly while performing operations on data.
         | 2. These methods are helpers for the interpolation methods in the interpolation.py
-        module and hence run linearly and not in parallel which will result in slower execution time.
+             module and hence run linearly and not in parallel which will result in slower execution time.
         | 3. All the methods in this module perform calculation on a single Trajectory ID due to which
-        it will wrong results on data with multiple trajectories. Instead, use the interpolation.py
-        methods for faster and reliable calculations.
+             it will wrong results on data with multiple trajectories. Instead, use the interpolation.py
+             methods for faster and reliable calculations.
 
     The helpers class has the functionalities that interpolate a point based
     on the given data by the user. The class contains the following 4
