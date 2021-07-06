@@ -1,13 +1,12 @@
 """
     | 1. The temporal_features module contains all the features of the library
-    that calculates several features based on the DateTime provided in
-    the data.
+         that calculates several features based on the DateTime provided in
+         the data.
     | 2. It is to be noted that most of the functions in this module
          calculate the features and then add the results to an entirely new
          column with a new column header.
-    | 3. It is to be also noted that a lot of
-         these features are inspired from the PyMove library and we are
-         crediting the PyMove creators with them.
+    | 3. It is to be also noted that a lot of these features are inspired from
+         the PyMove library and we are crediting the PyMove creators with them.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: 22 May, 2021
