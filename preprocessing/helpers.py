@@ -1,4 +1,16 @@
 """
+    Warning
+    -------
+        | None of the methods in this module should be used directly while performing operations
+        on data.
+
+        | These methods are helpers for the interpolation methods in the interpolation.py
+        module and hence run linearly and not in parallel which will result in slower execution time.
+
+        | All the methods in this module perform calculation on a single Trajectory ID due to which
+        it will wrong results on data with multiple trajectories. Instead, use the interpolation.py
+        methods for faster and reliable calculations.
+
     The helpers class has the functionalities that interpolate a point based
     on the given data by the user. The class contains the following 4
     interpolation calculators:
@@ -17,6 +29,8 @@
 """
 import math
 import os
+
+import pandas
 import psutil
 import pandas as pd
 import numpy as np
@@ -319,14 +333,14 @@ class Helpers:
                 #     (td**2)*coef_x[0]/2 + (td**3)*coef_x[1]/6
                 # y = lon[i-1] + lon_velocity[i-1] * td + \
                 #     (td ** 2) * coef_y[0] / 2 + (td ** 3) * coef_y[1] / 6
-                x = Helpers.pos(t=td, x1=lat[i-1], v1=lat_velocity[i-1], b=coef_x[0], c=coef_x[1])
-                y = Helpers.pos(t=td, x1=lon[i-1], v1=lon_velocity[i-1], b=coef_y[0], c=coef_y[1])
+                x = Helpers._pos(t=td, x1=lat[i-1], v1=lat_velocity[i-1], b=coef_x[0], c=coef_x[1])
+                y = Helpers._pos(t=td, x1=lon[i-1], v1=lon_velocity[i-1], b=coef_y[0], c=coef_y[1])
                 dataframe.loc[new_times[i-1]] = [id_, x, y]
 
         return dataframe
 
     @staticmethod
-    def pos(t, x1, v1, b, c):
+    def _pos(t, x1, v1, b, c):
         return x1 + v1 * t + (t ** 2) * b / 2 + (t ** 3) * c / 6
                 
     # -------------------------------------- General Utilities ---------------------------------- #
