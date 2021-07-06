@@ -3,9 +3,9 @@
     filtering the data based on time, date, proximity to a point and
     several others.
 
-    @Authors: Yaksh J Haranwala, Salman Haidri
-    @Date: 8th June, 2021
-    @Version: 1.0
+    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Date: 8th June, 2021
+    | Version: 1.0
 """
 import math
 import warnings

@@ -40,9 +40,8 @@ class Helpers:
 
             Warning
             -------
-                Private Helper method
-                Can't be used for dataframes with multiple trajectory ids and there might be a significant
-                drop in performance.
+                This method should not be used for dataframes with multiple trajectory ids as it will
+                yield wrong results and there might be a significant drop in performance.
 
             Parameters
             ----------
@@ -89,15 +88,16 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def _cubic_help(df: Union[pd.DataFrame, NumTrajDF], id_: Text, time_jump: float):
+    def cubic_help(df: Union[pd.DataFrame, NumTrajDF], id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses cubic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
             the user-specified time_jump and inserts the interpolated point those between 2 points.
 
-            WARNING: Private Helper method
-                Can't be used for dataframes with multiple trajectory ids and there might be a significant
-                drop in performance.
+            Warning
+            -------
+                This method should not be used for dataframes with multiple trajectory ids as it will
+                yield wrong results and there might be a significant drop in performance..
 
             Parameters
             ----------
@@ -151,15 +151,16 @@ class Helpers:
         return df
 
     @staticmethod
-    def _random_walk_help(dataframe: NumTrajDF, id_: Text, time_jump: float):
+    def random_walk_help(dataframe: NumTrajDF, id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses random-walk interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
             the user-specified time_jump and inserts the interpolated point those between 2 points.
 
-            WARNING: Private Helper method
-                Can't be used for dataframes with multiple trajectory ids and there might be a significant
-                drop in performance.
+            Warning
+            -------
+                This method should not be used for dataframes with multiple trajectory ids as it will
+                yield wrong results and there might be a significant drop in performance.
 
             Parameters
             ----------
@@ -252,15 +253,16 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def _kinematic_help(dataframe: Union[pd.DataFrame, NumTrajDF], id_: Text, time_jump: float):
+    def kinematic_help(dataframe: Union[pd.DataFrame, NumTrajDF], id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses kinematic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
             the user-specified time_jump and inserts the interpolated point those between 2 points.
 
-            WARNING: Private Helper method
-                Can't be used for dataframes with multiple trajectory ids and there might be a significant
-                drop in performance.
+            Warning
+            -------
+                This method should not be used for dataframes with multiple trajectory ids as it will
+                yield wrong results and there might be a significant drop in performance.
 
             Parameters
             ----------
