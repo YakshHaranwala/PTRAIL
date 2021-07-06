@@ -1,5 +1,5 @@
 """
-    This module contains all the helper functions for the parallel calculators in
+    This module contains all the helper functions for the parallel calculations in
     the spatial and temporal features classes.
 
     Warning

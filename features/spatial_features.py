@@ -415,6 +415,7 @@ class SpatialFeatures:
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             dataframe = SpatialFeatures.create_distance_between_consecutive_column(dataframe)
+            print(dataframe.head())
             distances = dataframe.reset_index()['Distance_prev_to_curr']
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 

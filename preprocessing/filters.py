@@ -716,6 +716,9 @@ class Filters:
             ----------
                 "Pedrido, M.O., "Hampel", (2020), GitHub repository,
                 https://github.com/MichaelisTrofficus/hampel_filter"
+
+                "Nogueira, T.O., "kinematic_interpolation.py", (2016), GitHub repository,
+                "https://gist.github.com/talespaiva/128980e3608f9bc5083b.js" "
         """
         try:
             # First, extract the column from the dataframe and then obtain the
@@ -735,3 +738,4 @@ class Filters:
         except KeyError:
             raise MissingColumnsException(f"The column {column_name} does not exist in the dataset."
                                           f"Please check the column name and try again.")
+
