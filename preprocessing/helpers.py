@@ -1,13 +1,11 @@
 """
     Warning
     -------
-        | None of the methods in this module should be used directly while performing operations
+        | 1. None of the methods in this module should be used directly while performing operations
         on data.
-
-        | These methods are helpers for the interpolation methods in the interpolation.py
+        | 2. These methods are helpers for the interpolation methods in the interpolation.py
         module and hence run linearly and not in parallel which will result in slower execution time.
-
-        | All the methods in this module perform calculation on a single Trajectory ID due to which
+        | 3. All the methods in this module perform calculation on a single Trajectory ID due to which
         it will wrong results on data with multiple trajectories. Instead, use the interpolation.py
         methods for faster and reliable calculations.
 

@@ -6,9 +6,9 @@ some existing dataframe and appends these information to them. It is to
 be also noted that a lot of these features are inspired from the PyMove
 library and we are crediting the PyMove creators with them.
 
-authors: Yaksh J Haranwala, Salman Haidri
-date: 2nd June, 2021
-version: 1.0
+| Authors: Yaksh J Haranwala, Salman Haidri
+| Date: 2nd June, 2021
+| Version: 1.0
 
 References
 ----------
@@ -40,7 +40,7 @@ class SpatialFeatures:
         Return the bounding box of the Trajectory data. Essentially, the bounding box is of
         the following format:
 
-        (min Latitude, min Longitude, max Latitude, max Longitude).
+            (min Latitude, min Longitude, max Latitude, max Longitude).
 
         Parameters
         ----------
@@ -49,7 +49,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        tuple
+        tuple:
             The bounding box of the trajectory
         """
         return (
@@ -64,9 +64,11 @@ class SpatialFeatures:
         """
         Get the starting location of an object's trajectory in the data.
 
-        NOTE: If the user does not give in any traj_id, then the library,
-              by default gives out the start locations of all the unique trajectory ids
-              present in the data.
+        Note
+        ----
+            If the user does not give in any traj_id, then the library,
+            by default gives out the start locations of all the unique trajectory ids
+            present in the data.
 
         Parameters
         ----------
@@ -77,9 +79,9 @@ class SpatialFeatures:
 
         Returns
         -------
-        tuple
+        tuple:
             The (lat, longitude) tuple containing the start location.
-        pandas.core.dataframe.DataFrame
+        pandas.core.dataframe.DataFrame:
             The dataframe containing start locations of all trajectory IDs.
         """
         # If traj_id is None, find the start times of all the unique trajectories present in the data.
@@ -117,7 +119,12 @@ class SpatialFeatures:
     def get_end_location(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
         """
         Get the ending location of an object's trajectory in the data.
-        Note: If the user does not provide a trajectory id, then the last
+
+        Note
+        ----
+            If the user does not give in any traj_id, then the library,
+            by default gives out the end locations of all the unique trajectory ids
+            present in the data.
 
         Parameters
         ----------
@@ -125,10 +132,13 @@ class SpatialFeatures:
             The DaskTrajectoryDF storing the trajectory data.
         traj_id
             The ID of the trajectory whose end location is to be found.
+
         Returns
         -------
-        tuple
+        tuple:
             The (lat, longitude) tuple containing the end location.
+        pandas.core.dataframe.DataFrame:
+            The dataframe containing start locations of all trajectory IDs.
         """
         # If traj_id is None, find the end times of all the unique trajectories present in the data.
         # Else first filter out a dataframe containing the given traj_id and then return the end
@@ -182,7 +192,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        core.TrajectoryDF.NumPandasTraj
+        core.TrajectoryDF.NumPandasTraj:
             The dataframe containing the resultant column.
         """
         # Case-1: The number of unique Trajectory IDs is less than x.
@@ -226,7 +236,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        core.TrajectoryDF.NumPandasTraj
+        core.TrajectoryDF.NumPandasTraj:
             The dataframe containing the resultant column.
         """
         # Case-1: The number of unique Trajectory IDs is less than x.
@@ -269,7 +279,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        float
+        float:
             The total distance covered on that date by that trajectory ID.
         """
         # First, reset the index of the dataframe.
@@ -298,7 +308,7 @@ class SpatialFeatures:
         """
         Checks how many points are within the range of the given coordinate. By first making a column
         containing the distance between the given coordinate and rest of the points in dataframe by calling
-        create_distance_from_point(). And then comparing each point using the condition if it's within the
+        create_distance_from_point() and then comparing each point using the condition if it's within the
         range and appending the values in a column and attaching it to the dataframe.
 
         Parameters
@@ -312,7 +322,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        core.TrajectoryDF.NumPandasTraj
+        core.TrajectoryDF.NumPandasTraj:
             The dataframe containing the resultant column.
         """
         # splitting the dataframe according to trajectory ids
@@ -346,7 +356,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        core.TrajectoryDF.NumPandasTraj
+        core.TrajectoryDF.NumPandasTraj:
             The dataframe containing the resultant column.
         """
         # dataframe = dataframe.reset_index()
@@ -381,7 +391,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        core.TrajectoryDF.NumPandasTraj
+        core.TrajectoryDF.NumPandasTraj:
             The dataframe containing the resultant column.
         """
         # Here, we are using try and catch blocks to check whether the DataFrame has the
@@ -429,7 +439,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        core.TrajectoryDF.NumPandasTraj
+        core.TrajectoryDF.NumPandasTraj:
             The dataframe containing the resultant column.
         """
         # Try catch is used to check if speed column is present or not
@@ -470,7 +480,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        core.TrajectoryDF.NumPandasTraj
+        core.TrajectoryDF.NumPandasTraj:
             The dataframe containing the resultant column.
         """
         # Try catch is used to check if acceleration column is present or not
@@ -515,7 +525,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        NumPandasTraj
+        NumPandasTraj:
                 The dataframe containing the resultant column.
         """
         # Case-1: The number of unique Trajectory IDs is less than x.
@@ -554,7 +564,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        NumPandasTraj
+        NumPandasTraj:
             The dataframe containing the Bearing rate column
         """
         # Try catch to check for Bearing column
@@ -593,7 +603,7 @@ class SpatialFeatures:
 
         Returns
         -------
-        NumPandasTraj
+        NumPandasTraj:
             The dataframe containing the rate of Bearing rate column
         """
         # Try catch to check for Bearing Rate column
@@ -634,12 +644,12 @@ class SpatialFeatures:
 
         Returns
         -------
-        float
+        float:
             The distance covered by the trajectory
 
         Raises
         ------
-        MissingTrajIDException
+        MissingTrajIDException:
             The Trajectory ID given by the user is not present in the dataset.
         """
         # First, filter the dataframe and create a smaller dataframe containing only the
@@ -669,7 +679,7 @@ class SpatialFeatures:
         Note
         ----
         If no Trajectory ID is specified, then the number of unique locations in the
-        entire dataset is calculated.
+        visited by each trajectory in the dataset is calculated.
 
         Parameters
         ----------
@@ -680,8 +690,10 @@ class SpatialFeatures:
 
         Returns
         -------
-        integer
+        int:
             The number of unique locations in the dataframe/trajectory id.
+        pandas.core.dataframe.DataFrame:
+            The dataframe containing start locations of all trajectory IDs.
         """
         dataframe = dataframe.reset_index()
         if traj_id is None:
@@ -705,4 +717,3 @@ class SpatialFeatures:
         else:
             filtered_df = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
             return filtered_df.groupby([const.LAT, const.LONG]).ngroups
-
