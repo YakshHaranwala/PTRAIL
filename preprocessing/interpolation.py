@@ -6,9 +6,9 @@
     exceeds the time jump, the interpolated point is added to the position with large jump
     with a time increase of time jump. This interpolated row is added to the dataframe.
 
-    |Authors: Yaksh J Haranwala, Salman Haidri
-    |Date: 21st June, 2021
-    |Version: 1.0
+    Authors: Yaksh J Haranwala, Salman Haidri |br|
+    Date: 21st June, 2021 |br|
+    Version: 1.0 |br|
 """
 import itertools
 import os
