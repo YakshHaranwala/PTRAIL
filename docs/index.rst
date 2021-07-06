@@ -28,6 +28,9 @@ References
    modules
 
 
+.. |br| raw:: html
+
+  <br/>
 
 Indices and tables
 ==================

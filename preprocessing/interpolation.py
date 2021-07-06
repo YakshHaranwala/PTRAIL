@@ -27,7 +27,6 @@ from typing import Optional, Text, Union
 NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
 
 
-
 class Interpolation:
     @staticmethod
     def interpolate_position(dataframe: NumTrajDF, time_jump: float, ip_type: Optional[Text] = 'linear'):
