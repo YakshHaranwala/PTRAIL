@@ -24,19 +24,19 @@ class Filters:
     @staticmethod
     def remove_duplicates(dataframe: NumTrajDF):
         """
-            Drop duplicates based on the four following columns:
-                1. Trajectory ID
-                2. DateTime
-                3. Latitude
-                4. Longitude
+        Drop duplicates based on the four following columns:
+            | 1. Trajectory ID
+            | 2. DateTime
+            | 3. Latitude
+            | 4. Longitude
 
-            Duplicates will be dropped only when all the values in the above mentioned
-            four columns are the same.
+        Duplicates will be dropped only when all the values in the above mentioned
+        four columns are the same.
 
-            Returns
-            -------
-                NumPandasTraj
-                    The dataframe with dropped duplicates.
+        Returns
+        -------
+            NumPandasTraj
+                The dataframe with dropped duplicates.
         """
         return dataframe.reset_index().drop_duplicates(
             subset=[const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG],
@@ -153,14 +153,14 @@ class Filters:
             Note
             ----
             The following options are to be noted for filtering the data:
-            1. If the start_date and end_date both are not given, then entire
-            dataset itself is returned.
-            2. If only start_date is given, then the trajectory data after
-            (including the start date) the start date is returned.
-            3. If only end_date is given, then the trajectory data before
-            (including the end date) the end date is returned.
-            4. If start_date and end_date both are given then the data between
-            the start_date and end_date (included) are returned.
+            | 1. If the start_date and end_date both are not given, then entire
+                 dataset itself is returned.
+            | 2. If only start_date is given, then the trajectory data after
+                 (including the start date) the start date is returned.
+            | 3. If only end_date is given, then the trajectory data before
+                 (including the end date) the end date is returned.
+            | 4. If start_date and end_date both are given then the data between
+                 the start_date and end_date (included) are returned.
 
             Parameters
             ----------
@@ -230,17 +230,18 @@ class Filters:
                            end_dateTime: Optional[Text] = None):
         """
             Filter the dataset by user-given time range.
+
             Note
             ----
             The following options are to be noted for filtering the data.
-            1. If the start_dateTime and end_dateTime both are not given, then entire
-            dataset itself is returned.
-            2. If only start_dateTime is given, then the trajectory data after
-            (including the start datetime) the start date is returned.
-            3. If only end_dateTime is given, then the trajectory data before
-            (including the end datetime) the end date is returned.
-            4. If start_dateTime and end_dateTime both are given then the data between
-            the start_dateTime and end_dateTime (included) are returned.
+            | 1. If the start_dateTime and end_dateTime both are not given, then entire
+                 dataset itself is returned.
+            | 2. If only start_dateTime is given, then the trajectory data after
+                 (including the start datetime) the start date is returned.
+            | 3. If only end_dateTime is given, then the trajectory data before
+                 (including the end datetime) the end date is returned.
+            | 4. If start_dateTime and end_dateTime both are given then the data between
+                 the start_dateTime and end_dateTime (included) are returned.
 
             Parameters
             ----------
@@ -297,7 +298,11 @@ class Filters:
     def filter_by_max_speed(dataframe: NumTrajDF, max_speed: float):
         """
             Remove the data points which have speed more than a user given speed.
-            NOTE: The max_speed is given in the units m/s (metres per second).
+
+            Note
+            ----
+                The max_speed is given in the units m/s (metres per second).
+
             Parameters
             ----------
                 dataframe: NumPandasTraj
@@ -334,7 +339,11 @@ class Filters:
     def filter_by_min_speed(dataframe, min_speed: float):
         """
             Remove the data points which have speed less than a user given speed.
-            NOTE: The min_speed is given in the units m/s (metres per second).
+
+            Note
+            ----
+                The min_speed is given in the units m/s (metres per second).
+
             Parameters
             ----------
                 dataframe: NumPandasTraj
@@ -372,7 +381,10 @@ class Filters:
         """
             Remove the points that have a distance between 2 consecutive points
             lesser than a user specified value.
-            NOTE: min_distance is given in metres.
+
+            Note
+            ----
+                min_distance is given in metres.
 
             Parameters
             ----------
@@ -413,7 +425,10 @@ class Filters:
         """
             Remove the points that have a distance between 2 consecutive points
             greater than a user specified value.
-            NOTE: max_distance is given in metres.
+
+            Note
+            ----
+                max_distance is given in metres.
 
             Parameters
             ----------
@@ -454,9 +469,15 @@ class Filters:
         """
             Filter out values that have distance between consecutive points greater
             than a user-given distance speed between consecutive points greater than
-            a user-given speed.
-            NOTE: The max_distance is given in metres
-            NOTE: The max_speed is given in metres/second (m/s).
+            a user-given speed
+
+            Note
+            ----
+                The max_distance is given in metres
+
+            Note
+            ----
+                The max_speed is given in metres/second (m/s).
 
             Parameters
             ----------
@@ -496,8 +517,14 @@ class Filters:
             Filter out values that have distance between consecutive points lesser
             than a user-given distance speed between consecutive points lesser than
             a user-given speed.
-            NOTE: The min_distance is given in metres
-            NOTE: The min_speed is given in metres/second (m/s).
+
+            Note
+            ----
+                The min_distance is given in metres.
+
+            Note
+            ----
+                The min_speed is given in metres/second (m/s).
 
             Parameters
             ----------
@@ -538,11 +565,11 @@ class Filters:
             Check the outlier points based on distance between 2 consecutive points.
             Outlier formula:
 
-            Lower outlier = Q1 - (1.5*IQR)
-            Higher outlier = Q3 + (1.5*IQR)
-            IQR = Inter quartile range = Q3 - Q1
+            | Lower outlier = Q1 - (1.5*IQR)
+            | Higher outlier = Q3 + (1.5*IQR)
+            | IQR = Inter quartile range = Q3 - Q1
 
-            We need to find points between lower and higher outlier
+            | We need to find points between lower and higher outlier
 
             Parameters
             ----------
@@ -589,11 +616,11 @@ class Filters:
             Check the outlier points based on distance between 2 consecutive points.
             Outlier formula:
 
-            Lower outlier = Q1 - (1.5*IQR)
-            Higher outlier = Q3 + (1.5*IQR)
-            IQR = Inter quartile range = Q3 - Q1
+            | Lower outlier = Q1 - (1.5*IQR)
+            | Higher outlier = Q3 + (1.5*IQR)
+            | IQR = Inter quartile range = Q3 - Q1
 
-            We need to find points between lower and higher outlier
+            | We need to find points between lower and higher outlier
 
             Parameters
             ----------
@@ -663,8 +690,10 @@ class Filters:
             Use the hampel filter to remove outliers from the dataset on the basis
             of column specified by the user.
 
-            WARNING: The execution speed is slower than the other outlier detection methods
-                     provided in the library.
+            Note
+            ----
+                The execution speed is slower than the other outlier detection methods
+                provided in the library.
 
             Parameters
             ----------
