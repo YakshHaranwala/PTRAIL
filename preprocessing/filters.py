@@ -7,17 +7,23 @@
     | Date: 8th June, 2021
     | Version: 1.0
 """
+import itertools
 import math
 import warnings
 from typing import Text, Optional
+import os
+import psutil
 
 import numpy as np
 import pandas as pd
-from hampel import hampel
+import multiprocessing
 
 import utilities.constants as const
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from utilities.exceptions import *
+from preprocessing.helpers import Helpers as helper
+
+NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
 
 
 class Filters:
@@ -690,10 +696,11 @@ class Filters:
             Use the hampel filter to remove outliers from the dataset on the basis
             of column specified by the user.
 
-            Note
-            ----
-                The execution speed is slower than the other outlier detection methods
-                provided in the library.
+            Warning
+            -------
+                Do not use Hampel filter outlier detection and try to detect outliers
+                with DateTime as it will raise a NotImplementedError as it has not been
+                implemented yet by the original author of the Hampel filter.
 
             Parameters
             ----------
@@ -720,22 +727,56 @@ class Filters:
                 "Nogueira, T.O., "kinematic_interpolation.py", (2016), GitHub repository,
                 "https://gist.github.com/talespaiva/128980e3608f9bc5083b.js" "
         """
-        try:
-            # First, extract the column from the dataframe and then obtain the
-            # outlier indices which are to be removed.
-            dataframe = dataframe.reset_index()
-            col = dataframe[column_name]
-            outlier_indices = hampel(col)
+        # Reset the index of the dataframe and then split the original dataframe into
+        # smaller chunks containing a fixed number of trajectory IDs.
+        df = dataframe.reset_index()
+        df_chunks = helper._df_split_helper(df)
 
-            # Now, drop the indices given out by the hampel filter.
-            to_return = dataframe.drop(dataframe.index[outlier_indices])
+        # create a list using the multiprocessing manager to store the returns of the parallel
+        # helper functions.
+        processes = [None] * len(df_chunks)
+        manager = multiprocessing.Manager()
+        return_list = manager.list()
 
-            warnings.warn("If kinematic features have been generated on the dataframe, then make "
-                          "sure to generate them again as outlier detection drops the point from "
-                          "the dataframe and does not run the kinematic features again.")
+        # Spawn the parallel process and run the hampel filter.
+        for i in range(len(processes)):
+            processes[i] = multiprocessing.Process(target=Filters._hampel,
+                                                   args=(df_chunks[i], column_name, return_list))
+            processes[i].start()
 
-            return NumTrajDF(to_return, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
-        except KeyError:
-            raise MissingColumnsException(f"The column {column_name} does not exist in the dataset."
-                                          f"Please check the column name and try again.")
+        # Join the helper processes again to free up the CPUs and the main memory.
+        for j in range(len(processes)):
+            processes[j].join()
 
+        warnings.warn("If kinematic features have been generated on the dataframe, then make "
+                      "sure to generate them again as outlier detection drops the point from "
+                      "the dataframe and does not run the kinematic features again.")
+
+        # Convert the results back to NumPandasTraj and return the resultant dataframe.
+        return NumTrajDF(pd.concat(return_list),
+                         const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+
+    @staticmethod
+    def _hampel(dataframe, column_name: Text, return_list: list):
+        """
+            This is a mid-level helper function for the hampel filter. The
+            purpose of this function is to split the smaller chunks of dataframe
+            received into even smaller chunks containing 1 trajectory ID per chunk,
+            then call the helper function from the helper module and run the hampel filter
+            on it, then merge all the smaller results and append it to the return list.
+        """
+        # Split the smaller dataframe further into smaller chunks containing only 1
+        # Trajectory ID per index.
+        ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
+        df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
+
+        # Here, create as many processes at once as there are number of CPUs available in
+        # the system - 1. One CPU is kept free at all times in order to not block up
+        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+        # of the system.)
+        small_pool = multiprocessing.Pool(NUM_CPU - 1)
+        final = small_pool.starmap(helper.hampel_help,
+                                   zip(df_chunks, itertools.repeat(column_name)))
+
+        return_list.append(pd.concat(final))

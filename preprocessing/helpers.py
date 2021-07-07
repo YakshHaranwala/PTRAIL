@@ -24,10 +24,9 @@
     | Version: 1.0
     | Date: 16th June, 2021
 """
-import math
 import os
+import warnings
 
-import pandas
 import psutil
 import pandas as pd
 import numpy as np
@@ -37,7 +36,8 @@ from features.spatial_features import SpatialFeatures as spatial
 from scipy.interpolate import CubicSpline
 from typing import Text, Union
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
-from scipy.stats import truncnorm
+from hampel import hampel
+from utilities.exceptions import *
 
 
 class Helpers:
@@ -335,6 +335,55 @@ class Helpers:
                 dataframe.loc[new_times[i-1]] = [id_, x, y]
 
         return dataframe
+
+    @staticmethod
+    def hampel_help(df, column_name):
+        """
+            This function is the helper function for the hampel_outlier_detection()
+            function present in the filters module. The purpose of the function is to
+            run the hampel filter on a single trajectory ID, remove the outliers
+            and return the smaller dataframe.
+
+            Warning
+            -------
+                This function should not be used directly as it will result in a
+                slower execution of the function and might result in removal of
+                points that are actually not outliers.
+
+            Warning
+            -------
+                Do not use Hampel filter outlier detection and try to detect outliers
+                with DateTime as it will raise a NotImplementedError as it has not been
+                implemented yet by the original author of the Hampel filter.
+
+            Parameters
+            ----------
+                df: NumPandasTraj/pd.core.dataframe.DataFrame
+                    The dataframe which the outliers are to be removed
+                column_name: Text
+                    The column based on which the outliers are to be removed.
+
+            Returns
+            -------
+                pd.core.dataframe.DataFrame
+                    The dataframe where the outlier points are removed.
+
+        """
+        try:
+            # First, extract the column from the dataframe and then obtain the
+            # outlier indices which are to be removed.
+            col = df[column_name]
+            outlier_indices = hampel(col)
+
+            # Now, drop the indices given out by the hampel filter.
+            to_return = df.drop(df.index[outlier_indices])
+            #
+
+            return to_return
+
+        except KeyError:
+            raise MissingColumnsException(f"The column {column_name} does not exist in the dataset."
+                                          f"Please check the column name and try again.")
 
     @staticmethod
     def _pos(t, x1, v1, b, c):
