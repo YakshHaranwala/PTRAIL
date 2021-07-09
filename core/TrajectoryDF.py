@@ -33,12 +33,12 @@ class NumPandasTraj(DataFrame):
             Note
             ----
                 | The mandatory columns in the dataset are:
-                |    1. DateTime (will be converted to pandas DateTime format)
-                |    2. Trajectory ID (will be converted to string format)
-                |    3. Latitude (will be converted to float64 format)
-                |    4. Longitude (will be converted to float64 format)
+                |    1. DateTime
+                |    2. Trajectory ID
+                |    3. Latitude
+                |    4. Longitude
 
-                | rest_of_columns makes sure that if the data_set is a list, it has appropriate headers
+                | ``rest_of_columns`` makes sure that if the data_set is a list, it has appropriate headers
                   that the user wants instead of the default numerical values.
 
             Parameters
