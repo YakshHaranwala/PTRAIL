@@ -3,7 +3,9 @@
     that calculates kinematic features based on the coordinates of points
     provided in the data. This module mostly extracts and modifies data
     collected from some existing dataframe and appends these information
-    to them.
+    to them. Inspiration of lots of functions in this module is taken from
+    the PyMove library.
+
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: 2nd June, 2021
@@ -11,10 +13,8 @@
 
     References
     ----------
-        Inspiration of lots of functions in this module is taken from the PyMove library.
-
-        Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
-        Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019
+            Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
+            Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019
 """
 import itertools
 import multiprocessing
