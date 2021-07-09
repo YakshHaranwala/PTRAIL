@@ -100,7 +100,7 @@ class SpatialFeatures:
             # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
             # of the system.).
             mp_pool = multiprocessing.Pool(NUM_CPU - 1)
-            results = mp_pool.starmap(helpers._start_location_helper, zip(itertools.repeat(dataframe), ids_))
+            results = mp_pool.starmap(helpers.start_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results)
@@ -156,7 +156,7 @@ class SpatialFeatures:
             # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
             # of the system.)
             mp_pool = multiprocessing.Pool(NUM_CPU - 1)
-            results = mp_pool.starmap(helpers._end_location_helper, zip(itertools.repeat(dataframe), ids_))
+            results = mp_pool.starmap(helpers.end_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results)
@@ -194,7 +194,7 @@ class SpatialFeatures:
         """
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
-            result = helpers._distance_between_consecutive_helper(dataframe)
+            result = helpers.distance_between_consecutive_helper(dataframe)
             return NumPandasTraj(result, const.LAT, const.LONG,
                                  const.DateTime, const.TRAJECTORY_ID)
         # Case-2: The number of unique Trajectory IDs is significant.
@@ -208,7 +208,7 @@ class SpatialFeatures:
             # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
             # of the system.)
             multi_pool = multiprocessing.Pool(NUM_CPU - 1)
-            result = multi_pool.map(helpers._distance_between_consecutive_helper, df_chunks)
+            result = multi_pool.map(helpers.distance_between_consecutive_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
             return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
@@ -238,7 +238,7 @@ class SpatialFeatures:
         """
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
-            result = helpers._distance_from_start_helper(dataframe)
+            result = helpers.distance_from_start_helper(dataframe)
             return NumPandasTraj(result, const.LAT, const.LONG,
                                  const.DateTime, const.TRAJECTORY_ID)
 
@@ -253,7 +253,7 @@ class SpatialFeatures:
             # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
             # of the system.)
             multi_pool = multiprocessing.Pool(NUM_CPU - 1)
-            result = multi_pool.map(helpers._distance_from_start_helper, df_chunks)
+            result = multi_pool.map(helpers.distance_from_start_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
             return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
@@ -332,7 +332,7 @@ class SpatialFeatures:
         # of the system.)
         pool = multiprocessing.Pool(NUM_CPU - 1)
         args = zip(df_chunks, itertools.repeat(coordinates), itertools.repeat(dist_range))
-        result = pool.starmap(helpers._point_within_range_helper, args)
+        result = pool.starmap(helpers.point_within_range_helper, args)
 
         # Now lets join all the smaller partitions and return the resultant dataframe
         result = pd.concat(result)
@@ -366,7 +366,7 @@ class SpatialFeatures:
         # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
         # of the system.)
         pool = multiprocessing.Pool(NUM_CPU - 1)
-        answer = pool.starmap(helpers._distance_from_given_point_helper, zip(df_chunks, itertools.repeat(coordinates)))
+        answer = pool.starmap(helpers.distance_from_given_point_helper, zip(df_chunks, itertools.repeat(coordinates)))
 
         # Now lets join all the smaller partitions and then add the Distance to the
         # specific point column.
@@ -532,7 +532,7 @@ class SpatialFeatures:
         """
         # Case-1: The number of unique Trajectory IDs is less than x.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
-            result = helpers._bearing_helper(dataframe)
+            result = helpers.bearing_helper(dataframe)
             return NumPandasTraj(result, const.LAT, const.LONG,
                                  const.DateTime, const.TRAJECTORY_ID)
 
@@ -547,7 +547,7 @@ class SpatialFeatures:
             # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
             # of the system.)
             multi_pool = multiprocessing.Pool(NUM_CPU - 1)
-            result = multi_pool.map(helpers._bearing_helper, df_chunks)
+            result = multi_pool.map(helpers.bearing_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
             return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
@@ -710,7 +710,7 @@ class SpatialFeatures:
             # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
             # of the system.)
             mp_pool = multiprocessing.Pool(NUM_CPU - 1)
-            results = mp_pool.starmap(helpers._number_of_location_helper, zip(itertools.repeat(dataframe), ids_))
+            results = mp_pool.starmap(helpers.number_of_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results)
