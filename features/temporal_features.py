@@ -43,7 +43,7 @@ class TemporalFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
+                NumPandasTraj:
                     The dataframe containing the resultant column.
 
         """
@@ -68,7 +68,7 @@ class TemporalFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj
+                NumPandasTraj
                     The dataframe containing the resultant column.
 
         """
@@ -94,7 +94,7 @@ class TemporalFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj
+                NumPandasTraj
                     The dataframe containing the resultant column.
         """
         dataframe = dataframe.reset_index()
@@ -118,7 +118,7 @@ class TemporalFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj
+                NumPandasTraj
                     The dataframe containing the resultant column if inplace.
 
             References
@@ -158,7 +158,7 @@ class TemporalFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj
+                NumPandasTraj
                     The dataframe containing the resultant column.
 
             References
@@ -197,7 +197,7 @@ class TemporalFeatures:
 
             Parameters
             ----------
-                dataframe: core.TrajectoryDF.NumPandasTraj
+                dataframe: NumPandasTraj
                     The dataframe containing the resultant column if inplace is True.
                 traj_id: Optional[Text]
                     The trajectory id for which the duration is required.

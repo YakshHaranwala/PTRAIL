@@ -128,8 +128,8 @@ class SpatialFeatures:
 
             Parameters
             ----------
-                dataframe: DaskTrajectoryDF
-                    The DaskTrajectoryDF storing the trajectory data.
+                dataframe: NumPandasTraj
+                    The NumPandasTraj storing the trajectory data.
                 traj_id
                     The ID of the trajectory whose end location is to be found.
 
@@ -189,8 +189,8 @@ class SpatialFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
-                    The dataframe containing the resultant column.
+                NumPandasTraj:
+                    The dataframe containing the resultant Distance_prev_to_curr column.
         """
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
@@ -223,7 +223,7 @@ class SpatialFeatures:
             Note
             ----
                 When the trajectory ID changes in the data, then the distance calculation again
-                starts from the first point of the new trajectory ID and the first point of the
+                starts from the first point of the new trajectory ID and the first distance of the
                 new trajectory ID will be set to 0.
 
             Parameters
@@ -233,8 +233,8 @@ class SpatialFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
-                    The dataframe containing the resultant column.
+                NumPandasTraj:
+                    The dataframe containing the resultant Distance_start_to_curr column.
         """
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
@@ -319,8 +319,8 @@ class SpatialFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
-                    The dataframe containing the resultant column.
+                NumPandasTraj:
+                    The dataframe containing the resultant Within_Xm_of_(x,y) column.
         """
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
@@ -353,8 +353,8 @@ class SpatialFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
-                    The dataframe containing the resultant column.
+                NumPandasTraj:
+                    The dataframe containing the resultant Distance_from_(x, y) column.
         """
         # dataframe = dataframe.reset_index()
         # splitting the dataframe according to trajectory ids
@@ -394,8 +394,8 @@ class SpatialFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
-                    The dataframe containing the resultant column.
+                NumPandasTraj:
+                    The dataframe containing the resultant Speed_prev_to_curr column.
         """
         # Here, we are using try and catch blocks to check whether the DataFrame has the
         # Distance_prev_to_curr column.
@@ -432,7 +432,7 @@ class SpatialFeatures:
     @staticmethod
     def create_acceleration_from_prev_column(dataframe: NumPandasTraj):
         """
-            Create a column containing acceleration of the object from the start to the current
+            Create a column containing acceleration of the object from the previous to the current
             point.
 
             Parameters
@@ -442,8 +442,8 @@ class SpatialFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
-                    The dataframe containing the resultant column.
+                NumPandasTraj:
+                    The dataframe containing the resultant Acceleration_prev_to_curr column.
         """
         # Try catch is used to check if speed column is present or not
         try:
@@ -473,7 +473,7 @@ class SpatialFeatures:
     @staticmethod
     def create_jerk_from_prev_column(dataframe: NumPandasTraj):
         """
-            Create a column containing jerk of the object from the start to the current
+            Create a column containing jerk of the object from previous to the current
             point.
 
             Parameters
@@ -483,8 +483,8 @@ class SpatialFeatures:
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj:
-                    The dataframe containing the resultant column.
+                NumPandasTraj:
+                    The dataframe containing the resultant jerk_prev_to_curr column.
         """
         # Try catch is used to check if acceleration column is present or not
         try:
@@ -596,7 +596,7 @@ class SpatialFeatures:
     def create_rate_of_bearing_rate_column(dataframe: NumPandasTraj):
         """
             Calculates the rate of bearing rate of the consecutive points.
-            Add adding that column into the dataframe
+            And then adding that column into the dataframe.
 
             Parameters
             ----------
