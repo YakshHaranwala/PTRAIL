@@ -106,8 +106,8 @@ class Helpers:
             time of the specified trajectory IDs the DF and then another returns dataframe containing
             end latitude, end longitude, DateTime and trajectory ID for each trajectory
 
-            Parameter
-            ---------
+            Parameters
+            ----------
                 dataframe: NumPandasTraj
                     The dataframe containing the original data.
                 ids_: list
