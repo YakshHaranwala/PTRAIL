@@ -240,12 +240,6 @@ class NumPandasTraj(DataFrame):
         """
             Set the Index of the dataframe back to traj_id and DateTime.
 
-            WARNING
-            -------
-                This must be used everytime after the reset_index is called
-                in order to set the index back to library default values as
-                it is necessary to perform various other functionalities.
-
             Raises
             ------
                 MissingColumnsException
