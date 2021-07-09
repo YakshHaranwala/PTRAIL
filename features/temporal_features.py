@@ -12,10 +12,10 @@
     | Date: 22 May, 2021
     | Version: 1.0
 
-     References
+    References
     ----------
-        "Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
-         Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019"
+        Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
+        Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019
 """
 import itertools
 import multiprocessing
@@ -39,12 +39,12 @@ class TemporalFeatures:
             Parameters
             ----------
                 dataframe: NumPandasTraj
-                    The DaskTrajectoryDF on which the creation of the time column is to be done.
+                    The NumPandasTraj Dataframe on which the creation of the time column is to be done.
 
             Returns
             -------
                 NumPandasTraj:
-                    The dataframe containing the resultant column.
+                    The dataframe containing the resultant Date column.
 
         """
         df = dataframe.reset_index()
@@ -53,7 +53,8 @@ class TemporalFeatures:
         df['Date'] = df[const.DateTime].dt.date
 
         # Return the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(df.reset_index(drop=True), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return NumPandasTraj(df.reset_index(drop=True),
+                             const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_time_column(dataframe: NumPandasTraj):
@@ -64,12 +65,12 @@ class TemporalFeatures:
             Parameters
             ----------
                 dataframe: NumPandasTraj
-                    The DaskTrajectoryDF on which the creation of the time column is to be done.
+                    The NumPandasTraj Dataframe on which the creation of the time column is to be done.
 
             Returns
             -------
                 NumPandasTraj
-                    The dataframe containing the resultant column.
+                    The dataframe containing the resultant Time column.
 
         """
         dataframe = dataframe.reset_index()
@@ -95,7 +96,7 @@ class TemporalFeatures:
             Returns
             -------
                 NumPandasTraj
-                    The dataframe containing the resultant column.
+                    The dataframe containing the resultant Day_of_week column.
         """
         dataframe = dataframe.reset_index()
 
@@ -119,13 +120,13 @@ class TemporalFeatures:
             Returns
             -------
                 NumPandasTraj
-                    The dataframe containing the resultant column if inplace.
+                    The dataframe containing the resultant Weekend column.
 
             References
             ----------
-                "Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
-                 Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
-                 Universidade Federal Do Cear ́a, 2019."
+                Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
+                Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
+                Universidade Federal Do Cear ́a, 2019.
 
         """
         dataframe = dataframe.reset_index()
@@ -159,13 +160,13 @@ class TemporalFeatures:
             Returns
             -------
                 NumPandasTraj
-                    The dataframe containing the resultant column.
+                    The dataframe containing the resultant Time_Of_Day column.
 
             References
             ----------
-                "Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
-                 Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
-                 Universidade Federal Do Cear ́a, 2019."
+                Arina De Jesus Amador Monteiro Sanches. 'Uma Arquitetura E Imple-menta ̧c ̃ao
+                Do M ́odulo De Pr ́e-processamento Para Biblioteca Pymove'.Bachelor’s thesis.
+                Universidade Federal Do Cear ́a, 2019.
 
         """
         dataframe = dataframe.reset_index()
@@ -191,9 +192,8 @@ class TemporalFeatures:
 
             Note
             ----
-            If no trajectory ID is given by the user, then the duration of the entire
-            data set is given i.e., the difference between the max time in the dataset
-            and the min time in the dataset.
+                If no trajectory ID is given by the user, then the duration of each
+                unique trajectory is calculated.
 
             Parameters
             ----------
@@ -204,8 +204,10 @@ class TemporalFeatures:
 
             Returns
             -------
-                pandas.TimeDelta
+                pandas.TimeDelta:
                     The trajectory duration.
+                pandas.core.dataframe.DataFrame:
+                    The dataframe containing the duration of all trajectories in the dataset.
         """
         dataframe = dataframe.reset_index()
         if traj_id is None:
@@ -215,7 +217,7 @@ class TemporalFeatures:
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
             mp_pool = multiprocessing.Pool(len(ids_))
-            results = mp_pool.starmap(helpers._traj_duration_helper, zip(itertools.repeat(dataframe), ids_))
+            results = mp_pool.starmap(helpers.traj_duration_helper, zip(itertools.repeat(dataframe), ids_))
 
             results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
             return results
@@ -233,9 +235,9 @@ class TemporalFeatures:
 
             Note
             ----
-            If the trajectory ID is not specified by the user, then by default,
-            the starting times of all the trajectory IDs in the data are
-            returned.
+                If the trajectory ID is not specified by the user, then by default,
+                the starting times of all the trajectory IDs in the data are
+                returned.
 
             Parameters
             ----------
@@ -266,7 +268,7 @@ class TemporalFeatures:
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the start times for a smaller set of IDs only.
             mp_pool = multiprocessing.Pool(len(ids_))
-            results = mp_pool.starmap(helpers._start_time_helper, zip(itertools.repeat(dataframe), ids_))
+            results = mp_pool.starmap(helpers.start_time_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
@@ -283,9 +285,9 @@ class TemporalFeatures:
 
             Note
             ----
-            If the trajectory ID is not specified by the user, then by default,
-            the ending times of all the trajectory IDs in the data are
-            returned.
+                If the trajectory ID is not specified by the user, then by default,
+                the ending times of all the trajectory IDs in the data are
+                returned.
 
             Parameters
             ----------
@@ -316,7 +318,7 @@ class TemporalFeatures:
             # Now, create a multiprocessing pool and then run processes in parallel
             # which calculate the end times for a smaller set of IDs only.
             mp_pool = multiprocessing.Pool(len(ids_))
-            results = mp_pool.starmap(helpers._end_time_helper, zip(itertools.repeat(dataframe), ids_))
+            results = mp_pool.starmap(helpers.end_time_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results).sort_values(const.TRAJECTORY_ID)

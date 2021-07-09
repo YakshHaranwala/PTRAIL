@@ -320,7 +320,7 @@ class SpatialFeatures:
             Returns
             -------
                 NumPandasTraj:
-                    The dataframe containing the resultant Within_Xm_of_(x,y) column.
+                    The dataframe containing the resultant Within_x_m_from_(x,y) column.
         """
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
