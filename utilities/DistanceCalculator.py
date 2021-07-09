@@ -72,4 +72,4 @@ class FormulaLog:
 
         bearing = np.arctan2(y, x)
 
-        return np.rad2deg(bearing)
+        return (np.rad2deg(bearing)) % 360
