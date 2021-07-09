@@ -5,7 +5,7 @@
     NumPandasTraj which is mentioned in the documentation of the constructor.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
-    | Date: June 2, 2021.
+    | Date: May 26, 2021.
     | Version: 1.0
 
 """
