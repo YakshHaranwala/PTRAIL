@@ -42,24 +42,24 @@ class Interpolation:
 
             Warning
             -------
-            The Interpolation methods will only return the 4 mandatory library columns
-            because it is not possible to interpolate other data that may or may not be
-            present in the dataset apart from latitude, longitude and datetime. As a
-            result, other columns are dropped.
+                The Interpolation methods will only return the 4 mandatory library columns
+                because it is not possible to interpolate other data that may or may not be
+                present in the dataset apart from latitude, longitude and datetime. As a
+                result, other columns are dropped.
 
             Note
             ----
-            The time-jump parameter specifies where the new points are to be
-            inserted based on the time difference between 2 consecutive points.
-            However, it does not guarantee that the dataset will be brought down
-            to having difference between 2 consecutive points equal to or
-            less than the user specified time jump.
+                The time-jump parameter specifies where the new points are to be
+                inserted based on the time difference between 2 consecutive points.
+                However, it does not guarantee that the dataset will be brought down
+                to having difference between 2 consecutive points equal to or
+                less than the user specified time jump.
 
             Note
             ----
-            The time-jump is specified in seconds. Hence, if the user-specified
-            time-jump is not sensible, then the execution of the method will take
-            a very long time.
+                The time-jump is specified in seconds. Hence, if the user-specified
+                time-jump is not sensible, then the execution of the method will take
+                a very long time.
 
             Parameters
             ----------
