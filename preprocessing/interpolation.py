@@ -186,7 +186,7 @@ class Interpolation:
 
             WARNING: Do not use this method directly as it will run slower. Instead,
                      use the method interpolate_position() and specify the ip_type as
-                     cubic to perform linear interpolation much faster.
+                     cubic to perform cubic interpolation much faster.
 
             Parameters
             ----------
@@ -235,7 +235,7 @@ class Interpolation:
 
              WARNING: Do not use this method directly as it will run slower. Instead,
                      use the method interpolate_position() and specify the ip_type as
-                     linear to perform linear interpolation much faster.
+                     kinematic to perform kinematic interpolation much faster.
 
              Parameters
              ----------
@@ -279,12 +279,12 @@ class Interpolation:
     @staticmethod
     def _random_walk_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump, return_list):
         """
-             Method for Kinematic interpolation of a dataframe based on the time jump provided.
+             Method for Random walk interpolation of a dataframe based on the time jump provided.
              It interpolates the coordinates based on the Datetime of the dataframe.
 
              WARNING: Do not use this method directly as it will run slower. Instead,
                      use the method interpolate_position() and specify the ip_type as
-                     linear to perform linear interpolation much faster.
+                     random-walk to perform random walk interpolation much faster.
 
 
              Parameters
