@@ -1,3 +1,15 @@
+"""
+    The TrajectoryDF module is the main module containing the NumPandasTraj Dataframe
+    for storing the Trajectory Data with NumMobility Library. The Dataframe has
+    certain restrictions on what type of data is mandatory in order to be stored as a
+    NumPandasTraj which is mentioned in the documentation of the constructor.
+
+    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Date: June 2, 2021.
+    | Version: 1.0
+
+"""
+
 from parser import ParserError
 from typing import Dict, List, Union, Optional, Text
 
@@ -16,31 +28,33 @@ class NumPandasTraj(DataFrame):
     def __init__(self, data_set: Union[DataFrame, List, Dict], latitude: Text, longitude: Text, datetime: Text,
                  traj_id: Text, rest_of_columns: Optional[List[Text]] = None):
         """
-        Construct a trajectory dataframe. Note that the mandatory columns in the dataset are:
-        Note that the below mentioned columns also need their headers to be provided.
+            Construct a trajectory dataframe to store and represent the Trajectory Data.
 
-        1. DateTime (will be converted to pandas DateTime format)
-        2. Trajectory ID (will be converted to string format)
-        3. Latitude (will be converted to float64 format)
-        4. Longitude (will be converted to float64 format)
+            Note
+            ----
+                | The mandatory columns in the dataset are:
+                |    1. DateTime (will be converted to pandas DateTime format)
+                |    2. Trajectory ID (will be converted to string format)
+                |    3. Latitude (will be converted to float64 format)
+                |    4. Longitude (will be converted to float64 format)
 
-        rest_of_columns makes sure that if the data_set is a list, it has appropriate headers
-        that the user wants instead of the default numerical values.
+                | rest_of_columns makes sure that if the data_set is a list, it has appropriate headers
+                  that the user wants instead of the default numerical values.
 
-        Parameters
-        ----------
-        data_set: List, Dictionary or pandas DF.
-            The data provided by the user that needs to be represented and stored.
-        datetime: str
-            The header of the datetime column.
-        traj_id: str
-            The header of the Trajectory ID column.
-        latitude: str
-            The header of the latitude column.
-        longitude: str
-            The header of the longitude column.
-        rest_of_columns: Optional[list[Text]]
-            A list containing headers of the columns other than the mandatory ones.
+            Parameters
+            ----------
+                data_set: List, Dictionary or pandas DF.
+                    The data provided by the user that needs to be represented and stored.
+                datetime: str
+                    The header of the datetime column.
+                traj_id: str
+                    The header of the Trajectory ID column.
+                latitude: str
+                    The header of the latitude column.
+                longitude: str
+                    The header of the longitude column.
+                rest_of_columns: Optional[list[Text]]
+                    A list containing headers of the columns other than the mandatory ones.
         """
         # Case-1: The data is from a dictionary.
         # Here, first check whether the data is in dictionary form and if it is so, then convert into
@@ -61,47 +75,47 @@ class NumPandasTraj(DataFrame):
         # Case-3: The data is from a pandas DF.
         # Here, all we have to do is to rename the column names from the data to default names.
         elif isinstance(data_set, DataFrame):
-            data_set = self.rename_df_col_headers(data_set, latitude, longitude, datetime, traj_id)
+            data_set = self._rename_df_col_headers(data_set, latitude, longitude, datetime, traj_id)
 
         # Now, renaming the default column names to library default column names.
-        column_names = self.get_default_column_names(DateTime=datetime, traj_id=traj_id,
-                                                     latitude=latitude, longitude=longitude)
+        column_names = self._get_default_column_names(DateTime=datetime, traj_id=traj_id,
+                                                      latitude=latitude, longitude=longitude)
         data_set.rename(columns=column_names, inplace=True)
 
         # Now checking whether all the columns are present in the data and then verifying the data types
         # of all the columns abd then calling the super() to create and return the dataframe.
-        if self.validate_columns(data_set):
-            self.validate_data_types(data_set)
+        if self._validate_columns(data_set):
+            self._validate_data_types(data_set)
             data_set.set_index([const.TRAJECTORY_ID, const.DateTime], inplace=True)
             data_set.sort_values([const.TRAJECTORY_ID, const.DateTime], inplace=True)
             super(NumPandasTraj, self).__init__(data_set)
 
     # ------------------------------ General Utilities ----------------------------- #
-    def rename_df_col_headers(self, data: DataFrame, lat: Text, lon: Text,
-                              datetime: Text, traj_id: Text):
+    def _rename_df_col_headers(self, data: DataFrame, lat: Text, lon: Text,
+                               datetime: Text, traj_id: Text):
         """
-        Change the column headers of the columns when the user given data is in the
-        form of a pandas DF while creating the NumPandasTraj. This method is mainly
-        used when the user reads in data from a csv because the CSV file might
-        contain different names for the columns.
+            Change the column headers of the columns when the user given data is in the
+            form of a pandas DF while creating the NumPandasTraj. This method is mainly
+            used when the user reads in data from a csv because the CSV file might
+            contain different names for the columns.
 
-        Parameters
-        ----------
-        data: DataFrame
-            The dataframe whose column names are to be changed.
-        lat: Text
-            The header of the Latitude column.
-        lon: Text
-            The header of the Longitude column.
-        datetime: Text
-            The header of the DateTime column.
-        traj_id: Text
-            The header of the Trajectory ID column.
+            Parameters
+            ----------
+                data: DataFrame
+                    The dataframe whose column names are to be changed.
+                lat: Text
+                    The header of the Latitude column.
+                lon: Text
+                    The header of the Longitude column.
+                datetime: Text
+                    The header of the DateTime column.
+                traj_id: Text
+                    The header of the Trajectory ID column.
 
-        Returns
-        -------
-        pandas.DataFrame
-            The pandas dataframe containing the library default column headers.
+            Returns
+            -------
+                pandas.DataFrame
+                    The pandas dataframe containing the library default column headers.
         """
         cols = data.columns.to_list()  # List of all column names
         # Iterate over the list of column names and check for keywords in the header
@@ -119,28 +133,29 @@ class NumPandasTraj(DataFrame):
         data = data.set_axis(cols, axis=1)  # Change all the column names to modified values.
         return data
 
-    def validate_data_types(self, data: DataFrame):
+    def _validate_data_types(self, data: DataFrame):
         """
-        Check whether all the data given by the user is of valid type and if it isn't,
-        it converts them to the specified data types.
-        1. Trajectory_ID: Any -> str
-        2. LAT and LONG: Any -> float64
-        3. DateTime: Any -> dask.datetime64[ns]
+            Check whether all the data given by the user is of valid type and if it isn't,
+            it converts them to the specified data types.
+                1. Trajectory_ID: Any -> str
+                2. LAT: Any -> float64
+                3. LONG: Any -> float64
+                4. DateTime: Any -> dask.datetime64[ns]
 
-        Parameters
-        ----------
-        data: pd.DataFrame
-            This is the dataframe that contains the data that was passed in by the user.
-            The data is converted to pandas DF eventually in the import_data function anyway.
+            Parameters
+            ----------
+                data: pd.DataFrame
+                    This is the dataframe that contains the data that was passed in by the user.
+                    The data is converted to pandas DF eventually in the import_data function anyway.
 
-        Raises
-        ------
-        KeyError:
-            Dataframe has one of the mandatory columns missing.
-        ParserError:
-            The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
-        ValueError:
-            One of the data-types cannot be converted.
+            Raises
+            ------
+                KeyError:
+                    Dataframe has one of the mandatory columns missing.
+                ParserError:
+                    The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
+                ValueError:
+                    One of the data-types cannot be converted.
         """
         try:
             if data.dtypes[const.LAT] != 'float64':
@@ -158,26 +173,26 @@ class NumPandasTraj(DataFrame):
         except ValueError:
             raise ValueError('dtypes cannot be converted.')
 
-    def validate_columns(self, data: DataFrame) -> bool:
+    def _validate_columns(self, data: DataFrame) -> bool:
         """
-        Check whether all the columns are present in the DataFrame or not.
+            Check whether all the mandatory columns are present in the DataFrame or not.
 
-        Parameters
-        ----------
-        data
-            Data is the dask DataFrame containing all the data passed in by the user.
+            Parameters
+            ----------
+                data
+                    The DataFrame containing all the data passed in by the user.
 
-        Returns
-        -------
-        bool
-            Indicate whether or not all the columns that are mandatory are
-            present in the Data given by the user.
+            Returns
+            -------
+                bool
+                    Indicate whether or not all the columns that are mandatory are
+                    present in the Data given by the user.
 
-        Raises
-        ------
-        MissingColumnsException
-            One or more of the mandatory columns (Latitude, Longitude, DateTime, Traj_ID)
-            are missing in the data.
+            Raises
+            ------
+                MissingColumnsException
+                    One or more of the mandatory columns (Latitude, Longitude, DateTime, Traj_ID)
+                    are missing in the data.
         """
         try:
             if np.isin(const.LAT, data.columns) and \
@@ -188,7 +203,7 @@ class NumPandasTraj(DataFrame):
         except KeyError:
             raise MissingColumnsException("One of the columns are missing. Please check your data and try again.")
 
-    def get_default_column_names(self, DateTime, traj_id, latitude, longitude) -> dict:
+    def _get_default_column_names(self, DateTime, traj_id, latitude, longitude) -> dict:
         """
             Get a dictionary containing the key, value pairs of the library default
             column names for the following columns:
@@ -221,7 +236,7 @@ class NumPandasTraj(DataFrame):
             longitude: const.LONG
         }
 
-    def __reset_default_index(self):
+    def set_default_index(self):
         """
             Set the Index of the dataframe back to traj_id and DateTime.
 
@@ -245,17 +260,17 @@ class NumPandasTraj(DataFrame):
     @property
     def latitude(self):
         """
-        Accessor method for the latitude column of the DaskTrajectoryDF.
+            Accessor method for the latitude column of the NumPandasTraj DataFrame.
 
-        Returns
-        -------
-        dask.dataframe.core.Series
-            The Series containing all the latitude values from the DataFrame.
+            Returns
+            -------
+                pandas.core.series.Series
+                    The Series containing all the latitude values from the DataFrame.
 
-        Raises
-        ------
-        MissingColumnsException
-            Latitude column is missing from the data.
+            Raises
+            ------
+                MissingColumnsException
+                    Latitude column is missing from the data.
         """
         try:
             return self[const.LAT]
@@ -265,17 +280,17 @@ class NumPandasTraj(DataFrame):
     @property
     def longitude(self):
         """
-        Accessor method for the longitude column of the DaskTrajectoryDF.
+            Accessor method for the longitude column of the NumPandasTraj DataFrame.
 
-        Returns
-        -------
-        dask.dataframe.core.Series
-            The Series containing all the longitude values from the DataFrame.
+            Returns
+            -------
+                pandas.core.series.Series
+                    The Series containing all the longitude values from the DataFrame.
 
-        Raises
-        ------
-        MissingColumnsException
-            Longitude column is missing from the data
+            Raises
+            ------
+                MissingColumnsException
+                    Longitude column is missing from the data
         """
         try:
             return self[const.LONG]
@@ -285,17 +300,17 @@ class NumPandasTraj(DataFrame):
     @property
     def datetime(self):
         """
-        Accessor method for the DateTime column of the DaskTrajectoryDF.
+            Accessor method for the DateTime column of the NumPandasTraj DataFrame.
 
-        Returns
-        -------
-        dask.dataframe.core.Series
-            The Series containing all the DateTime values from the DataFrame.
+            Returns
+            -------
+                pandas.core.series.Series
+                    The Series containing all the DateTime values from the DataFrame.
 
-        Raises
-        ------
-        MissingColumnsException
-            DateTime column is missing from the data.
+            Raises
+            ------
+                MissingColumnsException
+                    DateTime column is missing from the data.
         """
         try:
             return self.index.get_level_values(const.DateTime).to_series()
@@ -305,17 +320,17 @@ class NumPandasTraj(DataFrame):
     @property
     def traj_id(self):
         """
-        Accessor method for the Trajectory_ID column of the DaskTrajectoryDF.
+            Accessor method for the Trajectory_ID column of the DaskTrajectoryDF.
 
-        Returns
-        -------
-        dask.dataframe.core.Series
-            The Series containing all the Trajectory_ID values from the DataFrame.
+            Returns
+            -------
+                pandas.core.series.Series
+                    The Series containing all the Trajectory_ID values from the DataFrame.
 
-        Raises
-        ------
-        MissingColumnsException
-            traj_id column is missing from the data.
+            Raises
+            ------
+                MissingColumnsException
+                    traj_id column is missing from the data.
         """
         try:
             return self.index.get_level_values(const.TRAJECTORY_ID).to_series()
@@ -329,69 +344,70 @@ class NumPandasTraj(DataFrame):
                f"Number of points in the data: {len(self)}\n" \
                f"Dataset time range: {self.datetime.max() - self.datetime.min()}\n" \
                f"Datatype of the DataFrame: {type(self)}\n" \
-               f"Dataset Bounding Box: {(self.latitude.min(), self.longitude.min(), self.latitude.max(), self.longitude.max())}\n\n" \
+               f"Dataset Bounding Box:" \
+               f" {(self.latitude.min(), self.longitude.min(), self.latitude.max(), self.longitude.max())}\n\n" \
                f"---------------------------------------------------------------------"
 
     # ------------------------------- File and DF Operations ----------------------------- #
 
     def to_numpy(self, dtype=None, copy: bool = False, na_value=lib.no_default) -> np.ndarray:
         """
-        Convert the DataFrame to a NumPy array.By default, the dtype of the returned array will
-        be the common dtype of all types in the DataFrame. For example, if the dtypes are float16
-        and float32, the results dtype will be float32. This may require copying data and coercing
-        values, which may be expensive
+            Convert the DataFrame to a NumPy array.By default, the dtype of the returned array will
+            be the common dtype of all types in the DataFrame. For example, if the dtypes are float16
+            and float32, the results dtype will be float32. This may require copying data and coercing
+            values, which may be expensive
 
-        Parameters
-        ----------
-        dtype:
-            The dtype to pass to :meth:`numpy.asarray`.
-        copy:
-            Whether to ensure that the returned value is not a view on another array.
-            Note that ``copy=False`` does not *ensure* that ``to_numpy()`` is no-copy.
-            Rather, ``copy=True`` ensure that a copy is made, even if not strictly necessary.
-        na_value:
-            The value to use for missing values. The default value depends on `dtype` and the
-            dtypes of the DataFrame columns.
+            Parameters
+            ----------
+                dtype:
+                    The dtype to pass to :meth:`numpy.asarray`.
+                copy:
+                    Whether to ensure that the returned value is not a view on another array.
+                    Note that ``copy=False`` does not *ensure* that ``to_numpy()`` is no-copy.
+                    Rather, ``copy=True`` ensure that a copy is made, even if not strictly necessary.
+                na_value:
+                    The value to use for missing values. The default value depends on `dtype` and the
+                    dtypes of the DataFrame columns.
         """
         return self.reset_index(drop=False).to_numpy()
 
     def sort_by_traj_id_and_datetime(self, ascending=True):
         """
-        Sort the trajectory in Ascending or descending order based on the following 2
-        columns in order:
-        1. Trajectory ID
-        2. DateTime
+            Sort the trajectory in Ascending or descending order based on the following 2
+            columns in order:
+                1. Trajectory ID
+                2. DateTime
 
-        Parameters
-        ----------
-        ascending: bool
-            Whether to sort the values in ascending order or descending order.
+            Parameters
+            ----------
+                ascending: bool
+                    Whether to sort the values in ascending order or descending order.
 
-        Returns
-        -------
-        NumPandasTraj
-            The sorted dataframe.
+            Returns
+            -------
+                NumPandasTraj
+                    The sorted dataframe.
         """
         return self.sort_values([const.TRAJECTORY_ID, const.DateTime], ascending=ascending)
 
     # ------------------------------------- Visualization ----------------------------------- #
     def plot_folium_traj(self, color: Text = 'blue', weight: float = 3, opacity: float = 0.5):
         """
-        Use folium to plot the trajectory on a map.
+            Use folium to plot the trajectory on a map.
 
-        Parameters
-        ----------
-        color: Text
-            The color of the trajectory line on the map.
-        weight: float
-            The weight of the trajectory line on the map.
-        opacity: float
-            The opacity of the trajectory line on the map.
+            Parameters
+            ----------
+                color: Text
+                    The color of the trajectory line on the map.
+                weight: float
+                    The weight of the trajectory line on the map.
+                opacity: float
+                    The opacity of the trajectory line on the map.
 
-        Returns
-        -------
-        folium.folium.Map
-            The map with plotted trajectory.
+            Returns
+            -------
+                folium.folium.Map
+                    The map with plotted trajectory.
         """
         sw = self[['lat', 'lon']].min().values.tolist()
         ne = self[['lat', 'lon']].max().values.tolist()
