@@ -13,8 +13,8 @@
     ----------
         Inspiration of lots of functions in this module is taken from the PyMove library.
 
-        "Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
-         Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019"
+        Arina De Jesus Amador Monteiro Sanches. “Uma Arquitetura E Imple-menta ̧c ̃ao Do M ́odulo De
+        Pr ́e-processamento Para Biblioteca Pymove”.Bachelor’s thesis. Universidade Federal Do Cear ́a, 2019
 """
 import itertools
 import multiprocessing
@@ -517,8 +517,8 @@ class SpatialFeatures:
             Create a column containing bearing between 2 consecutive points. Bearing is also
             referred as "Forward Azimuth" sometimes. Bearing/Forward Azimuth is defined as
             follows:
-                "Bearing is the horizontal angle between the direction of an object and another
-                 object, or between the object and the True North."
+                Bearing is the horizontal angle between the direction of an object and another
+                object, or between the object and the True North.
 
             Parameters
             ----------
