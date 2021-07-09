@@ -190,29 +190,29 @@ class NumPandasTraj(DataFrame):
 
     def get_default_column_names(self, DateTime, traj_id, latitude, longitude) -> dict:
         """
-        Get a dictionary containing the key, value pairs of the library default
-        column names for the following columns:
-        1. Latitude
-        2. Longitude
-        3. DateTime
-        4. Trajectory ID
+            Get a dictionary containing the key, value pairs of the library default
+            column names for the following columns:
+                1. Latitude
+                2. Longitude
+                3. DateTime
+                4. Trajectory ID
 
-        Parameters
-        ----------
-        DateTime: Text
-            The datetime header of the column already given by the user.
-        traj_id: Text
-            The traj_id header of the column already given by the user.
-        latitude:
-            The latitude header of the column already given by the user.
-        longitude:
-            The longitude header of the column already given by the user.
+            Parameters
+            ----------
+                DateTime: Text
+                    The datetime header of the column already given by the user.
+                traj_id: Text
+                    The traj_id header of the column already given by the user.
+                latitude:
+                    The latitude header of the column already given by the user.
+                longitude:
+                    The longitude header of the column already given by the user.
 
-        Returns
-        -------
-        dict
-            A dictionary of mappings from the given header by the user to the
-            library default headers.
+            Returns
+            -------
+                dict
+                    A dictionary of mappings from the given header by the user to the
+                    library default headers.
         """
         return {
             DateTime: const.DateTime,
@@ -223,18 +223,18 @@ class NumPandasTraj(DataFrame):
 
     def __reset_default_index(self):
         """
-        Set the Index of the dataframe back to DateTime and traj_id.
+            Set the Index of the dataframe back to traj_id and DateTime.
 
-        WARNING
-        -------
-        This must be used everytime after the reset_index is called
-        in order to set the index back to library default values as
-        it is necessary to perform various other functionalities.
+            WARNING
+            -------
+                This must be used everytime after the reset_index is called
+                in order to set the index back to library default values as
+                it is necessary to perform various other functionalities.
 
-        Raises
-        ------
-        MissingColumnsException
-            DateTime/traj_id column is missing from the dataset.
+            Raises
+            ------
+                MissingColumnsException
+                    DateTime/traj_id column is missing from the dataset.
         """
         try:
             self.set_index([const.DateTime, const.TRAJECTORY_ID], inplace=True)
