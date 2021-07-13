@@ -24,7 +24,7 @@ from preprocessing.helpers import Helpers as helper
 from core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from typing import Optional, Text, Union
 
-NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
+NUM_CPU = (len(os.sched_getaffinity(0)) * 2 if os.name == 'posix' else psutil.cpu_count() * 2) // 3
 
 
 class Interpolation:

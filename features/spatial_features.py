@@ -31,7 +31,7 @@ from utilities import constants as const
 from utilities.DistanceCalculator import FormulaLog as calc
 from utilities.exceptions import *
 
-NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
+NUM_CPU = (len(os.sched_getaffinity(0)) * 2 if os.name == 'posix' else psutil.cpu_count() * 2) // 3
 
 
 class SpatialFeatures:
@@ -252,7 +252,7 @@ class SpatialFeatures:
             # the system. (Note: The blocking of system is mostly prevalent in Windows and does
             # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
             # of the system.)
-            multi_pool = multiprocessing.Pool(NUM_CPU - 1)
+            multi_pool = multiprocessing.Pool(NUM_CPU)
             result = multi_pool.map(helpers.distance_from_start_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
