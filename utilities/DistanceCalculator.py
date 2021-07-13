@@ -8,8 +8,9 @@
 """
 
 import numpy as np
-
 import utilities.constants as const
+
+np.seterr(invalid='ignore')
 
 
 class FormulaLog:
@@ -72,4 +73,4 @@ class FormulaLog:
 
         bearing = np.arctan2(y, x)
 
-        return (np.rad2deg(bearing)) % 360
+        return (np.rad2deg(bearing)) % 360.0
