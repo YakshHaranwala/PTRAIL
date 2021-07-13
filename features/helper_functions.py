@@ -510,7 +510,7 @@ class Helpers:
         return factor if factor < 100 else 100
 
     @staticmethod
-    def _df_split_helper(dataframe, cpu_count):
+    def _df_split_helper(dataframe):
         """
             This is the helper function for splitting up dataframes into smaller chunks.
             This function is widely used for main functions to help split the original
@@ -539,7 +539,7 @@ class Helpers:
         ids_ = list(dataframe.traj_id.value_counts().keys())
 
         # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = Helpers._partition_size(len(ids_), cpu_count)
+        split_factor = Helpers._get_partition_size(len(ids_))
         ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
         # Now split the dataframes based on set of Trajectory ids.
@@ -549,33 +549,33 @@ class Helpers:
                      for i in range(len(ids_))]
         return df_chunks
 
-    @staticmethod
-    def _partition_size(size, cpu_count):
-        """
-            Takes number of ids and makes use of a formula that gives a factor to makes set of ids
-            according to the number of processors available to work with.
-
-            Parameters
-            ----------
-                size: int
-                    The total number of trajectory IDs in the dataset.
-
-            Returns
-            -------
-                int
-                   The factor by which the datasets are to be split.
-        """
-        # Based on the Operating system, get the number of CPUs available for
-        # multiprocessing.
-        available_cpus = len(os.sched_getaffinity(0)) if os.name == 'posix' \
-            else psutil.cpu_count()  # Number of available CPUs.
-
-        # Integer divide the total number of Trajectory IDs by the number of available CPUs
-        # and square the number because if too many partitions are made, then it does more
-        # harm than good for the execution speed. The factor of 1 is added to avoid errors
-        # when the integer division yields a 0.
-        factor = ((size // cpu_count)) + 1
-
-        # Return the factor if it is less than 100 otherwise return 100.
-        # This factor hence is capped at 100.
-        return factor if factor < 100 else 100
+    # @staticmethod
+    # def _partition_size(size, cpu_count):
+    #     """
+    #         Takes number of ids and makes use of a formula that gives a factor to makes set of ids
+    #         according to the number of processors available to work with.
+    #
+    #         Parameters
+    #         ----------
+    #             size: int
+    #                 The total number of trajectory IDs in the dataset.
+    #
+    #         Returns
+    #         -------
+    #             int
+    #                The factor by which the datasets are to be split.
+    #     """
+    #     # Based on the Operating system, get the number of CPUs available for
+    #     # multiprocessing.
+    #     available_cpus = len(os.sched_getaffinity(0)) if os.name == 'posix' \
+    #         else psutil.cpu_count()  # Number of available CPUs.
+    #
+    #     # Integer divide the total number of Trajectory IDs by the number of available CPUs
+    #     # and square the number because if too many partitions are made, then it does more
+    #     # harm than good for the execution speed. The factor of 1 is added to avoid errors
+    #     # when the integer division yields a 0.
+    #     factor = ((size // cpu_count)) + 1
+    #
+    #     # Return the factor if it is less than 100 otherwise return 100.
+    #     # This factor hence is capped at 100.
+    #     return factor if factor < 100 else 100

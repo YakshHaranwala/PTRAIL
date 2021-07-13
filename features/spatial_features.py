@@ -150,12 +150,11 @@ class SpatialFeatures:
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
-            # Here, create as many processes at once as there are number of CPUs available in
-            # the system - 1. One CPU is kept free at all times in order to not block up
-            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-            # of the system.)
-            mp_pool = multiprocessing.Pool(NUM_CPU - 1)
+            # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+            # kept free at all times in order to not block up the system.
+            # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+            # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+            mp_pool = multiprocessing.Pool(NUM_CPU)
             results = mp_pool.starmap(helpers.end_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
@@ -339,12 +338,11 @@ class SpatialFeatures:
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
-        # Here, create as many processes at once as there are number of CPUs available in
-        # the system - 1. One CPU is kept free at all times in order to not block up
-        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-        # of the system.)
-        pool = multiprocessing.Pool(NUM_CPU - 1)
+        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+        # kept free at all times in order to not block up the system.
+        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+        pool = multiprocessing.Pool(NUM_CPU)
         args = zip(df_chunks, itertools.repeat(coordinates), itertools.repeat(dist_range))
         result = pool.starmap(helpers.point_within_range_helper, args)
 
@@ -374,12 +372,11 @@ class SpatialFeatures:
         # splitting the dataframe according to trajectory ids
         df_chunks = helpers._df_split_helper(dataframe)
 
-        # Here, create as many processes at once as there are number of CPUs available in
-        # the system - 1. One CPU is kept free at all times in order to not block up
-        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-        # of the system.)
-        pool = multiprocessing.Pool(NUM_CPU - 1)
+        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+        # kept free at all times in order to not block up the system.
+        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+        pool = multiprocessing.Pool(NUM_CPU)
         answer = pool.starmap(helpers.distance_from_given_point_helper, zip(df_chunks, itertools.repeat(coordinates)))
 
         # Now lets join all the smaller partitions and then add the Distance to the

@@ -169,7 +169,7 @@ class Interpolation:
         # the system. (Note: The blocking of system is mostly prevalent in Windows and does
         # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
         # of the system.)
-        small_pool = mlp.Pool(NUM_CPU - 1)
+        small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.linear_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
@@ -219,7 +219,7 @@ class Interpolation:
         # the system. (Note: The blocking of system is mostly prevalent in Windows and does
         # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
         # of the system.).
-        small_pool = mlp.Pool(NUM_CPU - 1)
+        small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.cubic_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
@@ -268,7 +268,7 @@ class Interpolation:
         # the system. (Note: The blocking of system is mostly prevalent in Windows and does
         # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
         # of the system.).
-        small_pool = mlp.Pool(NUM_CPU - 1)
+        small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.kinematic_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
@@ -318,7 +318,7 @@ class Interpolation:
         # the system. (Note: The blocking of system is mostly prevalent in Windows and does
         # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
         # of the system.).
-        small_pool = mlp.Pool(NUM_CPU - 1)
+        small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.random_walk_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
 
