@@ -31,7 +31,7 @@ from utilities import constants as const
 from utilities.DistanceCalculator import FormulaLog as calc
 from utilities.exceptions import *
 
-NUM_CPU = (len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count())
+NUM_CPU = (len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()) * 2 // 3
 
 
 class SpatialFeatures:
@@ -94,12 +94,11 @@ class SpatialFeatures:
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
-            # Here, create as many processes at once as there are number of CPUs available in
-            # the system - 1. One CPU is kept free at all times in order to not block up
-            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-            # of the system.).
-            mp_pool = multiprocessing.Pool(NUM_CPU - 1)
+            # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+            # kept free at all times in order to not block up the system.
+            # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+            # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+            mp_pool = multiprocessing.Pool(NUM_CPU)
             results = mp_pool.starmap(helpers.start_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
@@ -170,7 +169,7 @@ class SpatialFeatures:
                 return start_loc[const.LAT][0], start_loc[const.LONG][0]
 
     @staticmethod
-    def create_distance_between_consecutive_column(dataframe: NumPandasTraj, cpu_count):
+    def create_distance_between_consecutive_column(dataframe: NumPandasTraj):
         """
             Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
             The distance calculated is the Great-Circle (Haversine) distance.
@@ -191,12 +190,12 @@ class SpatialFeatures:
                 NumPandasTraj:
                     The dataframe containing the resultant Distance_prev_to_curr column.
         """
-        if cpu_count <= 1:
-            cpu_count = 1
-        elif cpu_count >= NUM_CPU:
-            cpu_count = NUM_CPU - 1
-        else:
-            cpu_count = cpu_count
+        # if cpu_count <= 1:
+        #     cpu_count = 1
+        # elif cpu_count >= NUM_CPU:
+        #     cpu_count = NUM_CPU - 1
+        # else:
+        #     cpu_count = cpu_count
 
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
@@ -206,14 +205,13 @@ class SpatialFeatures:
         # Case-2: The number of unique Trajectory IDs is significant.
         else:
             # splitting the dataframe according to trajectory ids.
-            df_chunks = helpers._df_split_helper(dataframe, cpu_count)
+            df_chunks = helpers._df_split_helper(dataframe)
 
-            # Here, create as many processes at once as there are number of CPUs available in
-            # the system - 1. One CPU is kept free at all times in order to not block up
-            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-            # of the system.)
-            multi_pool = multiprocessing.Pool(cpu_count)
+            # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+            # kept free at all times in order to not block up the system.
+            # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+            # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+            multi_pool = multiprocessing.Pool(NUM_CPU)
             result = multi_pool.map(helpers.distance_between_consecutive_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
@@ -221,7 +219,7 @@ class SpatialFeatures:
                                  const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_distance_from_start_column(dataframe: NumPandasTraj, cpu_count):
+    def create_distance_from_start_column(dataframe: NumPandasTraj):
         """
             Create a column containing distance between the start location and the rest of the
             points using Haversine formula. The distance calculated is the Great-Circle distance.
@@ -242,12 +240,12 @@ class SpatialFeatures:
                 NumPandasTraj:
                     The dataframe containing the resultant Distance_start_to_curr column.
         """
-        if cpu_count <= 1:
-            cpu_count = 1
-        elif cpu_count >= NUM_CPU:
-            cpu_count = NUM_CPU - 1
-        else:
-            cpu_count = cpu_count
+        # if cpu_count <= 1:
+        #     cpu_count = 1
+        # elif cpu_count >= NUM_CPU:
+        #     cpu_count = NUM_CPU - 1
+        # else:
+        #     cpu_count = cpu_count
 
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
@@ -258,14 +256,13 @@ class SpatialFeatures:
         # Case-2: The number of unique Trajectory IDs is significant.
         else:
             # splitting the dataframe according to trajectory ids.
-            df_chunks = helpers._df_split_helper(dataframe, cpu_count)
+            df_chunks = helpers._df_split_helper(dataframe)
 
-            # Here, create as many processes at once as there are number of CPUs available in
-            # the system - 1. One CPU is kept free at all times in order to not block up
-            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-            # of the system.)
-            multi_pool = multiprocessing.Pool(cpu_count)
+            # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+            # kept free at all times in order to not block up the system.
+            # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+            # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+            multi_pool = multiprocessing.Pool(NUM_CPU)
             result = multi_pool.map(helpers.distance_from_start_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
@@ -523,7 +520,7 @@ class SpatialFeatures:
             return dataframe
 
     @staticmethod
-    def create_bearing_column(dataframe: NumPandasTraj, cpu_count):
+    def create_bearing_column(dataframe: NumPandasTraj):
         """
             Create a column containing bearing between 2 consecutive points. Bearing is also
             referred as "Forward Azimuth" sometimes. Bearing/Forward Azimuth is defined as
@@ -541,12 +538,13 @@ class SpatialFeatures:
                 NumPandasTraj:
                         The dataframe containing the resultant Bearing_from_prev column.
         """
-        if cpu_count <= 1:
-            cpu_count = 1
-        elif cpu_count >= NUM_CPU:
-            cpu_count = NUM_CPU - 1
-        else:
-            cpu_count = cpu_count
+        # if cpu_count <= 1:
+        #     cpu_count = 1
+        # elif cpu_count >= NUM_CPU:
+        #     cpu_count = NUM_CPU - 1
+        # else:
+        #     cpu_count = cpu_count
+
         # Case-1: The number of unique Trajectory IDs is less than x.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
             result = helpers.bearing_helper(dataframe)
@@ -556,14 +554,13 @@ class SpatialFeatures:
         # Case-2: The number unique Trajectory IDs is significant.
         else:
             # splitting the dataframe according to trajectory ids.
-            df_chunks = helpers._df_split_helper(dataframe, cpu_count)
+            df_chunks = helpers._df_split_helper(dataframe)
 
-            # Here, create as many processes at once as there are number of CPUs available in
-            # the system - 1. One CPU is kept free at all times in order to not block up
-            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-            # of the system.)
-            multi_pool = multiprocessing.Pool(cpu_count)
+            # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+            # kept free at all times in order to not block up the system.
+            # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+            # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+            multi_pool = multiprocessing.Pool(NUM_CPU)
             result = multi_pool.map(helpers.bearing_helper, df_chunks)
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
@@ -721,12 +718,11 @@ class SpatialFeatures:
             split_factor = helpers._get_partition_size(len(ids_))
             ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
-            # Here, create as many processes at once as there are number of CPUs available in
-            # the system - 1. One CPU is kept free at all times in order to not block up
-            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-            # of the system.)
-            mp_pool = multiprocessing.Pool(NUM_CPU - 1)
+            # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+            # kept free at all times in order to not block up the system.
+            # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+            # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+            mp_pool = multiprocessing.Pool(NUM_CPU)
             results = mp_pool.starmap(helpers.number_of_location_helper, zip(itertools.repeat(dataframe), ids_))
 
             # Concatenate all the smaller dataframes and return the answer.
