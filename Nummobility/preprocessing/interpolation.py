@@ -23,8 +23,9 @@ import multiprocessing as mlp
 from Nummobility.preprocessing.helpers import Helpers as helper
 from Nummobility.core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from typing import Optional, Text, Union
+from math import ceil
 
-NUM_CPU = (len(os.sched_getaffinity(0)) * 2 if os.name == 'posix' else psutil.cpu_count() * 2) // 3
+NUM_CPU = ceil((len(os.sched_getaffinity(0)) * 2 if os.name == 'posix' else psutil.cpu_count() * 2) / 3)
 
 
 class Interpolation:
