@@ -1,11 +1,11 @@
-core package
-============
+nummobilitycore package
+=======================
 
 Submodules
 ----------
 
-core.TrajectoryDF module
-------------------------
+nummobility.core.TrajectoryDF module
+------------------------------------
 
 .. automodule:: core.TrajectoryDF
    :members:

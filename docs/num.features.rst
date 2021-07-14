@@ -1,5 +1,5 @@
-features package
-================
+nummobility.features package
+============================
 
 Submodules
 ----------
@@ -12,8 +12,8 @@ nummobility.features.helper\_functions module
    :undoc-members:
    :show-inheritance:
 
-features.spatial\_features module
----------------------------------
+nummobility.features.spatial\_features module
+---------------------------------------------
 
 .. automodule:: features.spatial_features
    :members:

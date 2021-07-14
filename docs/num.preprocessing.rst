@@ -1,4 +1,4 @@
-preprocessing package
+nummobility.preprocessing package
 =====================
 
 Submodules
@@ -12,16 +12,16 @@ nummobility.preprocessing.filters module
    :undoc-members:
    :show-inheritance:
 
-preprocessing.helpers module
-----------------------------
+nummobility.preprocessing.helpers module
+----------------------------------------
 
 .. automodule:: preprocessing.helpers
    :members:
    :undoc-members:
    :show-inheritance:
 
-preprocessing.interpolation module
-----------------------------------
+nummobility.preprocessing.interpolation module
+----------------------------------------------
 
 .. automodule:: preprocessing.interpolation
    :members:

@@ -1,5 +1,5 @@
-utilities package
-=================
+nummobility.utilities package
+=============================
 
 Submodules
 ----------
