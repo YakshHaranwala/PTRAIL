@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-import TrajLib.TrajectoryDescriptor as TrajectoryDescriptor
-import TrajLib.TrajectoryFeatures as TrajectoryFeatures
+import SAFE_DELETE.TrajLib.TrajectoryDescriptor as TrajectoryDescriptor
+import SAFE_DELETE.TrajLib.TrajectoryFeatures as TrajectoryFeatures
 import matplotlib.pyplot as plt
 
 

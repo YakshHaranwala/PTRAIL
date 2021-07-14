@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from TrajLib.CBSmot import CBSmot
+from SAFE_DELETE.TrajLib.CBSmot import CBSmot
 
 # pd.options.mode.chained_assignment = 'raise'
 # pd.options.mode.chained_assignment = None

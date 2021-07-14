@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pywt as pywavelets
 from scipy.signal import lfilter
-import TrajLib.Distances as d
+from SAFE_DELETE import TrajLib as d
 
 
 def mad(a):

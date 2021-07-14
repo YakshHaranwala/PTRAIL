@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-import TrajLib.TrajectoryDescriptorFeature as tdf
-from TrajLib.TrajectoryFeatureExtractor import TrajectoryFeatureExtractor
+import SAFE_DELETE.TrajLib.TrajectoryDescriptorFeature as tdf
+from SAFE_DELETE.TrajLib.TrajectoryFeatureExtractor import TrajectoryFeatureExtractor
 
 
 class TrajectoryDescriptor:

@@ -1,4 +1,4 @@
-import TrajLib.Distances as d
+from SAFE_DELETE import TrajLib as d
 import pandas as pd
 # import numpy as np
 

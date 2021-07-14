@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-from TrajLib.Distances import Distances
+from SAFE_DELETE.TrajLib.Distances import Distances
 from collections import namedtuple
-from TrajLib.CBSmot import CBSmot
+from SAFE_DELETE.TrajLib.CBSmot import CBSmot
 
 
 class TrajectoryFeatureExtractor:
