@@ -3,16 +3,16 @@ from setuptools import find_packages
 
 #long_description = open('README.md').read()
 
-REQUIRED_PKGS = ['scipy',
-                 'pandas',
+REQUIRED_PKGS = ['numpy',
                  'hampel',
-                 'numpy',
+                 'pandas',
+                 'scipy',
                  'psutil',
                  'folium',
 ]
 
 setup(
-    name='numpandastraj',
+    name='Nummobility',
     packages=find_packages(),
     version='0.0.1',
     license='new BSD',
@@ -28,7 +28,7 @@ setup(
                  'Programming Language :: Python',
                  'Topic :: Software Development',
                  'Topic :: Scientific/Engineering',
-                 'Operating System :: OS Independent'
+                 'Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',
                  ],
     install_requires=REQUIRED_PKGS,

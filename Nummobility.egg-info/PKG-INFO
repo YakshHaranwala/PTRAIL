@@ -1,0 +1,20 @@
+Metadata-Version: 2.1
+Name: Nummobility
+Version: 0.0.1
+Summary: A Mobility-data Preprocessing Library using parallel computation.
+Home-page: https://github.com/YakshHaranwala/NumMobility.git
+Maintainer: NumMobility Developers
+Maintainer-email: mobilitylab2021@gmail.com
+License: new BSD
+Description: Hi! This is the home page of NumMobility library.
+Platform: UNKNOWN
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development
+Classifier: Topic :: Scientific/Engineering
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
