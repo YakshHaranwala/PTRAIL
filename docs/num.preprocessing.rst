@@ -4,8 +4,8 @@ preprocessing package
 Submodules
 ----------
 
-preprocessing.filters module
-----------------------------
+nummobility.preprocessing.filters module
+----------------------------------------
 
 .. automodule:: preprocessing.filters
    :members:

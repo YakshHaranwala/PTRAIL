@@ -4,8 +4,8 @@ features package
 Submodules
 ----------
 
-features.helper\_functions module
----------------------------------
+nummobility.features.helper\_functions module
+---------------------------------------------
 
 .. automodule:: features.helper_functions
    :members:
@@ -20,8 +20,8 @@ features.spatial\_features module
    :undoc-members:
    :show-inheritance:
 
-features.temporal\_features module
-----------------------------------
+nummobility.features.temporal\_features module
+----------------------------------------------
 
 .. automodule:: features.temporal_features
    :members:

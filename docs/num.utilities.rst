@@ -4,16 +4,16 @@ utilities package
 Submodules
 ----------
 
-utilities.DistanceCalculator module
------------------------------------
+nummobility.utilities.DistanceCalculator module
+-----------------------------------------------
 
 .. automodule:: utilities.DistanceCalculator
    :members:
    :undoc-members:
    :show-inheritance:
 
-utilities.conversions module
-----------------------------
+nummobility.utilities.conversions module
+----------------------------------------
 
 .. automodule:: utilities.conversions
    :members:
