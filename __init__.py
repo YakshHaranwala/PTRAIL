@@ -1,12 +1,12 @@
 from .core.TrajectoryDF import NumPandasTraj
 
-from .features.spatial_features import SpatialFeatures
-from .features.temporal_features import TemporalFeatures
-from .features.helper_functions import Helpers
+from .features import spatial_features
+from .features import temporal_features
+from .features import helper_functions
 
-from .preprocessing.interpolation import Interpolation
-from .preprocessing.helpers import Helpers
-from .preprocessing.filters import Filters
+from .preprocessing import interpolation
+from .preprocessing import helpers
+from .preprocessing import filters
 
 from .utilities import (
     constants,
