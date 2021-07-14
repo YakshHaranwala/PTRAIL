@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-long_description = open('README.md').read()
+#long_description = open('README.md').read()
 
 REQUIRED_PKGS = ['scipy',
                  'pandas',
@@ -13,14 +13,14 @@ REQUIRED_PKGS = ['scipy',
 
 setup(
     name='NumMobility',
-    packages=find_packages(exclude=('docs')),
+    packages=find_packages(exclude=('docs',)),
     version='0.0.1',
     include_package_date=True,
     license='new BSD',
     python_requires='>=3.6',
     description='A Mobility-data Preprocessing Library using parallel computation.',
-    long_description=long_description,
-    long_description_content_type="text/markdown",
+    #long_description=long_description,
+    #long_description_content_type="text/markdown",
     maintainer='NumMobility Developers',
     maintainer_email='mobilitylab2021@gmail.com',
     classifiers=['Intended Audience :: Science/Research',
