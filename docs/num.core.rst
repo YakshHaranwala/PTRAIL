@@ -1,13 +1,13 @@
-nummobility.core package
+Nummobility.core package
 =======================
 
 Submodules
 ----------
 
-nummobility.core.TrajectoryDF module
+Nummobility.core.TrajectoryDF module
 ------------------------------------
 
-.. automodule:: nummobility.core.TrajectoryDF
+.. automodule:: Nummobility.core.TrajectoryDF
    :members:
    :undoc-members:
    :show-inheritance:

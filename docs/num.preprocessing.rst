@@ -1,29 +1,29 @@
-nummobility.preprocessing package
+Nummobility.preprocessing package
 =================================
 
 Submodules
 ----------
 
-nummobility.preprocessing.filters module
+Nummobility.preprocessing.filters module
 ----------------------------------------
 
-.. automodule:: nummobility.preprocessing.filters
+.. automodule:: Nummobility.preprocessing.filters
    :members:
    :undoc-members:
    :show-inheritance:
 
-nummobility.preprocessing.helpers module
+Nummobility.preprocessing.helpers module
 ----------------------------------------
 
-.. automodule:: nummobility.preprocessing.helpers
+.. automodule:: Nummobility.preprocessing.helpers
    :members:
    :undoc-members:
    :show-inheritance:
 
-nummobility.preprocessing.interpolation module
+Nummobility.preprocessing.interpolation module
 ----------------------------------------------
 
-.. automodule:: nummobility.preprocessing.interpolation
+.. automodule:: Nummobility.preprocessing.interpolation
    :members:
    :undoc-members:
    :show-inheritance:

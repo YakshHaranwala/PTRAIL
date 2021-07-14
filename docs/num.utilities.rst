@@ -1,21 +1,21 @@
-nummobility.utilities package
+Nummobility.utilities package
 =============================
 
 Submodules
 ----------
 
-nummobility.utilities.DistanceCalculator module
+Nummobility.utilities.DistanceCalculator module
 -----------------------------------------------
 
-.. automodule:: nummobility.utilities.DistanceCalculator
+.. automodule:: Nummobility.utilities.DistanceCalculator
    :members:
    :undoc-members:
    :show-inheritance:
 
-nummobility.utilities.conversions module
+Nummobility.utilities.conversions module
 ----------------------------------------
 
-.. automodule:: nummobility.utilities.conversions
+.. automodule:: Nummobility.utilities.conversions
    :members:
    :undoc-members:
    :show-inheritance:

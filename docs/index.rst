@@ -1,4 +1,4 @@
-NumMobility: A Mobility Data PreProcessing Library
+NummMobility: A Mobility Data PreProcessing Library
 ==================================================
 
 Introduction

@@ -1,4 +1,4 @@
-NumMobility
+Nummobility
 ===========
 
 .. toctree::
