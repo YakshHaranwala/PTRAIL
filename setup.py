@@ -13,7 +13,7 @@ REQUIRED_PKGS = ['scipy',
 
 setup(
     url='https://github.com/YakshHaranwala/NumMobility.git',
-    name='nummobility',
+    name='mobility123',
     packages=find_packages(),
     version='0.0.1',
     include_package_data=True,
