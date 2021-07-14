@@ -13,7 +13,7 @@ REQUIRED_PKGS = ['scipy',
 
 setup(
     name='NumMobility',
-    packages=find_packages(where=["./"], exclude=('SAFE_DELETE',)),
+    packages=find_packages(exclude=('SAFE_DELETE',)),
     version='0.0.1',
     include_package_date=True,
     license='new BSD',
