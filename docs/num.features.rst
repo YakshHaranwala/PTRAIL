@@ -7,7 +7,7 @@ Submodules
 nummobility.features.helper\_functions module
 ---------------------------------------------
 
-.. automodule:: features.helper_functions
+.. automodule:: nummobility.features.helper_functions
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ nummobility.features.helper\_functions module
 nummobility.features.spatial\_features module
 ---------------------------------------------
 
-.. automodule:: features.spatial_features
+.. automodule:: nummobility.features.spatial_features
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ nummobility.features.spatial\_features module
 nummobility.features.temporal\_features module
 ----------------------------------------------
 
-.. automodule:: features.temporal_features
+.. automodule:: nummobility.features.temporal_features
    :members:
    :undoc-members:
    :show-inheritance:

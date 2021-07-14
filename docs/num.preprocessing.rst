@@ -7,7 +7,7 @@ Submodules
 nummobility.preprocessing.filters module
 ----------------------------------------
 
-.. automodule:: preprocessing.filters
+.. automodule:: nummobility.preprocessing.filters
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ nummobility.preprocessing.filters module
 nummobility.preprocessing.helpers module
 ----------------------------------------
 
-.. automodule:: preprocessing.helpers
+.. automodule:: nummobility.preprocessing.helpers
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ nummobility.preprocessing.helpers module
 nummobility.preprocessing.interpolation module
 ----------------------------------------------
 
-.. automodule:: preprocessing.interpolation
+.. automodule:: nummobility.preprocessing.interpolation
    :members:
    :undoc-members:
    :show-inheritance:

@@ -7,7 +7,7 @@ Submodules
 nummobility.utilities.DistanceCalculator module
 -----------------------------------------------
 
-.. automodule:: utilities.DistanceCalculator
+.. automodule:: nummobility.utilities.DistanceCalculator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ nummobility.utilities.DistanceCalculator module
 nummobility.utilities.conversions module
 ----------------------------------------
 
-.. automodule:: utilities.conversions
+.. automodule:: nummobility.utilities.conversions
    :members:
    :undoc-members:
    :show-inheritance:
