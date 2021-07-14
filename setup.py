@@ -12,10 +12,11 @@ REQUIRED_PKGS = ['scipy',
 ]
 
 setup(
+    url='https://github.com/YakshHaranwala/NumMobility.git',
     name='nummobility',
-    packages=find_packages(exclude=('docs',)),
+    packages=find_packages(),
     version='0.0.1',
-    include_package_date=True,
+    include_package_data=True,
     license='new BSD',
     python_requires='>=3.6',
     description='A Mobility-data Preprocessing Library using parallel computation.',

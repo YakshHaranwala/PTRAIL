@@ -1,8 +1,8 @@
 Metadata-Version: 2.1
-Name: NumMobility
+Name: nummobility
 Version: 0.0.1
 Summary: A Mobility-data Preprocessing Library using parallel computation.
-Home-page: UNKNOWN
+Home-page: https://github.com/YakshHaranwala/NumMobility.git
 Maintainer: NumMobility Developers
 Maintainer-email: mobilitylab2021@gmail.com
 License: new BSD
