@@ -12,15 +12,13 @@ REQUIRED_PKGS = ['scipy',
 ]
 
 setup(
-    url='https://github.com/YakshHaranwala/NumMobility.git',
-    name='mobility123',
+    name='numpandastraj',
     packages=find_packages(),
     version='0.0.1',
-    include_package_data=True,
     license='new BSD',
     python_requires='>=3.6',
     description='A Mobility-data Preprocessing Library using parallel computation.',
-    long_description="Hi!",
+    long_description="Hi! This is the home page of NumMobility library.",
     long_description_content_type="text/markdown",
     maintainer='NumMobility Developers',
     maintainer_email='mobilitylab2021@gmail.com',
@@ -30,12 +28,10 @@ setup(
                  'Programming Language :: Python',
                  'Topic :: Software Development',
                  'Topic :: Scientific/Engineering',
-                 'Operating System :: Microsoft :: Windows',
-                 'Operating System :: Unix',
-                 'Operating System :: MacOS',
-                 'Programming Language :: Python :: 3.6',
-                 'Programming Language :: Python :: 3.7',
-                 'Programming Language :: Python :: 3.8',
+                 'Operating System :: OS Independent'
+                 'Programming Language :: Python :: 3',
                  ],
-    install_requires=REQUIRED_PKGS
-    )
+    install_requires=REQUIRED_PKGS,
+    url='https://github.com/YakshHaranwala/NumMobility.git',
+    include_package_data=True,
+)
