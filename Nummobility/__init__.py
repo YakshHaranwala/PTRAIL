@@ -15,4 +15,4 @@ from .utilities import (
     exceptions,
 )
 
-__version__ = '0.1.2 Beta'
+__version__ = '0.1.1 Beta'

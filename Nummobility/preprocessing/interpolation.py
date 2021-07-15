@@ -173,6 +173,8 @@ class Interpolation:
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.linear_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
+        small_pool.close()
+        small_pool.join()
 
         # Append the smaller dataframe to process manager list so that result
         # can be finally merged into a larger dataframe.
@@ -274,6 +276,8 @@ class Interpolation:
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.kinematic_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
+        small_pool.close()
+        small_pool.join()
 
         # Append the smaller dataframe to process manager list so that result
         # can be finally merged into a larger dataframe.
@@ -324,6 +328,8 @@ class Interpolation:
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.random_walk_help,
                                    zip(df_chunks, ids_, itertools.repeat(time_jump)))
+        small_pool.close()
+        small_pool.join()
 
         # Append the smaller dataframe to process manager list so that result
         # can be finally merged into a larger dataframe.

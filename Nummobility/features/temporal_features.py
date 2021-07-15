@@ -218,6 +218,8 @@ class TemporalFeatures:
 
             mp_pool = multiprocessing.Pool(len(ids_))
             results = mp_pool.starmap(helpers.traj_duration_helper, zip(itertools.repeat(dataframe), ids_))
+            mp_pool.close()
+            mp_pool.join()
 
             results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
             return results
@@ -269,6 +271,8 @@ class TemporalFeatures:
             # which calculate the start times for a smaller set of IDs only.
             mp_pool = multiprocessing.Pool(len(ids_))
             results = mp_pool.starmap(helpers.start_time_helper, zip(itertools.repeat(dataframe), ids_))
+            mp_pool.close()
+            mp_pool.join()
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results).sort_values(const.TRAJECTORY_ID)
@@ -319,6 +323,8 @@ class TemporalFeatures:
             # which calculate the end times for a smaller set of IDs only.
             mp_pool = multiprocessing.Pool(len(ids_))
             results = mp_pool.starmap(helpers.end_time_helper, zip(itertools.repeat(dataframe), ids_))
+            mp_pool.close()
+            mp_pool.join()
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results).sort_values(const.TRAJECTORY_ID)

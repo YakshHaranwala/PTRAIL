@@ -30,6 +30,7 @@ from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.features.helper_functions import Helpers as helpers
 from Nummobility.utilities import constants as const
 from Nummobility.utilities.DistanceCalculator import FormulaLog as calc
+from Nummobility.utilities.exceptions import *
 
 NUM_CPU = ceil((len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()) * 2 / 3)
 
@@ -100,6 +101,8 @@ class SpatialFeatures:
             # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
             mp_pool = multiprocessing.Pool(NUM_CPU)
             results = mp_pool.starmap(helpers.start_location_helper, zip(itertools.repeat(dataframe), ids_))
+            mp_pool.close()
+            mp_pool.join()
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results)
@@ -155,6 +158,8 @@ class SpatialFeatures:
             # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
             mp_pool = multiprocessing.Pool(NUM_CPU)
             results = mp_pool.starmap(helpers.end_location_helper, zip(itertools.repeat(dataframe), ids_))
+            mp_pool.close()
+            mp_pool.join()
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results)
@@ -213,6 +218,8 @@ class SpatialFeatures:
             # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
             multi_pool = multiprocessing.Pool(NUM_CPU)
             result = multi_pool.map(helpers.distance_between_consecutive_helper, df_chunks)
+            multi_pool.close()
+            multi_pool.join()
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
             return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
@@ -379,6 +386,8 @@ class SpatialFeatures:
         # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
         pool = multiprocessing.Pool(NUM_CPU)
         answer = pool.starmap(helpers.distance_from_given_point_helper, zip(df_chunks, itertools.repeat(coordinates)))
+        pool.close()
+        pool.join()
 
         # Now lets join all the smaller partitions and then add the Distance to the
         # specific point column.
@@ -566,6 +575,8 @@ class SpatialFeatures:
             # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
             multi_pool = multiprocessing.Pool(NUM_CPU)
             result = multi_pool.map(helpers.bearing_helper, df_chunks)
+            multi_pool.close()
+            multi_pool.join()
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
             return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
@@ -728,6 +739,8 @@ class SpatialFeatures:
             # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
             mp_pool = multiprocessing.Pool(NUM_CPU)
             results = mp_pool.starmap(helpers.number_of_location_helper, zip(itertools.repeat(dataframe), ids_))
+            mp_pool.close()
+            mp_pool.join()
 
             # Concatenate all the smaller dataframes and return the answer.
             results = pd.concat(results)
