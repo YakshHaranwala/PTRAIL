@@ -61,5 +61,5 @@ NumMobility is a state-of-the art Mobility Data Preprocessing Library that mainl
 <h2> Examples </h2>
 
 <span> &#8618; </span>
-<a href='https://mybinder.org/v2/gh/YakshHaranwala/NumMobility/382fd02f46a20292e713c5dac6706d49debe4849' target='_blank'> <i> Binder Link </i> </a>
+<a href='https://mybinder.org/v2/gh/YakshHaranwala/NumMobility/ef4be1ed4c535e0dc9bb40226659ac9f9cecffc5' target='_blank'> <i> Binder Link </i> </a>
 
