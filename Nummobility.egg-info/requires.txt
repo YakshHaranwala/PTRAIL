@@ -1,6 +1,0 @@
-numpy
-hampel
-pandas
-scipy
-psutil
-folium

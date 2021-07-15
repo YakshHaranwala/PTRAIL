@@ -1,4 +1,3 @@
-
 <!---------------------- Introduction Section ------------------->
 <h1> NumMobility: A Mobility Data PreProcessing Library </h1>
 
@@ -41,69 +40,20 @@ NumMobility is a state-of-the art Mobility Data Preprocessing Library that mainl
 </li>
 </ol>
 
-<!----------------- Dataset Link Section --------------------->
-<hr style="height:6px;background-color:black">
-
-<p align='justify'>
-In the introduction of the library, the seagulls dataset is used
-which can be downloaded from the link below: <br>
-<span> &#8618; </span>
-<a href="https://github.com/YakshHaranwala/NumMobility/blob/main/examples/data/gulls.csv" target='_blank'> Seagulls Dataset </a>
-</p>
-
-<!----------------- NbViewer Link ---------------------------->
-<hr style="height:6px;background-color:black">
-<p align='justify'>
-Note: Viewing this notebook in GitHub will not render JavaScript
-elements. Hence, for a better experience, click the link below
-to open the Jupyter notebook in NB viewer.
-
-<span> &#8618; </span>
-<a href="https://nbviewer.jupyter.org/github/YakshHaranwala/NumMobility/blob/main/examples/0.%20Intro%20to%20NumMobility.ipynb" target='_blank'> Click Here </a>
-</p>
-
 <!------------------------- Documentation Link ----------------->
-<hr style="height:6px;background-color:black">
-<p align='justify'>
-The Link to NumMobility's Documentation is: <br>
-</p>
+<h2> Documentation </h2>
 
 <span> &#8618; </span>
 <a href='https://nummobility.readthedocs.io/en/latest/' target='_blank'> <i> NumMobility Documentation </i> </a>
-<hr style="height:6px;background-color:black">
-<h2> Importing Trajectory Data into a NumPandasTraj Dataframe </h2>
 
-<p align='justify'>
-NumMobility Library stores Mobility Data (Trajectories) in a specialised
-pandas Dataframe structure called NumPandasTraj. As a result, the following
-constraints are enforced for the data to be able to be stores in a NumPandasTraj.
-</p>
+<!-------------------- Pip Installation ------------------------->
+<h2> Pip Installation </h2>
 
-<ol align='justify'>
-   <li>
-        Firstly, for a mobility dataset to be able to work with NumMobility Library needs
-        to have the following mandatory columns present:
-       <ul type='square'>
-           <li> DateTime </li>
-           <li> Trajectory ID </li>
-           <li> Latitude </li>
-           <li> Longitude </li>
-       </ul>
-   </li>
-   <li>
-       Secondly, NumPandasTraj has a very specific constraint for the index of the
-       dataframes, the Library enforces a multi-index consisting of the
-       <b><i> Trajectory ID, DateTime </i></b> columns because the operations of the
-       library are dependent on the 2 columns. As a result, it is recommended
-       to not change the index and keep the multi-index of <b><i> Trajectory ID, DateTime </i></b>
-       at all times.
-   </li>
-   <li>
-        Note that since NumPandasTraj Dataframe is built on top of
-        python pandas, it does not have any restrictions on the number
-        of columns that the dataset has. The only requirement is that
-        the dataset should atleast contain the above mentioned four columns.
-   </li>
-</ol>
+1. `pip install Nummobility`
 
-<hr style="height:6px;background-color:black">
+<!------------------------ Usage Examples ----------------------->
+<h2> Examples </h2>
+
+<span> &#8618; </span>
+<a href='https://github.com/YakshHaranwala/NumMobility/tree/main/examples' target='_blank'> <i> NumMobility Examples </i> </a>
+

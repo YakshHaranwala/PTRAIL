@@ -1,7 +1,8 @@
 from setuptools import setup
 from setuptools import find_packages
 
-#long_description = open('README.md').read()
+with open('README.md', 'r') as f:
+    LONG_DESCRIPTION = f.read()
 
 REQUIRED_PKGS = ['numpy',
                  'hampel',
@@ -14,11 +15,11 @@ REQUIRED_PKGS = ['numpy',
 setup(
     name='Nummobility',
     packages=find_packages(),
-    version='0.0.1',
+    version='0.1.1',
     license='new BSD',
     python_requires='>=3.6',
     description='A Mobility-data Preprocessing Library using parallel computation.',
-    long_description="Hi! This is the home page of NumMobility library.",
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     maintainer='NumMobility Developers',
     maintainer_email='mobilitylab2021@gmail.com',
