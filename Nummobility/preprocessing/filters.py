@@ -776,5 +776,7 @@ class Filters:
         small_pool = multiprocessing.Pool(NUM_CPU - 1)
         final = small_pool.starmap(helper.hampel_help,
                                    zip(df_chunks, itertools.repeat(column_name)))
+        small_pool.close()
+        small_pool.join()
 
         return_list.append(pd.concat(final))

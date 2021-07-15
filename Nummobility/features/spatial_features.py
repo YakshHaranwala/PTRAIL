@@ -264,6 +264,8 @@ class SpatialFeatures:
             # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
             multi_pool = multiprocessing.Pool(NUM_CPU)
             result = multi_pool.map(helpers.distance_from_start_helper, df_chunks)
+            multi_pool.close()
+            multi_pool.join()
 
             # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
             return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
@@ -342,6 +344,8 @@ class SpatialFeatures:
         pool = multiprocessing.Pool(NUM_CPU)
         args = zip(df_chunks, itertools.repeat(coordinates), itertools.repeat(dist_range))
         result = pool.starmap(helpers.point_within_range_helper, args)
+        pool.close()
+        pool.join()
 
         # Now lets join all the smaller partitions and return the resultant dataframe
         result = pd.concat(result)
