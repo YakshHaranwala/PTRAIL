@@ -20,6 +20,7 @@ from pandas import DataFrame
 from pandas._libs import lib
 
 from Nummobility.utilities import constants as const
+from Nummobility.utilities.exceptions import *
 import folium
 
 
@@ -387,6 +388,11 @@ class NumPandasTraj(DataFrame):
     def plot_folium_traj(self, color: Text = 'blue', weight: float = 3, opacity: float = 0.5):
         """
             Use folium to plot the trajectory on a map.
+
+            # TODO: Currently, we are plotting all the points of the trajectory on a single
+                    plot with the same color which makes it impossible to distinguish several
+                    trajectories (if present) in the dataset from one another. Hence, we need
+                    to modify in order to show each trajectory uniquely.
 
             Parameters
             ----------
