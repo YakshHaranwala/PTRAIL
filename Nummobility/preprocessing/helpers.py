@@ -137,7 +137,7 @@ class Helpers:
         # points for the dataframes which have a length greater than 3 else CubicSpline
         # doesn't execute.
         if len(df) > 3:
-            cubic_spline = CubicSpline(x=df.reset_index()[const.DateTime],
+            cubic_spline = CubicSpline(x=df.reset_index()[const.DateTime].sort_values(),
                                        y=coords,
                                        extrapolate=True, bc_type='not-a-knot')
 
@@ -159,6 +159,7 @@ class Helpers:
                     df.loc[new_times[j - 1]] = [id_, ip_coords[j - 1][0], ip_coords[j - 1][1]]
 
         return df
+
 
     @staticmethod
     def random_walk_help(dataframe: NumPandasTraj, id_: Text, time_jump: float):
