@@ -11,6 +11,7 @@ REQUIRED_PKGS = ['numpy',
                  'psutil',
                  'folium',
                  'matplotlib',
+                 'scikit-learn',
 ]
 
 setup(
