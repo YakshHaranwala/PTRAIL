@@ -182,55 +182,59 @@ class Interpolation:
 
     @staticmethod
     def _cubic_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump: float, return_list: list):
-        """
-            Method for cubic interpolation of a dataframe based on the time jump provided.
-            It makes use of scipy library's CubicSpline functionality and interpolates
-            the coordinates based on the Datetime of the dataframe.
+        try:
+            """
+                Method for cubic interpolation of a dataframe based on the time jump provided.
+                It makes use of scipy library's CubicSpline functionality and interpolates
+                the coordinates based on the Datetime of the dataframe.
+    
+                WARNING: Do not use this method directly as it will run slower. Instead,
+                         use the method interpolate_position() and specify the ip_type as
+                         cubic to perform cubic interpolation much faster.
+    
+                Parameters
+                ----------
+                    dataframe: Union[pd.DataFrame, NumTrajDF]
+                        The dataframe on which interpolation is to be performed
+                    time_jump: float
+                        The maximum time difference allowed to have between rows
+                    return_list: list
+                        The list used by the Multiprocessing manager to get the return values
+    
+                Returns
+                -------
+                    pandas.core.dataframe.DataFrame:
+                        The dataframe containing the new interpolated points.
+    
+            """
+            # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
+            # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
+            # a list.
+            dataframe = dataframe.reset_index()[
+                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
 
-            WARNING: Do not use this method directly as it will run slower. Instead,
-                     use the method interpolate_position() and specify the ip_type as
-                     cubic to perform cubic interpolation much faster.
+            # Split the smaller dataframe further into smaller chunks containing only 1
+            # Trajectory ID per index.
+            ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
+            df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
 
-            Parameters
-            ----------
-                dataframe: Union[pd.DataFrame, NumTrajDF]
-                    The dataframe on which interpolation is to be performed
-                time_jump: float
-                    The maximum time difference allowed to have between rows
-                return_list: list
-                    The list used by the Multiprocessing manager to get the return values
+            # Here, create as many processes at once as there are number of CPUs available in
+            # the system - 1. One CPU is kept free at all times in order to not block up
+            # the system. (Note: The blocking of system is mostly prevalent in Windows and does
+            # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
+            # of the system.).
+            small_pool = mlp.Pool(NUM_CPU)
+            final = small_pool.starmap(helper.cubic_help,
+                                       zip(df_chunks, ids_, itertools.repeat(time_jump)))
+            small_pool.close()
+            small_pool.join()
 
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame:
-                    The dataframe containing the new interpolated points.
+            # Append the smaller dataframe to process manager list so that result
+            # can be finally merged into a larger dataframe.
+            return_list.append(pd.concat(final))
 
-        """
-        # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
-        # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
-        # a list.
-        dataframe = dataframe.reset_index()[
-            [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
-
-        # Split the smaller dataframe further into smaller chunks containing only 1
-        # Trajectory ID per index.
-        ids_ = list(dataframe[const.TRAJECTORY_ID].value_counts().keys())
-        df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i]] for i in range(len(ids_))]
-
-        # Here, create as many processes at once as there are number of CPUs available in
-        # the system - 1. One CPU is kept free at all times in order to not block up
-        # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-        # of the system.).
-        small_pool = mlp.Pool(NUM_CPU)
-        final = small_pool.starmap(helper.cubic_help,
-                                   zip(df_chunks, ids_, itertools.repeat(time_jump)))
-        small_pool.close()
-        small_pool.join()
-
-        # Append the smaller dataframe to process manager list so that result
-        # can be finally merged into a larger dataframe.
-        return_list.append(pd.concat(final))
+        except ValueError:
+            raise ValueError
 
     @staticmethod
     def _kinematic_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump, return_list):
