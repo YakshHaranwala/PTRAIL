@@ -389,13 +389,8 @@ class NumPandasTraj(DataFrame):
         """
             Use folium to plot the trajectory on a map.
 
-            # TODO: Currently, we are plotting all the points of the trajectory on a single
-                    plot with the same color which makes it impossible to distinguish several
-                    trajectories (if present) in the dataset from one another. Hence, we need
-                    to modify in order to show each trajectory uniquely.
-
             Parameters
-            ----------.
+            ----------
                 weight: float
                     The weight of the trajectory line on the map.
                 opacity: float
