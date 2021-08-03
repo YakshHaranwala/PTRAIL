@@ -9,7 +9,7 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: 2nd June, 2021
-    | Version: 1.0
+    | Version: 0.2 Beta
 
     References
     ----------

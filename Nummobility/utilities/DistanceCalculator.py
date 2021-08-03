@@ -2,9 +2,9 @@
     DistanceCalculator module contains various types of distance formulas that can be used to calculate
     distance between 2 points on the surface of earth depending on the CRS being used.
 
-    Authors: Salman Haidri, Yaksh J Haranwala
-    Date: 28th May, 2021
-    Version 1.0
+    | Authors: Salman Haidri, Yaksh J Haranwala
+    | Date: 28th May, 2021
+    | Version: 0.2 Beta
 """
 
 import numpy as np

@@ -12,7 +12,8 @@ REQUIRED_PKGS = ['numpy',
                  'folium',
                  'matplotlib',
                  'scikit-learn',
-]
+                 'osmnx',
+                 ]
 
 setup(
     name='Nummobility',

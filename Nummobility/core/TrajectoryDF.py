@@ -6,7 +6,7 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: May 26, 2021.
-    | Version: 1.0
+    | Version: 0.2 Beta
 
 """
 import random

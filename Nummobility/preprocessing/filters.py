@@ -5,7 +5,7 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: 8th June, 2021
-    | Version: 1.0
+    | Version: 0.2 Beta
 """
 import itertools
 import math

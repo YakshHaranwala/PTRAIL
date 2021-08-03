@@ -9,6 +9,10 @@
         might even yield wrong results if used directly. They are meant to be used
         only as helpers. For calculation of features, use the ones in the
         features package.
+
+    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Date: 2nd June, 2021
+    | Version: 0.2 Beta
 """
 import os
 
@@ -268,7 +272,7 @@ class Helpers:
             distances[i] = calc.haversine_distance(coordinates[0], coordinates[1],
                                                    latitudes[i], longitudes[i])
 
-        dataframe[f'Distance_to_{coordinates}'] = distances
+        dataframe[f'Distance_from_{coordinates}'] = distances
         return dataframe
 
     @staticmethod
