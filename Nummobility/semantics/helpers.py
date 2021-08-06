@@ -14,12 +14,20 @@
     | Date: 4th August, 2021
     | Version: 0.2 Beta
 """
-from Nummobility.core.TrajectoryDF import NumPandasTraj
-import Nummobility.utilities.constants as const
-from Nummobility.utilities.DistanceCalculator import FormulaLog
+import os
+import psutil
+import warnings
+
+import numpy as np
 import osmnx as ox
 import pandas as pd
-import os, psutil
+
+import Nummobility.utilities.constants as const
+from Nummobility.core.TrajectoryDF import NumPandasTraj
+from Nummobility.utilities.DistanceCalculator import FormulaLog
+from Nummobility.features.spatial_features import SpatialFeatures
+
+warnings.filterwarnings("ignore")
 
 
 class SemanticHelpers:
@@ -94,6 +102,70 @@ class SemanticHelpers:
 
         # Finally, set the index as traj_id and osmid and return the dataframe.
         return dataframe.set_index([const.TRAJECTORY_ID, 'osmid'], drop=True)
+
+    @staticmethod
+    def nearest_bank_helper(dataframe, dist_threshold: int):
+        """
+            Find the bank nearest to the given point within the given threshold.
+
+            Parameters
+            ----------
+                dataframe:
+                    The point nearest to which the bank is to be found.
+                dist_threshold: int
+                    The maximum range within which the banks are to be searched.
+
+            Returns
+            -------
+
+        """
+
+        bank_column = []
+        for i in range(len(dataframe)):
+            coords = (dataframe.reset_index()[const.LAT][i], dataframe.reset_index()[const.LONG][i])
+            tags = {'amenity': ['atm', 'banks']}
+
+            banks = ox.geometries_from_point(center_point=coords,
+                                             dist=dist_threshold,
+                                             tags=tags)
+
+            lat = list(banks['geometry'].apply(lambda p: p.y))
+            lon = list(banks['geometry'].apply(lambda p: p.x))
+
+            dists = []
+            for j in range(len(lat)):
+                dists.append(FormulaLog.haversine_distance(coords[0], coords[1], lat[j], lon[j]))
+
+            if len(dists) > 0:
+                val = min(dists)
+            else:
+                val = None
+            bank_column.append(val)
+            print(i)
+
+        dataframe['Nearest_bank'] = pd.Series(bank_column, dtype=object)
+        print("DF over")
+        return dataframe
+
+    @staticmethod
+    def bank_within_dist_helper(dataframe, poi, dist_threshold):
+        indicator = []
+
+        for i in range(len(dataframe)):
+            coords = (dataframe.reset_index()[const.LAT][i],
+                      dataframe.reset_index()[const.LAT][i])
+
+            dist = SpatialFeatures.create_distance_from_given_point_column(dataframe=poi,
+                                                                           coordinates=coords)[f'Distance_from_{coords}']
+
+            if min(dist) < dist_threshold:
+                indicator.append(1)
+            else:
+                indicator.append(0)
+
+        dataframe[f'Bank_within_{dist_threshold}m'] = indicator
+
+        return dataframe
 
     # ------------------------------------ General Utilities ------------------------------------ #
     @staticmethod

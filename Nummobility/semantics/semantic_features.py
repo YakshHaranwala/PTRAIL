@@ -11,14 +11,17 @@
     | Version: 0.2 Beta
 
 """
+import itertools
 import math
 import multiprocessing
 import os
+from json import JSONDecodeError
 
 import osmnx as ox
 import pandas as pd
 import psutil
 
+from geopandas import GeoDataFrame
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.features.spatial_features import SpatialFeatures
 from Nummobility.utilities.DistanceCalculator import FormulaLog
@@ -31,35 +34,109 @@ NUM_CPU = math.ceil((len(os.sched_getaffinity(0)) if os.name == 'posix' else psu
 
 class SemanticFeatures:
     @staticmethod
-    def nearest_bank_detection(dataframe: NumPandasTraj, dist_threshold=1000):
-        # splitting the dataframe according to trajectory ids.
-            df_chunks = helpers._df_split_helper(dataframe)
+    def nearest_bank_detection(dataframe: NumPandasTraj, dist_threshold: int = 1000):
+        # splitting the dataframe according to trajectory id.
+        ids_ = list(dataframe.reset_index()[const.TRAJECTORY_ID].value_counts().keys())
+        df_chunks = [dataframe.reset_index().loc[dataframe.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
+                     for i in range(len(ids_))]
 
-            # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
-            # kept free at all times in order to not block up the system.
-            # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
-            # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
-            multi_pool = multiprocessing.Pool(NUM_CPU)
-            result = multi_pool.map(helpers.banks_crossed, df_chunks)
-            multi_pool.close()
-            multi_pool.join()
+        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+        # kept free at all times in order to not block up the system.
+        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+        multi_pool = multiprocessing.Pool(NUM_CPU)
+        result = multi_pool.starmap(helpers.bank_within_dist_helper, zip(df_chunks, itertools.repeat(dist_threshold)))
+        multi_pool.close()
+        multi_pool.join()
 
-            # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
-            return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
-                                 const.DateTime, const.TRAJECTORY_ID)
+        # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
+        return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
+                             const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def bank_alt(df: NumPandasTraj, dist_threshold: float = 1000):
-        bbox = SpatialFeatures.get_bounding_box(df)
-        tags = {'amenity': ['atm', 'banks']}
+    def bank_within_threshold(dataframe: NumPandasTraj, poi: GeoDataFrame, dist_threshold: float = 1000):
+        """
+            For all the points in the data, check whether there is a
+            bank within the threshold given by the user.
 
-        gdf = ox.geometries_from_bbox(north=bbox[2],
-                                      south=bbox[0],
-                                      east=bbox[3],
-                                      west=bbox[1],
-                                      tags=tags)
-        return gdf
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                    The dataframe containing the Trajectory Data.
+                poi: GeoDataFrame
+                    The GeoDataframe containing the point of interests.
+                dist_threshold: float
+                    The range within which banks are to be checked.
 
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe containing the column indicating the presence
+                    of a bank within the given threshold.
+        """
+        # splitting the dataframe according to trajectory id.
+        ids_ = list(dataframe.reset_index()[const.TRAJECTORY_ID].value_counts().keys())
+        df_chunks = [dataframe.reset_index().loc[dataframe.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
+                     for i in range(len(ids_))]
+
+        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+        # kept free at all times in order to not block up the system.
+        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+        multi_pool = multiprocessing.Pool(NUM_CPU)
+        result = multi_pool.starmap(helpers.bank_within_dist_helper,
+                                    zip(df_chunks, itertools.repeat(poi), itertools.repeat(dist_threshold)))
+        multi_pool.close()
+        multi_pool.join()
+
+        # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
+        return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
+                             const.DateTime, const.TRAJECTORY_ID)
+
+    @staticmethod
+    def nearest_bank_from_point(coords: tuple, dist_threshold, tags: dict):
+        """
+            Given a coordinate point and a distance threshold, find
+            the bank which is nearest to the point.
+
+            Parameter
+            ---------
+                coords: tuple
+                    The point near which the bank is to be found.
+                dist_threshold:
+                    The maximum distance from the point within which
+                    the distance is to be calculated.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame:
+                    A pandas DF containing the info about the nearest bank from
+                    the given point.
+        """
+        try:
+            poi = ox.geometries_from_point(center_point=coords,
+                                           dist=dist_threshold,
+                                           tags=tags)
+
+            if len(poi) > 0:
+                poi = poi.reset_index().loc[poi.reset_index()['element_type'] == 'node']
+
+                lat = list(poi['geometry'].apply(lambda p: p.y))
+                lon = list(poi['geometry'].apply(lambda p: p.x))
+
+                dists = []
+                for i in range(len(lat)):
+                    dists.append(FormulaLog.haversine_distance(coords[0], coords[1], lat[i], lon[i]))
+
+                poi[f'Distance_from_{coords}'] = dists
+
+                return poi.loc[poi[f'Distance_from_{coords}'] ==
+                               poi[f'Distance_from_{coords}'].min()].reset_index().drop(columns=['element_type', 'index'])
+            else:
+                return []
+
+        except JSONDecodeError:
+            raise ValueError("The tags provided are invalid. Please check your tags and try again.")
 
     @staticmethod
     def distance_from_nearby_hotels():

@@ -77,7 +77,7 @@ class Interpolation:
                     The dataframe containing the interpolated trajectory points.
         """
         # First, lets split the dataframe into smaller chunks containing
-        # points of only 1 trajectory per chunk.
+        # points of only n trajectory per chunk. n is
         df = dataframe.reset_index()
         df_chunks = helper._df_split_helper(df)
 
