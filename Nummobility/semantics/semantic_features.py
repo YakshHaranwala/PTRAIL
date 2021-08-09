@@ -23,8 +23,9 @@ import pandas as pd
 import psutil
 import numpy as np
 
-#from geopandas import GeoDataFrame
+from geopandas import GeoDataFrame
 from Nummobility.core.TrajectoryDF import NumPandasTraj
+from Nummobility.preprocessing.filters import Filters
 from Nummobility.features.spatial_features import SpatialFeatures
 from Nummobility.utilities.DistanceCalculator import FormulaLog
 from Nummobility.semantics.helpers import SemanticHelpers as helpers
@@ -141,42 +142,59 @@ class SemanticFeatures:
     #         raise ValueError("The tags provided are invalid. Please check your tags and try again.")
 
 
+    # @staticmethod
+    # def check_intersect(df: NumPandasTraj, geo_layers: Union[pd.DataFrame]):
+    #     df_lat = np.array(df.reset_index()[const.LAT].values)
+    #     df_lon = np.array(df.reset_index()[const.LONG].values)
+    #     gl_lat = np.array(geo_layers.reset_index()[const.LAT].values)
+    #     gl_lon = np.array(geo_layers.reset_index()[const.LONG].values)
+    #
+    #     # 2d array to store the displacement values
+    #     distances = np.zeros((len(df_lat), len(gl_lat)))
+    #     for i in range(len(df_lat)):
+    #         for j in range(len(gl_lat)):
+    #             # Check if the copordinate difference is +ve or -nve if +ve then find the distance else add a negative sign to it
+    #             if df_lat[i] - gl_lat[j] > 0 or df_lon[i] - gl_lon[j] > 0:
+    #                 distances[i][j] = (((df_lat[i] - gl_lat[j]) ** 2 + (df_lon[i] - gl_lon[j]) ** 2) ** 0.5)
+    #             else:
+    #                 distances[i][j] = (-(((df_lat[i] - gl_lat[j]) ** 2 + (df_lon[i] - gl_lon[j]) ** 2) ** 0.5))
+    #
+    #     #distances = ((((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5) if ((df_lat[:, None] - gl_lat[None, :]) > 0 or (df_lon[:, None] - gl_lon[None, :]) > 0) else -(((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5))
+    #     print(distances)
+    #
+    #     # If any of the value in a row is negative then intersection will store true else false
+    #     threshold = 0.0
+    #     intersections = (distances < 0.0).any(axis=1)
+    #     #print(intersections)
+    #     return intersections
+
     @staticmethod
-    def check_intersect(df: NumPandasTraj, geo_layers: Union[pd.DataFrame]):
-        df_lat = np.array(df.reset_index()[const.LAT].values)
-        df_lon = np.array(df.reset_index()[const.LONG].values)
+    def visited_pasture(df: NumPandasTraj, geo_layers: Union[pd.DataFrame, GeoDataFrame]):
         gl_lat = np.array(geo_layers.reset_index()[const.LAT].values)
         gl_lon = np.array(geo_layers.reset_index()[const.LONG].values)
 
-        # 2d array to store the displacement values
-        distances = np.zeros((len(df_lat), len(gl_lat)))
-        for i in range(len(df_lat)):
-            for j in range(len(gl_lat)):
-                # Check if the copordinate difference is +ve or -nve if +ve then find the distance else add a negative sign to it
-                if df_lat[i] - gl_lat[j] > 0 or df_lon[i] - gl_lon[j] > 0:
-                    distances[i][j] = (((df_lat[i] - gl_lat[j]) ** 2 + (df_lon[i] - gl_lon[j]) ** 2) ** 0.5)
-                else:
-                    distances[i][j] = (-(((df_lat[i] - gl_lat[j]) ** 2 + (df_lon[i] - gl_lon[j]) ** 2) ** 0.5))
+        # Now, lets find the bounding box of the trajectory.
+        bbox = SpatialFeatures.get_bounding_box(geo_layers)
 
-        #distances = ((((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5) if ((df_lat[:, None] - gl_lat[None, :]) > 0 or (df_lon[:, None] - gl_lon[None, :]) > 0) else -(((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5))
-        print(distances)
+        # Now, from the original dataframe, we will filter out the points
+        # that are within the bounding box that we found.
+        filt_df = Filters.filter_by_bounding_box(df, bbox)
+        df_lat = np.array(filt_df.reset_index()[const.LAT].values)
+        df_lon = np.array(filt_df.reset_index()[const.LONG].values)
 
-        # If any of the value in a row is negative then intersection will store true else false
-        threshold = 0.0
-        intersections = (distances < 0.0).any(axis=1)
-        #print(intersections)
-        return intersections
+        # Now, for each point in the filtered dataframe, we will check if the distance
+        # between the traj point and the habitat point is equal to the DistEWat or
+        # DistCWat + a given tolerance.
+        distances = ((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5
+
+        return distances
 
     @staticmethod
     def distance_from_nearby_hotels():
         pass
 
     @staticmethod
-    def distance_from_nearby_hopitals():
-        pass
-
-    @staticmethod
-    def distance_from_nearby_waterbody():
+    def distance_from_nearby_hospitals():
         pass
 
     @staticmethod

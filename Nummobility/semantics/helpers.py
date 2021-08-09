@@ -31,7 +31,7 @@ warnings.filterwarnings("ignore")
 
 
 class SemanticHelpers:
-    @staticmethod
+    # @staticmethod
     # def banks_crossed(df: NumPandasTraj, dist_threshold: float = 1000):
     #     """
     #         Find the banks crossed by the object during its trajectory.
