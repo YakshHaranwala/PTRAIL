@@ -19,7 +19,7 @@ import psutil
 import warnings
 
 import numpy as np
-import osmnx as ox
+#import osmnx as ox
 import pandas as pd
 
 import Nummobility.utilities.constants as const
@@ -32,120 +32,120 @@ warnings.filterwarnings("ignore")
 
 class SemanticHelpers:
     @staticmethod
-    def banks_crossed(df: NumPandasTraj, dist_threshold: float = 1000):
-        """
-            Find the banks crossed by the object during its trajectory.
-
-            Note
-            ----
-                By crossing, here we mean that the banks given out are within
-                the user specified range. So basically if the user has specified the
-                range as 1000 m, then the banks and atms given out are within 1000
-                m of the points of trajectory.
-
-            Parameters
-            ----------
-                df: NumPandasTraj
-                    The dataframe containing the Trajectory Data.
-                dist_threshold: float
-                    The radius of the circle within which the banks are to be located.
-
-            Returns
-            -------
-                pd.core.dataframe.DataFrame:
-                    Dataframe containing the banks crossed by the object during the course
-                    of its trajectory.
-
-
-        """
-        # The starting points of the trajectory.
-        start = df[const.LAT][0], df[const.LONG][0]
-        # dead_start = df[const.LAT][0], df[const.LONG][0]
-        lst = list()
-
-        # Now for every point in trajectory, check whether the distance
-        # between the current point and the start point is greater than the threshold.
-        for i in range(1, len(df)):
-            pt = df[const.LAT][i], df[const.LONG][i]
-            # Now, if the distance is indeed greater than the threshold, then check whether
-            # the distance between the very first point of the trajectory and the current
-            # point is greater than the threshold and if so, then add that point to the
-            # list of points from where the unique bank locations are to be found. The reasoning
-            # behind this is that the trajectory might not be a straight line and the object might
-            # take a turn and again come back to the point from where the trajectory started.
-            # Hence, the double comparisons.
-            if FormulaLog.haversine_distance(start[0], start[1], pt[0], pt[1]) > dist_threshold:
-                lst.append(pt)
-
-                # Change the initial comparison point to the current point.
-                start = pt
-
-        tags = {'amenity': ['atm', 'banks']}
-
-        print(f"Num unique points: {len(lst)}")
-
-        # Now, for each unique point calculated above, find the nearby banks
-        # and atms and drop the duplicates as the areas might overlap.
-        pdf = []
-        for i in range(len(lst)):
-            pt = lst[i]
-            gdf = ox.geometries_from_point(center_point=(pt[0], pt[1]),
-                                           tags=tags,
-                                           dist=dist_threshold)
-            pdf.append(gdf.drop_duplicates())
-
-        # Join all the smaller dataframes, add the traj_id column, drop the
-        # element_type column.
-        dataframe = pd.concat(pdf)
-        dataframe['traj_id'] = df.reset_index()[const.TRAJECTORY_ID][0]
-        # dataframe = dataframe.reset_index().drop(columns=['element_type'])
-
-        # Finally, set the index as traj_id and osmid and return the dataframe.
-        return dataframe.set_index([const.TRAJECTORY_ID, 'osmid'], drop=True)
-
-    @staticmethod
-    def nearest_bank_helper(dataframe, dist_threshold: int):
-        """
-            Find the bank nearest to the given point within the given threshold.
-
-            Parameters
-            ----------
-                dataframe:
-                    The point nearest to which the bank is to be found.
-                dist_threshold: int
-                    The maximum range within which the banks are to be searched.
-
-            Returns
-            -------
-
-        """
-
-        bank_column = []
-        for i in range(len(dataframe)):
-            coords = (dataframe.reset_index()[const.LAT][i], dataframe.reset_index()[const.LONG][i])
-            tags = {'amenity': ['atm', 'banks']}
-
-            banks = ox.geometries_from_point(center_point=coords,
-                                             dist=dist_threshold,
-                                             tags=tags)
-
-            lat = list(banks['geometry'].apply(lambda p: p.y))
-            lon = list(banks['geometry'].apply(lambda p: p.x))
-
-            dists = []
-            for j in range(len(lat)):
-                dists.append(FormulaLog.haversine_distance(coords[0], coords[1], lat[j], lon[j]))
-
-            if len(dists) > 0:
-                val = min(dists)
-            else:
-                val = None
-            bank_column.append(val)
-            print(i)
-
-        dataframe['Nearest_bank'] = pd.Series(bank_column, dtype=object)
-        print("DF over")
-        return dataframe
+    # def banks_crossed(df: NumPandasTraj, dist_threshold: float = 1000):
+    #     """
+    #         Find the banks crossed by the object during its trajectory.
+    #
+    #         Note
+    #         ----
+    #             By crossing, here we mean that the banks given out are within
+    #             the user specified range. So basically if the user has specified the
+    #             range as 1000 m, then the banks and atms given out are within 1000
+    #             m of the points of trajectory.
+    #
+    #         Parameters
+    #         ----------
+    #             df: NumPandasTraj
+    #                 The dataframe containing the Trajectory Data.
+    #             dist_threshold: float
+    #                 The radius of the circle within which the banks are to be located.
+    #
+    #         Returns
+    #         -------
+    #             pd.core.dataframe.DataFrame:
+    #                 Dataframe containing the banks crossed by the object during the course
+    #                 of its trajectory.
+    #
+    #
+    #     """
+    #     # The starting points of the trajectory.
+    #     start = df[const.LAT][0], df[const.LONG][0]
+    #     # dead_start = df[const.LAT][0], df[const.LONG][0]
+    #     lst = list()
+    #
+    #     # Now for every point in trajectory, check whether the distance
+    #     # between the current point and the start point is greater than the threshold.
+    #     for i in range(1, len(df)):
+    #         pt = df[const.LAT][i], df[const.LONG][i]
+    #         # Now, if the distance is indeed greater than the threshold, then check whether
+    #         # the distance between the very first point of the trajectory and the current
+    #         # point is greater than the threshold and if so, then add that point to the
+    #         # list of points from where the unique bank locations are to be found. The reasoning
+    #         # behind this is that the trajectory might not be a straight line and the object might
+    #         # take a turn and again come back to the point from where the trajectory started.
+    #         # Hence, the double comparisons.
+    #         if FormulaLog.haversine_distance(start[0], start[1], pt[0], pt[1]) > dist_threshold:
+    #             lst.append(pt)
+    #
+    #             # Change the initial comparison point to the current point.
+    #             start = pt
+    #
+    #     tags = {'amenity': ['atm', 'banks']}
+    #
+    #     print(f"Num unique points: {len(lst)}")
+    #
+    #     # Now, for each unique point calculated above, find the nearby banks
+    #     # and atms and drop the duplicates as the areas might overlap.
+    #     pdf = []
+    #     for i in range(len(lst)):
+    #         pt = lst[i]
+    #         gdf = ox.geometries_from_point(center_point=(pt[0], pt[1]),
+    #                                        tags=tags,
+    #                                        dist=dist_threshold)
+    #         pdf.append(gdf.drop_duplicates())
+    #
+    #     # Join all the smaller dataframes, add the traj_id column, drop the
+    #     # element_type column.
+    #     dataframe = pd.concat(pdf)
+    #     dataframe['traj_id'] = df.reset_index()[const.TRAJECTORY_ID][0]
+    #     # dataframe = dataframe.reset_index().drop(columns=['element_type'])
+    #
+    #     # Finally, set the index as traj_id and osmid and return the dataframe.
+    #     return dataframe.set_index([const.TRAJECTORY_ID, 'osmid'], drop=True)
+    #
+    # @staticmethod
+    # def nearest_bank_helper(dataframe, dist_threshold: int):
+    #     """
+    #         Find the bank nearest to the given point within the given threshold.
+    #
+    #         Parameters
+    #         ----------
+    #             dataframe:
+    #                 The point nearest to which the bank is to be found.
+    #             dist_threshold: int
+    #                 The maximum range within which the banks are to be searched.
+    #
+    #         Returns
+    #         -------
+    #
+    #     """
+    #
+    #     bank_column = []
+    #     for i in range(len(dataframe)):
+    #         coords = (dataframe.reset_index()[const.LAT][i], dataframe.reset_index()[const.LONG][i])
+    #         tags = {'amenity': ['atm', 'banks']}
+    #
+    #         banks = ox.geometries_from_point(center_point=coords,
+    #                                          dist=dist_threshold,
+    #                                          tags=tags)
+    #
+    #         lat = list(banks['geometry'].apply(lambda p: p.y))
+    #         lon = list(banks['geometry'].apply(lambda p: p.x))
+    #
+    #         dists = []
+    #         for j in range(len(lat)):
+    #             dists.append(FormulaLog.haversine_distance(coords[0], coords[1], lat[j], lon[j]))
+    #
+    #         if len(dists) > 0:
+    #             val = min(dists)
+    #         else:
+    #             val = None
+    #         bank_column.append(val)
+    #         print(i)
+    #
+    #     dataframe['Nearest_bank'] = pd.Series(bank_column, dtype=object)
+    #     print("DF over")
+    #     return dataframe
 
     @staticmethod
     def bank_within_dist_helper(dataframe, poi, dist_threshold):
