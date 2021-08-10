@@ -23,7 +23,8 @@ autodoc_mock_imports = ["scipy",
                         'psutil',
                         'folium',
                         'scikit-learn',
-                        'osmnx'
+                        'osmnx',
+                        'geopandas'
                         ]
 
 # -- Project information -----------------------------------------------------

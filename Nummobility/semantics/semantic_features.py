@@ -11,91 +11,96 @@
     | Version: 0.2 Beta
 
 """
-import itertools
 import math
-import multiprocessing
 import os
-from json import JSONDecodeError
-from typing import Union
+from typing import Union, Text
 
-#import osmnx as ox
+import geopandas as gpd
 import pandas as pd
 import psutil
-import numpy as np
 
-from geopandas import GeoDataFrame
 from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.preprocessing.filters import Filters
-from Nummobility.features.spatial_features import SpatialFeatures
-from Nummobility.utilities.DistanceCalculator import FormulaLog
-from Nummobility.semantics.helpers import SemanticHelpers as helpers
-
-import Nummobility.utilities.constants as const
 
 NUM_CPU = math.ceil((len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()) * 2 / 3)
 
 
 class SemanticFeatures:
     @staticmethod
-    def nearest_bank_detection(dataframe: NumPandasTraj, dist_threshold: int = 1000):
-        # splitting the dataframe according to trajectory id.
-        ids_ = list(dataframe.reset_index()[const.TRAJECTORY_ID].value_counts().keys())
-        df_chunks = [dataframe.reset_index().loc[dataframe.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
-                     for i in range(len(ids_))]
+    def visited_location(df: NumPandasTraj,
+                         geo_layers: Union[pd.DataFrame, gpd.GeoDataFrame],
+                         visited_location_name: Text,
+                         location_column_name: Text):
+        """
+            Create a column called visited_Pasture for all the pastures present in the
+            dataset.
 
-        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
-        # kept free at all times in order to not block up the system.
-        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
-        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
-        multi_pool = multiprocessing.Pool(NUM_CPU)
-        result = multi_pool.starmap(helpers.bank_within_dist_helper, zip(df_chunks, itertools.repeat(dist_threshold)))
-        multi_pool.close()
-        multi_pool.join()
+            Parameters
+            ----------
+                df: NumPandasTraj
+                    The dataframe containing the dataset.
+                geo_layers: Union[pd.DataFrame, gpd.GeoDataFrame]
+                    The Dataframe containing the geographical layers near the trajectory data.
+                    It is to be noted
+                visited_location_name: Text
+                    The location for which it is to be checked whether the objected visited it
+                    or not.
+                location_column_name: Text
 
-        # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
-        return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
-                             const.DateTime, const.TRAJECTORY_ID)
+            Returns
+            -------
+                NumPandasTraj:
+                    The Dataframe containing a new column indicating whether the animal
+                    has visited the pasture or not.
 
-    # @staticmethod
-    # def bank_within_threshold(dataframe: NumPandasTraj, poi: GeoDataFrame, dist_threshold: float = 1000):
-    #     """
-    #         For all the points in the data, check whether there is a
-    #         bank within the threshold given by the user.
-    #
-    #         Parameters
-    #         ----------
-    #             dataframe: NumPandasTraj
-    #                 The dataframe containing the Trajectory Data.
-    #             poi: GeoDataFrame
-    #                 The GeoDataframe containing the point of interests.
-    #             dist_threshold: float
-    #                 The range within which banks are to be checked.
-    #
-    #         Returns
-    #         -------
-    #             NumPandasTraj:
-    #                 The dataframe containing the column indicating the presence
-    #                 of a bank within the given threshold.
-    #     """
-    #     # splitting the dataframe according to trajectory id.
-    #     ids_ = list(dataframe.reset_index()[const.TRAJECTORY_ID].value_counts().keys())
-    #     df_chunks = [dataframe.reset_index().loc[dataframe.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
-    #                  for i in range(len(ids_))]
-    #
-    #     # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
-    #     # kept free at all times in order to not block up the system.
-    #     # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
-    #     # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
-    #     multi_pool = multiprocessing.Pool(NUM_CPU)
-    #     result = multi_pool.starmap(helpers.bank_within_dist_helper,
-    #                                 zip(df_chunks, itertools.repeat(poi), itertools.repeat(dist_threshold)))
-    #     multi_pool.close()
-    #     multi_pool.join()
-    #
-    #     # merge the smaller pieces and then return the dataframe converted to NumPandasTraj.
-    #     return NumPandasTraj(pd.concat(result), const.LAT, const.LONG,
-    #                          const.DateTime, const.TRAJECTORY_ID)
-    #
+        """
+        df = df.reset_index()
+        geo_layers = geo_layers.loc[geo_layers[location_column_name] == visited_location_name]
+        df1 = gpd.GeoDataFrame(df,
+                               geometry=gpd.points_from_xy(df["lon"],
+                                                           df["lat"]),
+                               crs={"init": "epsg:4326"})
+
+        df2 = geo_layers
+        df2 = gpd.GeoDataFrame(geo_layers,
+                               geometry=gpd.points_from_xy(geo_layers["lon"],
+                                                           geo_layers["lat"]),
+                               crs={"init": "epsg:4326"})
+
+        intersection = gpd.overlay(df1, df2, how='intersection')
+
+        print(len(intersection))
+
+        merged = pd.merge(df, intersection, how='outer', indicator=True)['_merge']
+
+        merged = merged.replace('both', 1)
+        merged = merged.replace('left_only', 0)
+        merged = merged.replace('right_only', 0)
+
+        df[f'Visited_{visited_location_name}'] = merged
+        df = df.drop(columns='geometry')
+        # return merged
+        return NumPandasTraj(df,
+                             latitude='lat',
+                             longitude='lon',
+                             datetime='DateTime',
+                             traj_id='traj_id')
+
+    @staticmethod
+    def distance_from_nearby_hotels():
+        pass
+
+    @staticmethod
+    def distance_from_nearby_hospitals():
+        pass
+
+    @staticmethod
+    def trajectory_crossing_paths():
+        pass
+
+    @staticmethod
+    def points_inside_polygon():
+        pass
+
     # @staticmethod
     # def nearest_bank_from_point(coords: tuple, dist_threshold, tags: dict):
     #     """
@@ -140,67 +145,3 @@ class SemanticFeatures:
     #
     #     except JSONDecodeError:
     #         raise ValueError("The tags provided are invalid. Please check your tags and try again.")
-
-
-    # @staticmethod
-    # def check_intersect(df: NumPandasTraj, geo_layers: Union[pd.DataFrame]):
-    #     df_lat = np.array(df.reset_index()[const.LAT].values)
-    #     df_lon = np.array(df.reset_index()[const.LONG].values)
-    #     gl_lat = np.array(geo_layers.reset_index()[const.LAT].values)
-    #     gl_lon = np.array(geo_layers.reset_index()[const.LONG].values)
-    #
-    #     # 2d array to store the displacement values
-    #     distances = np.zeros((len(df_lat), len(gl_lat)))
-    #     for i in range(len(df_lat)):
-    #         for j in range(len(gl_lat)):
-    #             # Check if the copordinate difference is +ve or -nve if +ve then find the distance else add a negative sign to it
-    #             if df_lat[i] - gl_lat[j] > 0 or df_lon[i] - gl_lon[j] > 0:
-    #                 distances[i][j] = (((df_lat[i] - gl_lat[j]) ** 2 + (df_lon[i] - gl_lon[j]) ** 2) ** 0.5)
-    #             else:
-    #                 distances[i][j] = (-(((df_lat[i] - gl_lat[j]) ** 2 + (df_lon[i] - gl_lon[j]) ** 2) ** 0.5))
-    #
-    #     #distances = ((((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5) if ((df_lat[:, None] - gl_lat[None, :]) > 0 or (df_lon[:, None] - gl_lon[None, :]) > 0) else -(((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5))
-    #     print(distances)
-    #
-    #     # If any of the value in a row is negative then intersection will store true else false
-    #     threshold = 0.0
-    #     intersections = (distances < 0.0).any(axis=1)
-    #     #print(intersections)
-    #     return intersections
-
-    @staticmethod
-    def visited_pasture(df: NumPandasTraj, geo_layers: Union[pd.DataFrame, GeoDataFrame]):
-        gl_lat = np.array(geo_layers.reset_index()[const.LAT].values)
-        gl_lon = np.array(geo_layers.reset_index()[const.LONG].values)
-
-        # Now, lets find the bounding box of the trajectory.
-        bbox = SpatialFeatures.get_bounding_box(geo_layers)
-
-        # Now, from the original dataframe, we will filter out the points
-        # that are within the bounding box that we found.
-        filt_df = Filters.filter_by_bounding_box(df, bbox)
-        df_lat = np.array(filt_df.reset_index()[const.LAT].values)
-        df_lon = np.array(filt_df.reset_index()[const.LONG].values)
-
-        # Now, for each point in the filtered dataframe, we will check if the distance
-        # between the traj point and the habitat point is equal to the DistEWat or
-        # DistCWat + a given tolerance.
-        distances = ((df_lat[:, None] - gl_lat[None, :]) ** 2 + (df_lon[:, None] - gl_lon[None, :]) ** 2) ** 0.5
-
-        return distances
-
-    @staticmethod
-    def distance_from_nearby_hotels():
-        pass
-
-    @staticmethod
-    def distance_from_nearby_hospitals():
-        pass
-
-    @staticmethod
-    def trajectory_crossing_paths():
-        pass
-
-    @staticmethod
-    def points_inside_polygon():
-        pass

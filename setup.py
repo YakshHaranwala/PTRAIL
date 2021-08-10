@@ -13,6 +13,7 @@ REQUIRED_PKGS = ['numpy',
                  'matplotlib',
                  'scikit-learn',
                  'osmnx',
+                 'geopandas'
                  ]
 
 setup(
