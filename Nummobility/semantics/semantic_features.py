@@ -18,8 +18,11 @@ from typing import Union, Text
 import geopandas as gpd
 import pandas as pd
 import psutil
+import numpy as np
 
 from Nummobility.core.TrajectoryDF import NumPandasTraj
+from Nummobility.features.spatial_features import SpatialFeatures
+from Nummobility.features.helper_functions import Helpers
 
 NUM_CPU = math.ceil((len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()) * 2 / 3)
 
