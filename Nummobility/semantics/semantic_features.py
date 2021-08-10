@@ -37,6 +37,13 @@ class SemanticFeatures:
             Create a column called visited_Pasture for all the pastures present in the
             dataset.
 
+            Warning
+            -------
+                While using this method, make sure that the geo_layers parameter dataframe
+                that is being passed into the method has Latitude and Longitude columns with
+                columns named as 'lat' and 'lon' respectively. If this format is not followed
+                then a KeyError will be thrown.
+
             Parameters
             ----------
                 df: NumPandasTraj
@@ -57,36 +64,141 @@ class SemanticFeatures:
 
         """
         df = df.reset_index()
+
+        # First, filter out the geo_layers dataset to include only the points of the location
+        # specified by the user.
         geo_layers = geo_layers.loc[geo_layers[location_column_name] == visited_location_name]
+
+        # Now for the trajectory dataset and the geo layers dataset both, convert them to a
+        # GeoDataFrame with the geometry of lat-lon for each point.
         df1 = gpd.GeoDataFrame(df,
                                geometry=gpd.points_from_xy(df["lon"],
                                                            df["lat"]),
                                crs={"init": "epsg:4326"})
 
-        df2 = geo_layers
         df2 = gpd.GeoDataFrame(geo_layers,
                                geometry=gpd.points_from_xy(geo_layers["lon"],
                                                            geo_layers["lat"]),
                                crs={"init": "epsg:4326"})
 
+        # Now, using GeoPandas, find where the trajectory points and the geo-layers
+        # point intersect.
         intersection = gpd.overlay(df1, df2, how='intersection')
 
-        print(len(intersection))
-
+        # Now, in the original dataframe, check which points have intersected
+        # with the geo-layers dataset and which ones have not.
         merged = pd.merge(df, intersection, how='outer', indicator=True)['_merge']
 
+        # Finally, replace the truth value of the points that have intersected to 1
+        # and set it to 0 for the points that have not intersected.
         merged = merged.replace('both', 1)
         merged = merged.replace('left_only', 0)
         merged = merged.replace('right_only', 0)
 
+        # Assign the resultant column to the original df and drop the unnecessary column
+        # of geometry.
         df[f'Visited_{visited_location_name}'] = merged
         df = df.drop(columns='geometry')
+
         # return merged
         return NumPandasTraj(df,
                              latitude='lat',
                              longitude='lon',
                              datetime='DateTime',
                              traj_id='traj_id')
+
+    @staticmethod
+    def visited_waterbody(df: NumPandasTraj,
+                          water_bodies: Union[pd.DataFrame, gpd.GeoDataFrame]):
+        """
+            Create a column with the information if the nearby water bodies were
+            visited or intersected by the given trajectory.
+
+            Parameters
+            ----------
+                df: NumPandasTraj
+                    The dataframe containing the trajectory data.
+                water_bodies: Union[pd.DataFrame, gpd.GeoDataFrame]
+                    The dataframe containing the data about water bodies in the
+                    area of interest.
+
+            Return
+            ------
+                NumPandasTraj:
+                    The dataframe containing the column indicating whether a water body/ water bodies
+                    were intersected by the object or not.
+        """
+        df = df.reset_index()
+        df1 = gpd.GeoDataFrame(df,
+                               geometry=gpd.points_from_xy(df["lon"],
+                                                           df["lat"]),
+                               crs={"init": "epsg:4326"})
+
+        intersection = gpd.overlay(df1, water_bodies, how="intersection")
+
+        merged = pd.merge(df, intersection, how="outer", indicator=True)['_merge']
+
+        merged = merged.replace('both', 1)
+        merged = merged.replace('left_only', 0)
+        merged = merged.replace('right_only', 0)
+
+        df[f'Visited_Waterbodies'] = merged
+        df = df.drop(columns='geometry')
+
+        return NumPandasTraj(df,
+                             latitude='lat',
+                             longitude='lon',
+                             datetime='DateTime',
+                             traj_id='traj_id')
+
+    @staticmethod
+    def waterbody_alt(df: NumPandasTraj,
+                      surrounding_data: Union[gpd.GeoDataFrame, pd.DataFrame, NumPandasTraj],
+                      dist_column_label: Text):
+        """
+            Given a surrounding data with information about the distance to the nearest water source
+            from a given coordinate, check whether the objects in the given trajectory data have
+            crossed those water sources or not.
+
+            Warning
+            -------
+                It is to be noted that for this method to work, the surrounding dataset NEEDS to have a
+                column containing distance to the nearest water body. For more info, see the Starkey dataset
+                which has the columns like 'DistCWat' and 'DistEWat'.
+
+
+            Parameters
+            ----------
+                df: NumPandasTraj
+                    The dataframe containing the trajectory data.
+                surrounding_data: Union[gpd.GeoDataFrame, pd.DataFrame]
+                    The surrounding data that needs to contain the information of distance
+                    to the nearest water body.
+                dist_column_label: Text
+                    The name of the column containing the distance information.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    The dataframe containing the new column indicating whether the object
+                    at that point is nearby a water body.
+
+            #TODO: Parallelize the shit out of this function.
+        """
+        waterbody = []
+        df2 = surrounding_data.copy()
+        for i in range(len(df)):
+            dist_array = Helpers.distance_from_given_point_helper(df2, (df['lat'][i], df['lon'][i]))[
+                f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
+            pond_array = df2[dist_column_label].to_numpy()
+
+            dist_comp = np.abs(pond_array - dist_array) <= 5
+            waterbody.append(np.any(dist_comp))
+        df['Nearby_water_body_visited'] = waterbody
+
+        return df
+
+
 
     @staticmethod
     def distance_from_nearby_hotels():
