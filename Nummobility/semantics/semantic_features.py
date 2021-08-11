@@ -30,6 +30,7 @@ if os.name == 'posix':
 else:
     NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
 
+
 class SemanticFeatures:
     @staticmethod
     def visited_location(df: NumPandasTraj,
