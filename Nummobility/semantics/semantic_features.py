@@ -26,7 +26,7 @@ from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.semantics.helpers import SemanticHelpers
 from Nummobility.utilities.DistanceCalculator import FormulaLog
 
-NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
+NUM_CPU = ceil(int(psutil.cpu_count()) * 2 / 3)
 
 
 class SemanticFeatures:
