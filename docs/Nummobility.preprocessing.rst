@@ -28,3 +28,10 @@ Nummobility.preprocessing.interpolation module
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
+
+.. automodule:: Nummobility.preprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:

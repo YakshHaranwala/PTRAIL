@@ -233,7 +233,7 @@ class SemanticFeatures:
                                            dist=dist_threshold,
                                            tags=tags)
 
-            #
+            # Check whether there are any errors
             if len(poi) > 0:
                 poi = poi.reset_index().loc[poi.reset_index()['element_type'] == 'node']
 

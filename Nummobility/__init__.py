@@ -8,6 +8,9 @@ from .preprocessing import interpolation
 from .preprocessing import filters
 from .preprocessing import helpers
 
+from .semantics import helpers
+from .semantics import semantic_features
+
 from .utilities import (
     constants,
     conversions,

@@ -28,3 +28,10 @@ Nummobility.features.temporal\_features module
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
+
+.. automodule:: Nummobility.features
+   :members:
+   :undoc-members:
+   :show-inheritance:
