@@ -23,6 +23,9 @@ import psutil
 import osmnx as ox
 
 from math import ceil
+
+from shapely.geometry import Polygon, MultiPolygon
+
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.semantics.helpers import SemanticHelpers
 from Nummobility.utilities.DistanceCalculator import FormulaLog
@@ -179,7 +182,54 @@ class SemanticFeatures:
         return results
 
     @staticmethod
-    def distance_from_nearby_hotels():
+    def trajectories_inside_polygon(df: NumPandasTraj, polygon: Polygon):
+        """
+            Given a trajectory dataframe and a Polygon, find out all the trajectories
+            that are inside the given polygon.
+
+            Warning
+            -------
+                While creating a polygon, the format of the coordinates is: (longitude, latitude)
+                instead of (latitude, longitude). Beware of that, otherwise the results will be
+                incorrect.
+
+            Parameters
+            ----------
+                df: NumPandasTraj
+                    The dataframe containing the trajectory data.
+                polygon: Polygon
+                    The polygon inside which the points are to be found.
+
+            Returns
+            -------
+                NumPandasTraj:
+                    A dataframe containing trajectories that are inside the polygon.
+        """
+        # Convert the original dataframe and the polygon to a GeoPandasDataframe.
+        df1 = gpd.GeoDataFrame(df.reset_index(),
+                               geometry=gpd.points_from_xy(df["lon"],
+                                                           df["lat"]),
+                               crs={"init": "epsg:4326"})
+
+        df2 = gpd.GeoDataFrame(geometry=gpd.GeoSeries(polygon),
+                               crs={"init": "epsg:4326"})
+
+        # Find the points on intersections between the 2 DataFrames.
+        intersection = gpd.overlay(df1=df1, df2=df2, how='intersection')
+
+        # Convert the filtered DF back to NumPandasTraj and return it.
+        return NumPandasTraj(data_set=intersection,
+                             datetime='DateTime',
+                             traj_id='traj_id',
+                             latitude='lat',
+                             longitude='lon').drop(columns=['geometry'])
+
+    @staticmethod
+    def traj_intersect_inside_polygon(df1: NumPandasTraj,
+                                      df2: NumPandasTraj,
+                                      polygon: Polygon):
+        """
+        """
         pass
 
     @staticmethod
@@ -188,10 +238,6 @@ class SemanticFeatures:
 
     @staticmethod
     def trajectory_crossing_paths():
-        pass
-
-    @staticmethod
-    def points_inside_polygon():
         pass
 
     @staticmethod

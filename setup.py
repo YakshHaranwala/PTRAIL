@@ -13,13 +13,14 @@ REQUIRED_PKGS = ['numpy',
                  'matplotlib',
                  'scikit-learn',
                  'osmnx',
-                 'geopandas'
+                 'geopandas',
+                 'shapely'
                  ]
 
 setup(
     name='Nummobility',
     packages=find_packages(),
-    version='0.2.1 Beta',
+    version='0.2.3 Beta',
     license='new BSD',
     python_requires='>=3.6',
     description='A Mobility-data Preprocessing Library using parallel computation.',
