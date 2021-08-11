@@ -36,10 +36,15 @@ class SemanticHelpers:
     def waterbody_visited_helper(df, surrounding_data, dist_column_label):
         waterbody = []
         df2 = surrounding_data.copy()
+
+        # Loop for every point in the dataframe and create a distance column with distance from every point in the
+        # surrounding data. Then use this distance column and the distance of POI column and compare each value.
+        # Store the comparison in an array True if they lie within the threshold else false. And if any of the
+        # value in it is true then that point in the dataframe was near a POI.
         for i in range(len(df)):
             dist_array = Helpers.distance_from_given_point_helper(df2, (df['lat'][i], df['lon'][i]))[
                 f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
-            pond_array = df2[dist_column_label].to_numpy()
+            poi_array = df2[dist_column_label].to_numpy()
 
             dist_comp = np.abs(pond_array - dist_array) <= 5
             waterbody.append(np.any(dist_comp))
