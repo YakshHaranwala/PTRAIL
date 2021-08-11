@@ -13,6 +13,7 @@
 """
 import itertools
 import multiprocessing
+import os
 from json import JSONDecodeError
 from typing import Union, Text
 
@@ -26,8 +27,7 @@ from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.semantics.helpers import SemanticHelpers
 from Nummobility.utilities.DistanceCalculator import FormulaLog
 
-num = psutil.cpu_count()
-num = int(num)
+num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
 
 

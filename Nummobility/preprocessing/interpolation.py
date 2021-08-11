@@ -25,8 +25,7 @@ from Nummobility.core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from typing import Optional, Text, Union
 from math import ceil
 
-num = psutil.cpu_count()
-num = int(num)
+num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
 
 

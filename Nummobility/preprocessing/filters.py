@@ -24,8 +24,7 @@ from Nummobility.utilities.exceptions import *
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.preprocessing.helpers import Helpers as helper
 
-num = psutil.cpu_count()
-num = int(num)
+num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
 
 

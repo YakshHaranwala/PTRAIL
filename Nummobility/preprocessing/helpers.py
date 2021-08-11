@@ -410,9 +410,8 @@ class Helpers:
         """
         # Based on the Operating system, get the number of CPUs available for
         # multiprocessing.
-        num = psutil.cpu_count()
-        num = int(num)
-        NUM_CPU = ceil((num * 2) / 3)
+        num = os.cpu_count()
+        NUM_CPU = math.ceil((num * 2) / 3)
 
         # Integer divide the total number of Trajectory IDs by the number of available CPUs
         # The factor of 1 is added to avoid errors when the integer division yields a 0.
