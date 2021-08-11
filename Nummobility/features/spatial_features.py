@@ -33,8 +33,9 @@ from Nummobility.utilities.DistanceCalculator import FormulaLog as calc
 from Nummobility.utilities.exceptions import *
 
 
-cpu_count = psutil.cpu_count()
-NUM_CPU = ceil((cpu_count * 2) / 3)
+num = int(psutil.cpu_count())
+NUM_CPU = ceil((num * 2) / 3)
+
 
 class SpatialFeatures:
     @staticmethod
