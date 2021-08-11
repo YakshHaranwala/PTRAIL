@@ -11,7 +11,9 @@
     | Version: 0.2 Beta
 
 """
+import itertools
 import math
+import multiprocessing
 import os
 from typing import Union, Text
 
@@ -23,12 +25,9 @@ import numpy as np
 from math import ceil
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.features.spatial_features import SpatialFeatures
-from Nummobility.features.helper_functions import Helpers
+from Nummobility.semantics.helpers import SemanticHelpers
 
-if os.name == 'posix':
-    NUM_CPU = ceil((len(os.sched_getaffinity(0)) * 2) / 3)
-else:
-    NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
+NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
 
 
 class SemanticFeatures:
@@ -189,19 +188,25 @@ class SemanticFeatures:
 
             #TODO: Parallelize the shit out of this function.
         """
-        waterbody = []
-        df2 = surrounding_data.copy()
-        for i in range(len(df)):
-            dist_array = Helpers.distance_from_given_point_helper(df2, (df['lat'][i], df['lon'][i]))[
-                f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
-            pond_array = df2[dist_column_label].to_numpy()
+        df_chunks = SemanticHelpers._df_split_helper(df)
+        print(len(df_chunks))
+        # Here, create 2/3rds number of processes as there are in the    system. Some CPUs are
+        # kept free at all times in order to not block up the system.
+        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+        mp_pool = multiprocessing.Pool(NUM_CPU)
+        results = mp_pool.starmap(SemanticHelpers.waterbody_visited_helper,
+                                  zip(df_chunks,
+                                      itertools.repeat(surrounding_data),
+                                      itertools.repeat(dist_column_label)
+                                      )
+                                  )
+        mp_pool.close()
+        mp_pool.join()
 
-            dist_comp = np.abs(pond_array - dist_array) <= 5
-            waterbody.append(np.any(dist_comp))
-        df['Nearby_water_body_visited'] = waterbody
-
-        return df
-
+        # Concatenate all the smaller dataframes and return the answer.
+        results = pd.concat(results)
+        return results
 
 
     @staticmethod

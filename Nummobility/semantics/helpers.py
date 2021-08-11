@@ -26,11 +26,27 @@ import Nummobility.utilities.constants as const
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.utilities.DistanceCalculator import FormulaLog
 from Nummobility.features.spatial_features import SpatialFeatures
+from Nummobility.features.helper_functions import Helpers
 
 warnings.filterwarnings("ignore")
 
 
 class SemanticHelpers:
+    @staticmethod
+    def waterbody_visited_helper(df, surrounding_data, dist_column_label):
+        waterbody = []
+        df2 = surrounding_data.copy()
+        for i in range(len(df)):
+            dist_array = Helpers.distance_from_given_point_helper(df2, (df['lat'][i], df['lon'][i]))[
+                f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
+            pond_array = df2[dist_column_label].to_numpy()
+
+            dist_comp = np.abs(pond_array - dist_array) <= 5
+            waterbody.append(np.any(dist_comp))
+        df['Nearby_water_body_visited'] = waterbody
+
+        return df
+
     # @staticmethod
     # def banks_crossed(df: NumPandasTraj, dist_threshold: float = 1000):
     #     """
@@ -147,25 +163,25 @@ class SemanticHelpers:
     #     print("DF over")
     #     return dataframe
 
-    @staticmethod
-    def bank_within_dist_helper(dataframe, poi, dist_threshold):
-        indicator = []
-
-        for i in range(len(dataframe)):
-            coords = (dataframe.reset_index()[const.LAT][i],
-                      dataframe.reset_index()[const.LAT][i])
-
-            dist = SpatialFeatures.create_distance_from_given_point_column(dataframe=poi,
-                                                                           coordinates=coords)[f'Distance_from_{coords}']
-
-            if min(dist) < dist_threshold:
-                indicator.append(1)
-            else:
-                indicator.append(0)
-
-        dataframe[f'Bank_within_{dist_threshold}m'] = indicator
-
-        return dataframe
+    # @staticmethod
+    # def bank_within_dist_helper(dataframe, poi, dist_threshold):
+    #     indicator = []
+    #
+    #     for i in range(len(dataframe)):
+    #         coords = (dataframe.reset_index()[const.LAT][i],
+    #                   dataframe.reset_index()[const.LAT][i])
+    #
+    #         dist = SpatialFeatures.create_distance_from_given_point_column(dataframe=poi,
+    #                                                                        coordinates=coords)[f'Distance_from_{coords}']
+    #
+    #         if min(dist) < dist_threshold:
+    #             indicator.append(1)
+    #         else:
+    #             indicator.append(0)
+    #
+    #     dataframe[f'Bank_within_{dist_threshold}m'] = indicator
+    #
+    #     return dataframe
 
     # ------------------------------------ General Utilities ------------------------------------ #
     @staticmethod
@@ -230,6 +246,7 @@ class SemanticHelpers:
 
         # Get the ideal number of IDs by which the dataframe is to be split.
         split_factor = SemanticHelpers._get_partition_size(len(ids_))
+        # split_factor = 1
         ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
         # Now split the dataframes based on set of Trajectory ids.
