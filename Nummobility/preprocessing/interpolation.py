@@ -25,10 +25,8 @@ from Nummobility.core.TrajectoryDF import NumPandasTraj as NumTrajDF
 from typing import Optional, Text, Union
 from math import ceil
 
-if os.name == 'posix':
-    NUM_CPU = ceil((len(os.sched_getaffinity(0)) * 2) / 3)
-else:
-    NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
+NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
+
 
 class Interpolation:
     @staticmethod
