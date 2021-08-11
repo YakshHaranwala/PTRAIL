@@ -18,13 +18,16 @@ import numpy as np
 import pandas as pd
 import multiprocessing
 
+from math import ceil
 import Nummobility.utilities.constants as const
 from Nummobility.utilities.exceptions import *
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.preprocessing.helpers import Helpers as helper
 
-NUM_CPU = len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()
-
+if os.name == 'posix':
+    NUM_CPU = ceil((len(os.sched_getaffinity(0)) * 2)) / 3
+else:
+    NUM_CPU = ceil(psutil.cpu_count() * 2) / 3
 
 class Filters:
     @staticmethod

@@ -32,7 +32,11 @@ from Nummobility.utilities import constants as const
 from Nummobility.utilities.DistanceCalculator import FormulaLog as calc
 from Nummobility.utilities.exceptions import *
 
-NUM_CPU = ceil((len(os.sched_getaffinity(0)) if os.name == 'posix' else psutil.cpu_count()) * 2 / 3)
+
+if os.name == 'posix':
+    NUM_CPU = ceil((len(os.sched_getaffinity(0)) * 2)) / 3
+else:
+    NUM_CPU = ceil(psutil.cpu_count() * 2) / 3
 
 
 class SpatialFeatures:
