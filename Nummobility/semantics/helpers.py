@@ -97,8 +97,9 @@ class SemanticHelpers:
         # Based on the Operating system, get the number of CPUs available for
         # multiprocessing.
         # Number of available CPUs.
-        cpu_count = psutil.cpu_count()
-        NUM_CPU = math.ceil((cpu_count * 2) / 3)
+        num = psutil.cpu_count()
+        num = int(num)
+        NUM_CPU = math.ceil((num * 2) / 3)
 
         # Integer divide the total number of Trajectory IDs by the number of available CPUs
         # and square the number because if too many partitions are made, then it does more

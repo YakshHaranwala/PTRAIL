@@ -19,7 +19,7 @@ REQUIRED_PKGS = ['numpy',
 setup(
     name='Nummobility',
     packages=find_packages(),
-    version='0.2 Beta',
+    version='0.2.1 Beta',
     license='new BSD',
     python_requires='>=3.6',
     description='A Mobility-data Preprocessing Library using parallel computation.',

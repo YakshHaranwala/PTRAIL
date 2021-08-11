@@ -33,7 +33,8 @@ from Nummobility.utilities.DistanceCalculator import FormulaLog as calc
 from Nummobility.utilities.exceptions import *
 
 
-num = int(psutil.cpu_count())
+num = psutil.cpu_count()
+num = int(num)
 NUM_CPU = ceil((num * 2) / 3)
 
 
