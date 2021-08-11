@@ -26,6 +26,7 @@ from Nummobility.preprocessing.helpers import Helpers as helper
 
 NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
 
+
 class Filters:
     @staticmethod
     def remove_duplicates(dataframe: NumPandasTraj):

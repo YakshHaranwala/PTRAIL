@@ -14,12 +14,12 @@
     | Date: 4th August, 2021
     | Version: 0.2 Beta
 """
+import math
 import os
 import psutil
 import warnings
 
 import numpy as np
-#import osmnx as ox
 import pandas as pd
 
 import Nummobility.utilities.constants as const
@@ -33,8 +33,31 @@ warnings.filterwarnings("ignore")
 
 class SemanticHelpers:
     @staticmethod
-    def waterbody_visited_helper(df, surrounding_data, dist_column_label):
-        waterbody = []
+    def visited_poi_helper(df, surrounding_data, dist_column_label, nearby_threshold):
+        """
+            Given a Trajectory dataframe and another dataset with the surrounding data,
+            find whether the given object is nearby a point of interest or not.
+
+            Parameters
+            ----------
+                df:
+                    The dataframe containing the trajectory data.
+                surrounding_data:
+                    The dataframe containing the data of the surroundings.
+                dist_column_label: Text
+                    The label of the column containing the distance of the coords from
+                    the nearest POI.
+                nearby_threshold: int
+                    The maximum distance between the POI and the current location of the object
+                    within which the object is considered to be crossing/visiting the POI.
+
+            Returns
+            -------
+                The original dataframe with another column added to it indicating whether
+                each point is within
+        """
+        # A boolean list to store if that point in trajectory lies around a POI.
+        POI = []
         df2 = surrounding_data.copy()
 
         # Loop for every point in the dataframe and create a distance column with distance from every point in the
@@ -46,11 +69,86 @@ class SemanticHelpers:
                 f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
             poi_array = df2[dist_column_label].to_numpy()
 
-            dist_comp = np.abs(pond_array - dist_array) <= 5
-            waterbody.append(np.any(dist_comp))
-        df['Nearby_water_body_visited'] = waterbody
+            dist_comp = np.abs(poi_array - dist_array) <= nearby_threshold
+            POI.append(np.any(dist_comp))
+
+        # Append the boolean list containing whether each point was near the POI of interest or not
+        df['Nearby_POI'] = POI
+        print('Finished')
 
         return df
+    # ------------------------------------ General Utilities ------------------------------------ #
+    @staticmethod
+    def _get_partition_size(size):
+        """
+            Takes number of ids and makes use of a formula that gives a factor to makes set of ids
+            according to the number of processors available to work with.
+
+            Parameters
+            ----------
+                size: int
+                    The total number of trajectory IDs in the dataset.
+
+            Returns
+            -------
+                int
+                   The factor by which the datasets are to be split.
+        """
+        # Based on the Operating system, get the number of CPUs available for
+        # multiprocessing.
+        # Number of available CPUs.
+        available_cpus = math.ceil((psutil.cpu_count() * 2) / 3)
+
+        # Integer divide the total number of Trajectory IDs by the number of available CPUs
+        # and square the number because if too many partitions are made, then it does more
+        # harm than good for the execution speed. The factor of 1 is added to avoid errors
+        # when the integer division yields a 0.
+        factor = ((size // available_cpus)) + 1
+
+        # Return the factor if it is less than 100 otherwise return 100.
+        # This factor hence is capped at 100.
+        return factor if factor < 100 else 100
+
+    @staticmethod
+    def _df_split_helper(dataframe):
+        """
+            This is the helper function for splitting up dataframes into smaller chunks.
+            This function is widely used for main functions to help split the original
+            dataframe into smaller chunks based on a fixed range of IDs. This function
+            splits the dataframes based on a predetermined number, stores them in a list
+            and returns it.
+
+            Note
+            ----
+                The dataframe is split based on the number of CPU cores available for.
+                For more info, take a look at the documentation of the get_partition_size()
+                function.
+
+            Parameters
+            ----------
+                dataframe: NumPandasTraj
+                The dataframe that is to be split.
+
+            Returns
+            -------
+                list:
+                    The list containing smaller dataframe chunks.
+        """
+        # First, create a list containing all the ids of the data and then further divide that
+        # list items and split it into sub-lists of ids equal to split_factor.
+        ids_ = list(dataframe.traj_id.value_counts().keys())
+
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        split_factor = SemanticHelpers._get_partition_size(len(ids_))
+        # split_factor = 1
+        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
+
+        # Now split the dataframes based on set of Trajectory ids.
+        # As of now, each smaller chunk is supposed to have data of 100
+        # trajectory IDs max
+        df_chunks = [dataframe.loc[dataframe.index.get_level_values(const.TRAJECTORY_ID).isin(ids_[i])]
+                     for i in range(len(ids_))]
+        return df_chunks
 
     # @staticmethod
     # def banks_crossed(df: NumPandasTraj, dist_threshold: float = 1000):
@@ -188,75 +286,3 @@ class SemanticHelpers:
     #
     #     return dataframe
 
-    # ------------------------------------ General Utilities ------------------------------------ #
-    @staticmethod
-    def _get_partition_size(size):
-        """
-            Takes number of ids and makes use of a formula that gives a factor to makes set of ids
-            according to the number of processors available to work with.
-
-            Parameters
-            ----------
-                size: int
-                    The total number of trajectory IDs in the dataset.
-
-            Returns
-            -------
-                int
-                   The factor by which the datasets are to be split.
-        """
-        # Based on the Operating system, get the number of CPUs available for
-        # multiprocessing.
-        available_cpus = len(os.sched_getaffinity(0)) if os.name == 'posix' \
-            else psutil.cpu_count()  # Number of available CPUs.
-
-        # Integer divide the total number of Trajectory IDs by the number of available CPUs
-        # and square the number because if too many partitions are made, then it does more
-        # harm than good for the execution speed. The factor of 1 is added to avoid errors
-        # when the integer division yields a 0.
-        factor = ((size // available_cpus) ** 2) + 1
-
-        # Return the factor if it is less than 100 otherwise return 100.
-        # This factor hence is capped at 100.
-        return factor if factor < 100 else 100
-
-    @staticmethod
-    def _df_split_helper(dataframe):
-        """
-            This is the helper function for splitting up dataframes into smaller chunks.
-            This function is widely used for main functions to help split the original
-            dataframe into smaller chunks based on a fixed range of IDs. This function
-            splits the dataframes based on a predetermined number, stores them in a list
-            and returns it.
-
-            Note
-            ----
-                The dataframe is split based on the number of CPU cores available for.
-                For more info, take a look at the documentation of the get_partition_size()
-                function.
-
-            Parameters
-            ----------
-                dataframe: NumPandasTraj
-                The dataframe that is to be split.
-
-            Returns
-            -------
-                list:
-                    The list containing smaller dataframe chunks.
-        """
-        # First, create a list containing all the ids of the data and then further divide that
-        # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = list(dataframe.traj_id.value_counts().keys())
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        split_factor = SemanticHelpers._get_partition_size(len(ids_))
-        # split_factor = 1
-        ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
-
-        # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
-        # trajectory IDs max
-        df_chunks = [dataframe.loc[dataframe.index.get_level_values(const.TRAJECTORY_ID).isin(ids_[i])]
-                     for i in range(len(ids_))]
-        return df_chunks

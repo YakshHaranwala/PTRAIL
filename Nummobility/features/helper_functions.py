@@ -14,6 +14,7 @@
     | Date: 2nd June, 2021
     | Version: 0.2 Beta
 """
+import math
 import os
 
 import numpy as np
@@ -500,8 +501,7 @@ class Helpers:
         """
         # Based on the Operating system, get the number of CPUs available for
         # multiprocessing.
-        available_cpus = len(os.sched_getaffinity(0)) if os.name == 'posix' \
-            else psutil.cpu_count()  # Number of available CPUs.
+        available_cpus = math.ceil((psutil.cpu_count() * 2) / 3)
 
         # Integer divide the total number of Trajectory IDs by the number of available CPUs
         # and square the number because if too many partitions are made, then it does more
