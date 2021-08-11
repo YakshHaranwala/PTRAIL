@@ -26,9 +26,9 @@ from Nummobility.features.spatial_features import SpatialFeatures
 from Nummobility.features.helper_functions import Helpers
 
 if os.name == 'posix':
-    NUM_CPU = ceil((len(os.sched_getaffinity(0)) * 2)) / 3
+    NUM_CPU = ceil((len(os.sched_getaffinity(0)) * 2) / 3)
 else:
-    NUM_CPU = ceil(psutil.cpu_count() * 2) / 3
+    NUM_CPU = ceil(psutil.cpu_count() * 2 / 3)
 
 class SemanticFeatures:
     @staticmethod
