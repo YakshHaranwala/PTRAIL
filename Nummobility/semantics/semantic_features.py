@@ -161,7 +161,7 @@ class SemanticFeatures:
         df_chunks = SemanticHelpers._df_split_helper(df)
         print(len(df_chunks))
 
-        # Here, create 2/3rds number of processes as there are in the    system. Some CPUs are
+        # Here, create 2/3rds number of processes as there are CPUs in the system. Some CPUs are
         # kept free at all times in order to not block up the system.
         # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
         # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
@@ -229,19 +229,27 @@ class SemanticFeatures:
                                       df2: NumPandasTraj,
                                       polygon: Polygon):
         """
+            Given a df1 and df2 containing trajectory data along with  polygon,
+            check whether the trajectory/trajectories are inside the polygon
+            and if they are, whether the intersect at any point or not.
+
+            Parameters
+            ----------
+                df1: NumPandasTraj
+                    Trajectory Dataframe 1.
+                df2: NumPandasTraj
+                    Trajectory Dataframe 2.
+                polygon: Polygon
+                    The area inside which it is to be determined if the trajectories
+                    intersect or not.
+
+            Returns
+            -------
         """
         pass
 
     @staticmethod
-    def distance_from_nearby_hospitals():
-        pass
-
-    @staticmethod
-    def trajectory_crossing_paths():
-        pass
-
-    @staticmethod
-    def nearest_poi_point(coords: tuple, dist_threshold, tags: dict):
+    def nearest_poi(coords: tuple, dist_threshold, tags: dict):
         """
             Given a coordinate point and a distance threshold, find the Point of Interest
             which is the nearest to it within the given distance threshold.
@@ -273,6 +281,11 @@ class SemanticFeatures:
                 pandas.core.dataframe.DataFrame:
                     A pandas DF containing the info about the nearest bank from
                     the given point.
+
+            Raises
+            ------
+                JSONDecodeError:
+                    One or more given tags are invalid.
         """
         try:
             # Given the tag, the point and the distance threshold, use the osmnx
@@ -281,24 +294,33 @@ class SemanticFeatures:
                                            dist=dist_threshold,
                                            tags=tags)
 
-            # Check whether there are any errors
+            # Check whether there are any errors in the tag or if there are actually
+            # no point of interests with the given tags nearby the given point.
             if len(poi) > 0:
+                # Remove unnecessary column of element_type.
                 poi = poi.reset_index().loc[poi.reset_index()['element_type'] == 'node']
 
+                # Convert the Geometry to lat and lon.
                 lat = list(poi['geometry'].apply(lambda p: p.y))
                 lon = list(poi['geometry'].apply(lambda p: p.x))
 
+                # Check the distances from all nearby resultant POIs and then find out the
+                # one which is the nearest to the given point. Mind that the distance
+                # calculated is the haversine distance and not walking/driving distance.
                 dists = []
                 for i in range(len(lat)):
                     dists.append(FormulaLog.haversine_distance(coords[0], coords[1], lat[i], lon[i]))
 
                 poi[f'Distance_from_{coords}'] = dists
 
+                # Return the nearest POI.
                 return poi.loc[poi[f'Distance_from_{coords}'] ==
                                poi[f'Distance_from_{coords}'].min()].reset_index().drop(columns=['element_type',
                                                                                                  'index'])
             else:
+                # If there are no POIs near the given point, return an empty list.
                 return []
 
         except JSONDecodeError:
             raise ValueError("The tags provided are invalid. Please check your tags and try again.")
+
