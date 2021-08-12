@@ -19,12 +19,11 @@ from typing import Union, Text
 
 import geopandas as gpd
 import pandas as pd
-import psutil
 import osmnx as ox
 
 from math import ceil
 
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import Polygon
 
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.semantics.helpers import SemanticHelpers
@@ -41,7 +40,7 @@ class SemanticFeatures:
                          visited_location_name: Text,
                          location_column_name: Text):
         """
-            Create a column called visited_Pasture for all the pastures present in the
+            Create a column called visited_Location for all the pastures present in the
             dataset.
 
             Warning
@@ -69,6 +68,7 @@ class SemanticFeatures:
                     The location for which it is to be checked whether the objected visited it
                     or not.
                 location_column_name: Text
+                    The name of the column that contains the location to be checked.
 
             Returns
             -------
@@ -224,6 +224,104 @@ class SemanticFeatures:
                              latitude='lat',
                              longitude='lon').drop(columns=['geometry'])
 
+    # @staticmethod
+    # def traj_intersect_inside_polygon(df1: NumPandasTraj,
+    #                                   df2: NumPandasTraj,
+    #                                   polygon: Polygon):
+    #     """
+    #         Given a df1 and df2 containing trajectory data along with  polygon,
+    #         check whether the trajectory/trajectories are inside the polygon
+    #         and if they are, whether the intersect at any point or not.
+    #
+    #         Warning
+    #         -------
+    #             While creating a polygon, the format of the coordinates is: (longitude, latitude)
+    #             instead of (latitude, longitude). Beware of that, otherwise the results will be
+    #             incorrect.
+    #
+    #         Note
+    #         ----
+    #             It is to be noted that df1 and df2 should only contain trajectory
+    #             data of only one trajectory each. If they contain more than one
+    #             trajectories, then the results might be unexpected.
+    #
+    #         Parameters
+    #         ----------
+    #             df1: NumPandasTraj
+    #                 Trajectory Dataframe 1.
+    #             df2: NumPandasTraj
+    #                 Trajectory Dataframe 2.
+    #             polygon: Polygon
+    #                 The area inside which it is to be determined if the trajectories
+    #                 intersect or not.
+    #
+    #         Returns
+    #         -------
+    #             NumPandasTraj:
+    #                 A dataframe containing trajectories that are inside the polygon.
+    #             geopandas.GeoDataFrame:
+    #                 An empty dataframe if both the trajectories do not interect.
+    #     """
+    #     df1, df2 = df1.reset_index(), df2.reset_index()
+    #     # Convert df1 to GeoDataFrame with correct geometry and the correct CRS.
+    #     gpd_one = gpd.GeoDataFrame(df1,
+    #                                geometry=gpd.points_from_xy(df1["lon"],
+    #                                                            df1["lat"]),
+    #                                crs={"init": "epsg:4326"})
+    #     # Convert df2 to GeoDataFrame with correct geometry and the correct CRS.
+    #     gpd_two = gpd.GeoDataFrame(df2,
+    #                                geometry=gpd.points_from_xy(df2["lon"],
+    #                                                            df2["lat"]),
+    #                                crs={"init": "epsg:4326"})
+    #
+    #     # Check whether trajectories T1 and T2 intersect at all along the course
+    #     # of their entire trajectories.
+    #     traj_intersect = gpd.overlay(df1=gpd_one, df2=gpd_two, how='intersection')
+    #
+    #     # Extract latitudes and longitudes which are intersecting in t1 and t2.
+    #     coords = list(zip(traj_intersect['lon_1'], (traj_intersect['lat_1'])))
+    #     intersect_poly = Polygon(coords)
+    #
+    #     # If the 2 trajectories intersect, then check whether there are any
+    #     # intersection points inside the polygon.
+    #     if len(traj_intersect) > 0:
+    #         intersect_gpd = gpd.GeoDataFrame(geometry=gpd.GeoSeries(intersect_poly),
+    #                                          crs={"init": "epsg:4326"})
+    #
+    #         print(intersect_gpd.head())
+    #
+    #         # Convert the polygon to a GeoDataFrame.
+    #         poly_gpd = gpd.GeoDataFrame(geometry=gpd.GeoSeries(polygon),
+    #                                     crs={"init": "epsg:4326"})
+    #         print(poly_gpd.head())
+    #
+    #         # Check whether any part of the intersection of the trajectories is
+    #         # inside the polygon.
+    #         intersect_inside_poly = gpd.overlay(df1=intersect_gpd,
+    #                                             df2=poly_gpd,
+    #                                             how='intersection')
+    #
+    #         df1 = df1.loc[df1['lat'] == intersect_inside_poly['lat_1']]
+    #         df1 = df1.loc[df1['lon'] == intersect_inside_poly['lon_1']]
+    #
+    #         df2 = df2.loc[df2['lat'] == intersect_inside_poly['lat_1']]
+    #         df2 = df2.loc[df2['lon'] == intersect_inside_poly['lon_1']]
+    #
+    #         return df1, df2
+    #         # if len(intersect_inside_poly) > 0:
+    #         #     # Convert the filtered DF back to NumPandasTraj and return it.
+    #         #     return NumPandasTraj(data_set=intersect_inside_poly,
+    #         #                          datetime='DateTime',
+    #         #                          traj_id='traj_id',
+    #         #                          latitude='lat',
+    #         #                          longitude='lon').drop(columns=['geometry'])
+    #         # else:
+    #         #     return intersect_inside_poly
+    #     else:
+    #         # Return an empty GeoDataFrame if there are no intersection points
+    #         # of the trajectories T1 and T2.
+    #         return traj_intersect
+
     @staticmethod
     def traj_intersect_inside_polygon(df1: NumPandasTraj,
                                       df2: NumPandasTraj,
@@ -232,6 +330,18 @@ class SemanticFeatures:
             Given a df1 and df2 containing trajectory data along with  polygon,
             check whether the trajectory/trajectories are inside the polygon
             and if they are, whether the intersect at any point or not.
+
+            Warning
+            -------
+                While creating a polygon, the format of the coordinates is: (longitude, latitude)
+                instead of (latitude, longitude). Beware of that, otherwise the results will be
+                incorrect.
+
+            Note
+            ----
+                It is to be noted that df1 and df2 should only contain trajectory
+                data of only one trajectory each. If they contain more than one
+                trajectories, then the results might be unexpected.
 
             Parameters
             ----------
@@ -245,8 +355,46 @@ class SemanticFeatures:
 
             Returns
             -------
+                NumPandasTraj:
+                    A dataframe containing trajectories that are inside the polygon.
+                geopandas.GeoDataFrame:
+                    An empty dataframe if both the trajectories do not interect.
         """
-        pass
+        df1, df2 = df1.reset_index(), df2.reset_index()
+        # Convert df1 to GeoDataFrame with correct geometry and the correct CRS.
+        gpd_one = gpd.GeoDataFrame(df1,
+                                   geometry=gpd.points_from_xy(df1["lon"],
+                                                               df1["lat"]),
+                                   crs={"init": "epsg:4326"})
+        # Convert df2 to GeoDataFrame with correct geometry and the correct CRS.
+        gpd_two = gpd.GeoDataFrame(df2,
+                                   geometry=gpd.points_from_xy(df2["lon"],
+                                                               df2["lat"]),
+                                   crs={"init": "epsg:4326"})
+
+        # Convert the polygon to a GeoDataFrame.
+        poly_gpd = gpd.GeoDataFrame(geometry=gpd.GeoSeries(polygon),
+                                    crs={"init": "epsg:4326"})
+
+        # First, checking intersection between t1 and polygon.
+        inter_one = gpd.overlay(gpd_one, poly_gpd, 'intersection')
+
+        # Now, checking intersection between t2 and polygon.
+        inter_two = gpd.overlay(gpd_two, poly_gpd, 'intersection')
+
+        # Now, checking intersection between inter t1 and t2.
+        final = gpd.overlay(inter_one, inter_two, 'intersection')
+
+        if len(final) > 0:
+            to_return = final[['traj_id_1', 'traj_id_2', 'lat_1', 'lon_1', 'DateTime_1', 'DateTime_2']]
+            to_return = to_return.rename(columns={'lat_1': 'lat',
+                                                  'lon_1': 'lon'})
+            cols = ['traj_id_1', 'DateTime_1', 'lat', 'lon', 'traj_id_2', 'DateTime_2']
+            to_return = to_return[cols]
+            return to_return
+        else:
+            return final
+
 
     @staticmethod
     def nearest_poi(coords: tuple, dist_threshold, tags: dict):
@@ -275,6 +423,8 @@ class SemanticFeatures:
                 dist_threshold:
                     The maximum distance from the point within which
                     the distance is to be calculated.
+                tags: dict
+                    The dictionary containing tags of Points of interest.
 
             Returns
             -------
