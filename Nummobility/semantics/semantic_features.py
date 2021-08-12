@@ -268,8 +268,8 @@ class SemanticFeatures:
                 one based on the distance and return it and will not given out the others
                 that may or may not be present within the threshold of the given point.
 
-            Parameter
-            ---------
+            Parameters
+            ----------
                 coords: tuple
                     The point near which the bank is to be found.
                 dist_threshold:
