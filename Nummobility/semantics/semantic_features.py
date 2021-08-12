@@ -18,6 +18,7 @@ from json import JSONDecodeError
 from typing import Union, Text
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import osmnx as ox
 
@@ -28,6 +29,7 @@ from shapely.geometry import Polygon
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.semantics.helpers import SemanticHelpers
 from Nummobility.utilities.DistanceCalculator import FormulaLog
+import Nummobility.utilities.constants as const
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
@@ -224,104 +226,6 @@ class SemanticFeatures:
                              latitude='lat',
                              longitude='lon').drop(columns=['geometry'])
 
-    # @staticmethod
-    # def traj_intersect_inside_polygon(df1: NumPandasTraj,
-    #                                   df2: NumPandasTraj,
-    #                                   polygon: Polygon):
-    #     """
-    #         Given a df1 and df2 containing trajectory data along with  polygon,
-    #         check whether the trajectory/trajectories are inside the polygon
-    #         and if they are, whether the intersect at any point or not.
-    #
-    #         Warning
-    #         -------
-    #             While creating a polygon, the format of the coordinates is: (longitude, latitude)
-    #             instead of (latitude, longitude). Beware of that, otherwise the results will be
-    #             incorrect.
-    #
-    #         Note
-    #         ----
-    #             It is to be noted that df1 and df2 should only contain trajectory
-    #             data of only one trajectory each. If they contain more than one
-    #             trajectories, then the results might be unexpected.
-    #
-    #         Parameters
-    #         ----------
-    #             df1: NumPandasTraj
-    #                 Trajectory Dataframe 1.
-    #             df2: NumPandasTraj
-    #                 Trajectory Dataframe 2.
-    #             polygon: Polygon
-    #                 The area inside which it is to be determined if the trajectories
-    #                 intersect or not.
-    #
-    #         Returns
-    #         -------
-    #             NumPandasTraj:
-    #                 A dataframe containing trajectories that are inside the polygon.
-    #             geopandas.GeoDataFrame:
-    #                 An empty dataframe if both the trajectories do not interect.
-    #     """
-    #     df1, df2 = df1.reset_index(), df2.reset_index()
-    #     # Convert df1 to GeoDataFrame with correct geometry and the correct CRS.
-    #     gpd_one = gpd.GeoDataFrame(df1,
-    #                                geometry=gpd.points_from_xy(df1["lon"],
-    #                                                            df1["lat"]),
-    #                                crs={"init": "epsg:4326"})
-    #     # Convert df2 to GeoDataFrame with correct geometry and the correct CRS.
-    #     gpd_two = gpd.GeoDataFrame(df2,
-    #                                geometry=gpd.points_from_xy(df2["lon"],
-    #                                                            df2["lat"]),
-    #                                crs={"init": "epsg:4326"})
-    #
-    #     # Check whether trajectories T1 and T2 intersect at all along the course
-    #     # of their entire trajectories.
-    #     traj_intersect = gpd.overlay(df1=gpd_one, df2=gpd_two, how='intersection')
-    #
-    #     # Extract latitudes and longitudes which are intersecting in t1 and t2.
-    #     coords = list(zip(traj_intersect['lon_1'], (traj_intersect['lat_1'])))
-    #     intersect_poly = Polygon(coords)
-    #
-    #     # If the 2 trajectories intersect, then check whether there are any
-    #     # intersection points inside the polygon.
-    #     if len(traj_intersect) > 0:
-    #         intersect_gpd = gpd.GeoDataFrame(geometry=gpd.GeoSeries(intersect_poly),
-    #                                          crs={"init": "epsg:4326"})
-    #
-    #         print(intersect_gpd.head())
-    #
-    #         # Convert the polygon to a GeoDataFrame.
-    #         poly_gpd = gpd.GeoDataFrame(geometry=gpd.GeoSeries(polygon),
-    #                                     crs={"init": "epsg:4326"})
-    #         print(poly_gpd.head())
-    #
-    #         # Check whether any part of the intersection of the trajectories is
-    #         # inside the polygon.
-    #         intersect_inside_poly = gpd.overlay(df1=intersect_gpd,
-    #                                             df2=poly_gpd,
-    #                                             how='intersection')
-    #
-    #         df1 = df1.loc[df1['lat'] == intersect_inside_poly['lat_1']]
-    #         df1 = df1.loc[df1['lon'] == intersect_inside_poly['lon_1']]
-    #
-    #         df2 = df2.loc[df2['lat'] == intersect_inside_poly['lat_1']]
-    #         df2 = df2.loc[df2['lon'] == intersect_inside_poly['lon_1']]
-    #
-    #         return df1, df2
-    #         # if len(intersect_inside_poly) > 0:
-    #         #     # Convert the filtered DF back to NumPandasTraj and return it.
-    #         #     return NumPandasTraj(data_set=intersect_inside_poly,
-    #         #                          datetime='DateTime',
-    #         #                          traj_id='traj_id',
-    #         #                          latitude='lat',
-    #         #                          longitude='lon').drop(columns=['geometry'])
-    #         # else:
-    #         #     return intersect_inside_poly
-    #     else:
-    #         # Return an empty GeoDataFrame if there are no intersection points
-    #         # of the trajectories T1 and T2.
-    #         return traj_intersect
-
     @staticmethod
     def traj_intersect_inside_polygon(df1: NumPandasTraj,
                                       df2: NumPandasTraj,
@@ -395,6 +299,61 @@ class SemanticFeatures:
         else:
             return final
 
+    @staticmethod
+    def detect_herd(df: NumPandasTraj,
+                    surroundings: Union[pd.DataFrame, gpd.GeoDataFrame],
+                    time_threshold: int):
+        """
+            Given a Trajectory Dataframe and another dataframe containing surrounding data,
+            detect a herd behaviour in a particular region of the surroundings.
+
+            Note
+            ----
+                The time_threshold is given in seconds.
+
+            Parameters
+            ----------
+                df: NumPandasTraj
+                    The dataframe containing Trajectory Data.
+                surroundings: Union[pd.DataFrame, gpd.GeoDataFrame]
+                    The dataframe containing surrounding data.
+                time_threshold: int
+                    The maximum time between 2 points of intersection lesser than which
+                    the objects are considered to be in herd.
+        """
+        coords = list(zip(surroundings['lon'], (surroundings['lat'])))
+        poly = Polygon(coords)
+
+        # First, check which of the trajectories are inside the polygon.
+        inside_polygon = SemanticFeatures.trajectories_inside_polygon(df, poly)
+
+        return inside_polygon
+
+        # # First split the dataframes based on set of Trajectory ids.
+        # # As of now, each smaller chunk is supposed to have data of 100
+        # # trajectory IDs max
+        # ids_ = list(df.traj_id.value_counts().keys())
+        #
+        # df_chunks = [df.loc[df.index.get_level_values(const.TRAJECTORY_ID) == ids_[i]]
+        #              for i in range(len(ids_))]
+        #
+
+        #
+        # main = []
+        # for i in range(len(df_chunks) - 1):
+        #     df1 = df_chunks[i]
+        #     df2 = df_chunks[i + 1]
+        #     intersect = SemanticFeatures.traj_intersect_inside_polygon(df1, df2, poly)
+        #
+        #     time_del = (np.abs((intersect['DateTime_2'] - intersect['DateTime_1'])).dt.total_seconds()).to_numpy()
+        #
+        #     indices = np.argwhere(time_del <= time_threshold).flatten()
+        #     print(indices)
+        #
+        #     filt_df = intersect.iloc[indices]
+        #     main.append(filt_df)
+        #
+        # return main
 
     @staticmethod
     def nearest_poi(coords: tuple, dist_threshold, tags: dict):
@@ -473,4 +432,5 @@ class SemanticFeatures:
 
         except JSONDecodeError:
             raise ValueError("The tags provided are invalid. Please check your tags and try again.")
+
 
