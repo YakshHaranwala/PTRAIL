@@ -214,13 +214,14 @@ class SemanticFeatures:
 
         # Find the points on intersections between the 2 DataFrames.
         intersection = gpd.overlay(df1=df1, df2=df2, how='intersection')
+        intersection = intersection.drop(columns=['geometry'])
 
         # Convert the filtered DF back to NumPandasTraj and return it.
         return NumPandasTraj(data_set=intersection,
                              datetime='DateTime',
                              traj_id='traj_id',
                              latitude='lat',
-                             longitude='lon').drop(columns=['geometry'])
+                             longitude='lon')
 
     @staticmethod
     def traj_intersect_inside_polygon(df1: NumPandasTraj,
