@@ -132,8 +132,8 @@ class SemanticFeatures:
             Warning
             -------
                 It is to be noted that for this method to work, the surrounding dataset NEEDS to have a
-                column containing distance to the nearest POI. For more info, see the Starkey dataset
-                which has the columns like 'DistCWat' and 'DistEWat'.
+                column containing distance to the nearest POI. For more info, see the Starkey habitat
+                dataset which has the columns like 'DistCWat' and 'DistEWat'.
 
 
             Parameters
