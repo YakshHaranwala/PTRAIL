@@ -14,13 +14,12 @@
     | Date: 2nd June, 2021
     | Version: 0.2 Beta
 """
-import math
-import os
+
+from math import ceil
 
 import numpy as np
 import pandas as pd
 import psutil
-from math import ceil
 
 from Nummobility.utilities import constants as const
 from Nummobility.utilities.DistanceCalculator import FormulaLog as calc

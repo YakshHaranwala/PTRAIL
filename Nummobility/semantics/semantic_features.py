@@ -15,21 +15,17 @@ import itertools
 import multiprocessing
 import os
 from json import JSONDecodeError
+from math import ceil
 from typing import Union, Text
 
 import geopandas as gpd
-import numpy as np
-import pandas as pd
 import osmnx as ox
-
-from math import ceil
-
+import pandas as pd
 from shapely.geometry import Polygon
 
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.semantics.helpers import SemanticHelpers
 from Nummobility.utilities.DistanceCalculator import FormulaLog
-import Nummobility.utilities.constants as const
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
@@ -300,62 +296,6 @@ class SemanticFeatures:
             return final
 
     @staticmethod
-    def detect_herd(df: NumPandasTraj,
-                    surroundings: Union[pd.DataFrame, gpd.GeoDataFrame],
-                    time_threshold: int):
-        """
-            Given a Trajectory Dataframe and another dataframe containing surrounding data,
-            detect a herd behaviour in a particular region of the surroundings.
-
-            Note
-            ----
-                The time_threshold is given in seconds.
-
-            Parameters
-            ----------
-                df: NumPandasTraj
-                    The dataframe containing Trajectory Data.
-                surroundings: Union[pd.DataFrame, gpd.GeoDataFrame]
-                    The dataframe containing surrounding data.
-                time_threshold: int
-                    The maximum time between 2 points of intersection lesser than which
-                    the objects are considered to be in herd.
-        """
-        coords = list(zip(surroundings['lon'], (surroundings['lat'])))
-        poly = Polygon(coords)
-
-        # First, check which of the trajectories are inside the polygon.
-        inside_polygon = SemanticFeatures.trajectories_inside_polygon(df, poly)
-
-        return inside_polygon
-
-        # # First split the dataframes based on set of Trajectory ids.
-        # # As of now, each smaller chunk is supposed to have data of 100
-        # # trajectory IDs max
-        # ids_ = list(df.traj_id.value_counts().keys())
-        #
-        # df_chunks = [df.loc[df.index.get_level_values(const.TRAJECTORY_ID) == ids_[i]]
-        #              for i in range(len(ids_))]
-        #
-
-        #
-        # main = []
-        # for i in range(len(df_chunks) - 1):
-        #     df1 = df_chunks[i]
-        #     df2 = df_chunks[i + 1]
-        #     intersect = SemanticFeatures.traj_intersect_inside_polygon(df1, df2, poly)
-        #
-        #     time_del = (np.abs((intersect['DateTime_2'] - intersect['DateTime_1'])).dt.total_seconds()).to_numpy()
-        #
-        #     indices = np.argwhere(time_del <= time_threshold).flatten()
-        #     print(indices)
-        #
-        #     filt_df = intersect.iloc[indices]
-        #     main.append(filt_df)
-        #
-        # return main
-
-    @staticmethod
     def nearest_poi(coords: tuple, dist_threshold, tags: dict):
         """
             Given a coordinate point and a distance threshold, find the Point of Interest
@@ -433,4 +373,56 @@ class SemanticFeatures:
         except JSONDecodeError:
             raise ValueError("The tags provided are invalid. Please check your tags and try again.")
 
-
+    # @staticmethod
+    # def detect_herd(df: NumPandasTraj,
+    #                 surroundings: Union[pd.DataFrame, gpd.GeoDataFrame],
+    #                 time_threshold: int):
+    #     """
+    #         Given a Trajectory Dataframe and another dataframe containing surrounding data,
+    #         detect a herd behaviour in a particular region of the surroundings.
+    #
+    #         Note
+    #         ----
+    #             The time_threshold is given in seconds.
+    #
+    #         Parameters
+    #         ----------
+    #             df: NumPandasTraj
+    #                 The dataframe containing Trajectory Data.
+    #             surroundings: Union[pd.DataFrame, gpd.GeoDataFrame]
+    #                 The dataframe containing surrounding data.
+    #             time_threshold: int
+    #                 The maximum time between 2 points of intersection lesser than which
+    #                 the objects are considered to be in herd.
+    #     """
+    #     # coords = list(zip(surroundings['lon'], (surroundings['lat'])))
+    #     # poly = Polygon(coords)
+    #     #
+    #     # # First, check which of the trajectories are inside the polygon.
+    #     # inside_polygon = SemanticFeatures.trajectories_inside_polygon(df, poly)
+    #     #
+    #     # return inside_polygon
+    #
+    #     # First split the dataframes based on set of Trajectory ids.
+    #     # As of now, each smaller chunk is supposed to have data of 100
+    #     # trajectory IDs max
+    #     ids_ = list(df.traj_id.value_counts().keys())
+    #
+    #     df_chunks = [df.loc[df.index.get_level_values(const.TRAJECTORY_ID) == ids_[i]]
+    #                  for i in range(len(ids_))]
+    #
+    #     main = []
+    #     for i in range(len(df_chunks) - 1):
+    #         df1 = df_chunks[i]
+    #         df2 = df_chunks[i + 1]
+    #         intersect = SemanticFeatures.traj_intersect_inside_polygon(df1, df2, poly)
+    #
+    #         time_del = (np.abs((intersect['DateTime_2'] - intersect['DateTime_1'])).dt.total_seconds()).to_numpy()
+    #
+    #         indices = np.argwhere(time_del <= time_threshold).flatten()
+    #         print(indices)
+    #
+    #         filt_df = intersect.iloc[indices]
+    #         main.append(filt_df)
+    #
+    #     return main

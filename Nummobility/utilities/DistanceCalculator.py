@@ -8,6 +8,7 @@
 """
 
 import numpy as np
+
 from Nummobility.utilities import constants as const
 
 np.seterr(invalid='ignore')

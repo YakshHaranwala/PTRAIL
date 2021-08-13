@@ -16,16 +16,12 @@
 """
 import math
 import os
-import psutil
 import warnings
 
 import numpy as np
-import pandas as pd
 
 import Nummobility.utilities.constants as const
 from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.utilities.DistanceCalculator import FormulaLog
-from Nummobility.features.spatial_features import SpatialFeatures
 from Nummobility.features.helper_functions import Helpers
 
 warnings.filterwarnings("ignore")
@@ -77,6 +73,7 @@ class SemanticHelpers:
         print('Finished')
 
         return df
+
     # ------------------------------------ General Utilities ------------------------------------ #
     @staticmethod
     def _get_partition_size(size):
@@ -286,4 +283,3 @@ class SemanticHelpers:
     #     dataframe[f'Bank_within_{dist_threshold}m'] = indicator
     #
     #     return dataframe
-

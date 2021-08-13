@@ -11,19 +11,17 @@
     | Version: 0.2 Beta
 """
 import itertools
+import multiprocessing as mlp
 import os
+from math import ceil
+from typing import Optional, Text, Union
 
 import pandas
 import pandas as pd
-import psutil
 
-from Nummobility.utilities import constants as const
-import multiprocessing as mlp
-
-from Nummobility.preprocessing.helpers import Helpers as helper
 from Nummobility.core.TrajectoryDF import NumPandasTraj as NumTrajDF
-from typing import Optional, Text, Union
-from math import ceil
+from Nummobility.preprocessing.helpers import Helpers as helper
+from Nummobility.utilities import constants as const
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)

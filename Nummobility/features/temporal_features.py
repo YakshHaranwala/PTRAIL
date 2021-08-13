@@ -333,4 +333,3 @@ class TemporalFeatures:
             filt = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
             filt_two = filt.loc[filt[const.DateTime] == filt[const.DateTime].max()]
             return filt_two[const.DateTime].iloc[0]
-

@@ -27,17 +27,16 @@
 """
 import math
 import os
-
-import psutil
-import pandas as pd
-import numpy as np
-from Nummobility.utilities import constants as const
-
-from Nummobility.features.spatial_features import SpatialFeatures as spatial
-from scipy.interpolate import CubicSpline
 from typing import Text, Union
-from Nummobility.core.TrajectoryDF import NumPandasTraj
+
+import numpy as np
+import pandas as pd
 from hampel import hampel
+from scipy.interpolate import CubicSpline
+
+from Nummobility.core.TrajectoryDF import NumPandasTraj
+from Nummobility.features.spatial_features import SpatialFeatures as spatial
+from Nummobility.utilities import constants as const
 from Nummobility.utilities.exceptions import *
 
 
@@ -161,7 +160,6 @@ class Helpers:
                     df.loc[new_times[j - 1]] = [id_, ip_coords[j - 1][0], ip_coords[j - 1][1]]
 
         return df
-
 
     @staticmethod
     def random_walk_help(dataframe: NumPandasTraj, id_: Text, time_jump: float):

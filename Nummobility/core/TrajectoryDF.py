@@ -13,6 +13,7 @@ import random
 from parser import ParserError
 from typing import Dict, List, Union, Optional, Text
 
+import folium
 import numpy as np
 import pandas as pd
 import pandas.core.dtypes.common
@@ -21,7 +22,6 @@ from pandas._libs import lib
 
 from Nummobility.utilities import constants as const
 from Nummobility.utilities.exceptions import *
-import folium
 
 
 class NumPandasTraj(DataFrame):

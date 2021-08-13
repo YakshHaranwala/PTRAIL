@@ -19,5 +19,4 @@ So far the features that I can think of:
         semantic_traj.pdf paper (pg. 9).
     11. Another very common one is the stop and stay point detection.
     12. Avoiding and chasing behaviour can also be done. However, it seems a little bit harder.
-
 """

@@ -9,20 +9,19 @@
 """
 import itertools
 import math
-import warnings
-from typing import Text, Optional
+import multiprocessing
 import os
-import psutil
+import warnings
+from math import ceil
+from typing import Text, Optional
 
 import numpy as np
 import pandas as pd
-import multiprocessing
 
-from math import ceil
 import Nummobility.utilities.constants as const
-from Nummobility.utilities.exceptions import *
 from Nummobility.core.TrajectoryDF import NumPandasTraj
 from Nummobility.preprocessing.helpers import Helpers as helper
+from Nummobility.utilities.exceptions import *
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
