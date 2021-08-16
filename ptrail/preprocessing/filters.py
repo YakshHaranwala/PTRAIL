@@ -18,10 +18,10 @@ from typing import Text, Optional
 import numpy as np
 import pandas as pd
 
-import Nummobility.utilities.constants as const
-from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.preprocessing.helpers import Helpers as helper
-from Nummobility.utilities.exceptions import *
+import ptrail.utilities.constants as const
+from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.preprocessing.helpers import Helpers as helper
+from ptrail.utilities.exceptions import *
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)

@@ -9,7 +9,7 @@
 
 import numpy as np
 
-from Nummobility.utilities import constants as const
+from ptrail.utilities import constants as const
 
 np.seterr(invalid='ignore')
 

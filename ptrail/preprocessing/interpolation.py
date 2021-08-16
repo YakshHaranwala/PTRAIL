@@ -19,9 +19,9 @@ from typing import Optional, Text, Union
 import pandas
 import pandas as pd
 
-from Nummobility.core.TrajectoryDF import NumPandasTraj as NumTrajDF
-from Nummobility.preprocessing.helpers import Helpers as helper
-from Nummobility.utilities import constants as const
+from ptrail.core.TrajectoryDF import NumPandasTraj as NumTrajDF
+from ptrail.preprocessing.helpers import Helpers as helper
+from ptrail.utilities import constants as const
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)

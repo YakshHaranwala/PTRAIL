@@ -1,6 +1,6 @@
 """
     The TrajectoryDF module is the main module containing the NumPandasTraj Dataframe
-    for storing the Trajectory Data with NumMobility Library. The Dataframe has
+    for storing the Trajectory Data with PTRAIL Library. The Dataframe has
     certain restrictions on what type of data is mandatory in order to be stored as a
     NumPandasTraj which is mentioned in the documentation of the constructor.
 
@@ -20,8 +20,8 @@ import pandas.core.dtypes.common
 from pandas import DataFrame
 from pandas._libs import lib
 
-from Nummobility.utilities import constants as const
-from Nummobility.utilities.exceptions import *
+from ptrail.utilities import constants as const
+from ptrail.utilities.exceptions import *
 
 
 class NumPandasTraj(DataFrame):

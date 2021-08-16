@@ -30,12 +30,12 @@ autodoc_mock_imports = ["scipy",
 
 # -- Project information -----------------------------------------------------
 
-project = 'NumMobility'
+project = 'PTRAIL'
 copyright = '2021, Yaksh J Haranwala, Salman Haidri'
 author = 'Yaksh J Haranwala, Salman Haidri'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '0.1 Beta'
 
 # -- General configuration ---------------------------------------------------
 

@@ -20,9 +20,9 @@ import warnings
 
 import numpy as np
 
-import Nummobility.utilities.constants as const
-from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.features.helper_functions import Helpers
+import ptrail.utilities.constants as const
+from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.features.helper_functions import Helpers
 
 warnings.filterwarnings("ignore")
 

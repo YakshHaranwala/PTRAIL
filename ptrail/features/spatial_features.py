@@ -25,11 +25,11 @@ from typing import Optional, Text
 import numpy as np
 import pandas as pd
 
-from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.features.helper_functions import Helpers as helpers
-from Nummobility.utilities import constants as const
-from Nummobility.utilities.DistanceCalculator import FormulaLog as calc
-from Nummobility.utilities.exceptions import *
+from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.features.helper_functions import Helpers as helpers
+from ptrail.utilities import constants as const
+from ptrail.utilities.DistanceCalculator import FormulaLog as calc
+from ptrail.utilities.exceptions import *
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
@@ -195,13 +195,6 @@ class SpatialFeatures:
                 NumPandasTraj:
                     The dataframe containing the resultant Distance_prev_to_curr column.
         """
-        # if cpu_count <= 1:
-        #     cpu_count = 1
-        # elif cpu_count >= NUM_CPU:
-        #     cpu_count = NUM_CPU - 1
-        # else:
-        #     cpu_count = cpu_count
-
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
             result = helpers.distance_between_consecutive_helper(dataframe)
@@ -247,13 +240,6 @@ class SpatialFeatures:
                 NumPandasTraj:
                     The dataframe containing the resultant Distance_start_to_curr column.
         """
-        # if cpu_count <= 1:
-        #     cpu_count = 1
-        # elif cpu_count >= NUM_CPU:
-        #     cpu_count = NUM_CPU - 1
-        # else:
-        #     cpu_count = cpu_count
-
         # Case-1: The number of unique Trajectory IDs is less than 100.
         if dataframe.traj_id.nunique() < const.MIN_IDS:
             result = helpers.distance_from_start_helper(dataframe)

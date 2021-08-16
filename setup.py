@@ -18,12 +18,12 @@ REQUIRED_PKGS = ['numpy>=1.20',
                  ]
 
 setup(
-    name='Nummobility',
+    name='ptrail',
     packages=find_packages(),
-    version='0.3 Beta',
+    version='0.1Beta',
     license='new BSD',
     python_requires='>=3.6',
-    description='A Mobility-data Preprocessing Library using parallel computation.',
+    description='PTRAIL: A Mobility-data Preprocessing Library using parallel computation.',
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     maintainer='NumMobility Developers',

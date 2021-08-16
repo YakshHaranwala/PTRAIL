@@ -21,8 +21,8 @@ import numpy as np
 import pandas as pd
 import psutil
 
-from Nummobility.utilities import constants as const
-from Nummobility.utilities.DistanceCalculator import FormulaLog as calc
+from ptrail.utilities import constants as const
+from ptrail.utilities.DistanceCalculator import FormulaLog as calc
 
 
 class Helpers:

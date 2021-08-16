@@ -24,9 +24,9 @@ from typing import Optional, Text
 import numpy as np
 import pandas as pd
 
-from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.features.helper_functions import Helpers as helpers
-from Nummobility.utilities import constants as const
+from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.features.helper_functions import Helpers as helpers
+from ptrail.utilities import constants as const
 
 
 class TemporalFeatures:

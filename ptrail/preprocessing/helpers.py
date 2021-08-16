@@ -34,10 +34,10 @@ import pandas as pd
 from hampel import hampel
 from scipy.interpolate import CubicSpline
 
-from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.features.spatial_features import SpatialFeatures as spatial
-from Nummobility.utilities import constants as const
-from Nummobility.utilities.exceptions import *
+from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.features.spatial_features import SpatialFeatures as spatial
+from ptrail.utilities import constants as const
+from ptrail.utilities.exceptions import *
 
 
 class Helpers:

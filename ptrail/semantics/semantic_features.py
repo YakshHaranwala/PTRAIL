@@ -23,9 +23,9 @@ import osmnx as ox
 import pandas as pd
 from shapely.geometry import Polygon
 
-from Nummobility.core.TrajectoryDF import NumPandasTraj
-from Nummobility.semantics.helpers import SemanticHelpers
-from Nummobility.utilities.DistanceCalculator import FormulaLog
+from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.semantics.helpers import SemanticHelpers
+from ptrail.utilities.DistanceCalculator import FormulaLog
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
