@@ -1,4 +1,4 @@
-PTRAIL: A Parallel Trajectory dAta preprocessIng Library
+PTRAIL: A Parallel TRajectory dAta preprocessIng Library
 ========================================================
 
 Introduction
@@ -26,7 +26,6 @@ References
    :caption: Contents:
 
    modules
-
 
 Indices and tables
 ==================
