@@ -4,4 +4,8 @@ ptrail
 .. toctree::
    :maxdepth: 4
 
-   ptrail
+   ptrail.core
+   ptrail.features
+   ptrail.preprocessing
+   ptrail.semantics
+   ptrail.utilities
