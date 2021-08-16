@@ -1,6 +1,6 @@
 <!---------------------- Introduction Section ------------------->
 <h1> PTRAIL:  A <b><i>P</i></b>arallel 
-<b><i>T</i></b>rajectory 
+<b><i>TR</i></b>ajectory 
 d<b><i>A</i></b>ta
 preprocess<b><i>I</i></b>ng
 <b><i>L</i></b>ibrary
