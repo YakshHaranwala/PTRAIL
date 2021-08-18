@@ -35,7 +35,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing all the original data.
                 ids_: list
                     A list containing all the Trajectory IDs present in the dataset.
@@ -74,7 +74,7 @@ class Helpers:
 
             Parameter
             ---------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing the original data.
                 ids_: list
                     List of trajectory ids for which the start times are to be calculated
@@ -113,7 +113,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing the original data.
                 ids_: list
                     List of trajectory ids for which the end times are to be calculated
@@ -151,12 +151,12 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which calculation is to be performed.
 
             Returns
             -------
-                core.TrajectoryDF.NumPandasTraj
+                core.TrajectoryDF.PTRAILDataFrame
                     The dataframe containing the resultant Distance_prev_to_curr column.
 
             References
@@ -200,7 +200,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which calculation is to be performed.
 
             Returns
@@ -251,7 +251,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which calculation is to be done.
                 coordinates: tuple
                     The coordinates from which the distance is to be calculated.
@@ -284,7 +284,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which the operation is to be performed.
                 coordinates: tuple
                     The coordinates from which the distance is to be checked.
@@ -325,12 +325,12 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which the calculation is to be done.
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The dataframe containing the Bearing column.
         """
         # Reset the index and set it to trajectory ID in order to iterate
@@ -369,7 +369,7 @@ class Helpers:
 
             Parameter
             ---------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe of which the locations are to be found.dataframe
                 ids_: list
                     List of trajectory ids for which the start locations are to be calculated
@@ -410,7 +410,7 @@ class Helpers:
 
             Parameter
             ---------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe of which the locations are to be found.dataframe
                 ids_: list
                     List of trajectory ids for which the end locations are to be calculated
@@ -451,7 +451,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing all the original data.
                 ids_: list
                     The list of ids for which the number of unique locations visited
@@ -579,7 +579,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                 The dataframe that is to be split.
 
             Returns

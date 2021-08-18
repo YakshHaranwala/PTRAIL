@@ -23,7 +23,7 @@ import osmnx as ox
 import pandas as pd
 from shapely.geometry import Polygon
 
-from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.features.helper_functions import Helpers
 from ptrail.utilities.DistanceCalculator import FormulaLog
 
@@ -33,7 +33,7 @@ NUM_CPU = ceil((num * 2) / 3)
 
 class SemanticFeatures:
     @staticmethod
-    def visited_location(df: NumPandasTraj,
+    def visited_location(df: PTRAILDataFrame,
                          geo_layers: Union[pd.DataFrame, gpd.GeoDataFrame],
                          visited_location_name: Text,
                          location_column_name: Text):
@@ -57,7 +57,7 @@ class SemanticFeatures:
 
             Parameters
             ----------
-                df: NumPandasTraj
+                df: PTRAILDataFrame
                     The dataframe containing the dataset.
                 geo_layers: Union[pd.DataFrame, gpd.GeoDataFrame]
                     The Dataframe containing the geographical layers near the trajectory data.
@@ -70,7 +70,7 @@ class SemanticFeatures:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The Dataframe containing a new column indicating whether the animal
                     has visited the pasture or not.
 
@@ -113,15 +113,15 @@ class SemanticFeatures:
         df = df.drop(columns='geometry')
 
         # return merged
-        return NumPandasTraj(df,
-                             latitude='lat',
-                             longitude='lon',
-                             datetime='DateTime',
-                             traj_id='traj_id')
+        return PTRAILDataFrame(df,
+                               latitude='lat',
+                               longitude='lon',
+                               datetime='DateTime',
+                               traj_id='traj_id')
 
     @staticmethod
-    def visited_poi(df: NumPandasTraj,
-                    surrounding_data: Union[gpd.GeoDataFrame, pd.DataFrame, NumPandasTraj],
+    def visited_poi(df: PTRAILDataFrame,
+                    surrounding_data: Union[gpd.GeoDataFrame, pd.DataFrame, PTRAILDataFrame],
                     dist_column_label: Text,
                     nearby_threshold: int):
         """
@@ -138,7 +138,7 @@ class SemanticFeatures:
 
             Parameters
             ----------
-                df: NumPandasTraj
+                df: PTRAILDataFrame
                     The dataframe containing the trajectory data.
                 surrounding_data: Union[gpd.GeoDataFrame, pd.DataFrame]
                     The surrounding data that needs to contain the information of distance
@@ -151,7 +151,7 @@ class SemanticFeatures:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The dataframe containing the new column indicating whether the object
                     at that point is nearby the POI.
 
@@ -180,7 +180,7 @@ class SemanticFeatures:
         return results
 
     @staticmethod
-    def trajectories_inside_polygon(df: NumPandasTraj, polygon: Polygon):
+    def trajectories_inside_polygon(df: PTRAILDataFrame, polygon: Polygon):
         """
             Given a trajectory dataframe and a Polygon, find out all the trajectories
             that are inside the given polygon.
@@ -193,14 +193,14 @@ class SemanticFeatures:
 
             Parameters
             ----------
-                df: NumPandasTraj
+                df: PTRAILDataFrame
                     The dataframe containing the trajectory data.
                 polygon: Polygon
                     The polygon inside which the points are to be found.
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     A dataframe containing trajectories that are inside the polygon.
         """
         # Convert the original dataframe and the polygon to a GeoPandasDataframe.
@@ -216,16 +216,16 @@ class SemanticFeatures:
         intersection = gpd.overlay(df1=df1, df2=df2, how='intersection')
         intersection = intersection.drop(columns=['geometry'])
 
-        # Convert the filtered DF back to NumPandasTraj and return it.
-        return NumPandasTraj(data_set=intersection,
-                             datetime='DateTime',
-                             traj_id='traj_id',
-                             latitude='lat',
-                             longitude='lon')
+        # Convert the filtered DF back to PTRAILDataFrame and return it.
+        return PTRAILDataFrame(data_set=intersection,
+                               datetime='DateTime',
+                               traj_id='traj_id',
+                               latitude='lat',
+                               longitude='lon')
 
     @staticmethod
-    def traj_intersect_inside_polygon(df1: NumPandasTraj,
-                                      df2: NumPandasTraj,
+    def traj_intersect_inside_polygon(df1: PTRAILDataFrame,
+                                      df2: PTRAILDataFrame,
                                       polygon: Polygon):
         """
             Given a df1 and df2 containing trajectory data along with  polygon,
@@ -246,9 +246,9 @@ class SemanticFeatures:
 
             Parameters
             ----------
-                df1: NumPandasTraj
+                df1: PTRAILDataFrame
                     Trajectory Dataframe 1.
-                df2: NumPandasTraj
+                df2: PTRAILDataFrame
                     Trajectory Dataframe 2.
                 polygon: Polygon
                     The area inside which it is to be determined if the trajectories
@@ -256,10 +256,10 @@ class SemanticFeatures:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     A dataframe containing trajectories that are inside the polygon.
                 geopandas.GeoDataFrame:
-                    An empty dataframe if both the trajectories do not interect.
+                    An empty dataframe if both the trajectories do not intersect.
         """
         df1, df2 = df1.reset_index(), df2.reset_index()
         # Convert df1 to GeoDataFrame with correct geometry and the correct CRS.
@@ -375,7 +375,7 @@ class SemanticFeatures:
             raise ValueError("The tags provided are invalid. Please check your tags and try again.")
 
     # @staticmethod
-    # def detect_herd(df: NumPandasTraj,
+    # def detect_herd(df: PTRAILDataFrame,
     #                 surroundings: Union[pd.DataFrame, gpd.GeoDataFrame],
     #                 time_threshold: int):
     #     """
@@ -388,7 +388,7 @@ class SemanticFeatures:
     #
     #         Parameters
     #         ----------
-    #             df: NumPandasTraj
+    #             df: PTRAILDataFrame
     #                 The dataframe containing Trajectory Data.
     #             surroundings: Union[pd.DataFrame, gpd.GeoDataFrame]
     #                 The dataframe containing surrounding data.

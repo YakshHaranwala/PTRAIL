@@ -34,7 +34,7 @@ import pandas as pd
 from hampel import hampel
 from scipy.interpolate import CubicSpline
 
-from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.features.spatial_features import SpatialFeatures as spatial
 from ptrail.utilities import constants as const
 from ptrail.utilities.exceptions import *
@@ -43,7 +43,7 @@ from ptrail.utilities.exceptions import *
 class Helpers:
     # ------------------------------------ Interpolation Helpers --------------------------------------- #
     @staticmethod
-    def linear_help(dataframe: Union[pd.DataFrame, NumPandasTraj], id_: Text, time_jump: float):
+    def linear_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame], id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses linear interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -99,7 +99,7 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def cubic_help(df: Union[pd.DataFrame, NumPandasTraj], id_: Text, time_jump: float):
+    def cubic_help(df: Union[pd.DataFrame, PTRAILDataFrame], id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses cubic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -162,7 +162,7 @@ class Helpers:
         return df
 
     @staticmethod
-    def random_walk_help(dataframe: NumPandasTraj, id_: Text, time_jump: float):
+    def random_walk_help(dataframe: PTRAILDataFrame, id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses random-walk interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -264,7 +264,7 @@ class Helpers:
         return dataframe
 
     @staticmethod
-    def kinematic_help(dataframe: Union[pd.DataFrame, NumPandasTraj], id_: Text, time_jump: float):
+    def kinematic_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame], id_: Text, time_jump: float):
         """
             This method takes a dataframe and uses kinematic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -358,7 +358,7 @@ class Helpers:
 
             Parameters
             ----------
-                df: NumPandasTraj/pd.core.dataframe.DataFrame
+                df: PTRAILDataFrame/pd.core.dataframe.DataFrame
                     The dataframe which the outliers are to be removed
                 column_name: Text
                     The column based on which the outliers are to be removed.
@@ -433,7 +433,7 @@ class Helpers:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe that is to be split.
 
             Returns

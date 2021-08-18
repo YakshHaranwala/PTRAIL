@@ -1,8 +1,8 @@
 """
-    The TrajectoryDF module is the main module containing the NumPandasTraj Dataframe
+    The TrajectoryDF module is the main module containing the PTRAILDataFrame Dataframe
     for storing the Trajectory Data with PTRAIL Library. The Dataframe has
     certain restrictions on what type of data is mandatory in order to be stored as a
-    NumPandasTraj which is mentioned in the documentation of the constructor.
+    PTRAILDataFrame which is mentioned in the documentation of the constructor.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: May 26, 2021.
@@ -24,7 +24,7 @@ from ptrail.utilities import constants as const
 from ptrail.utilities.exceptions import *
 
 
-class NumPandasTraj(DataFrame):
+class PTRAILDataFrame(DataFrame):
     def __init__(self, data_set: Union[DataFrame, List, Dict], latitude: Text, longitude: Text, datetime: Text,
                  traj_id: Text, rest_of_columns: Optional[List[Text]] = None):
         """
@@ -88,14 +88,14 @@ class NumPandasTraj(DataFrame):
             self._validate_data_types(data_set)
             data_set.set_index([const.TRAJECTORY_ID, const.DateTime], inplace=True)
             data_set.sort_values([const.TRAJECTORY_ID, const.DateTime], inplace=True)
-            super(NumPandasTraj, self).__init__(data_set)
+            super(PTRAILDataFrame, self).__init__(data_set)
 
     # ------------------------------ General Utilities ----------------------------- #
     def _rename_df_col_headers(self, data: DataFrame, lat: Text, lon: Text,
                                datetime: Text, traj_id: Text):
         """
             Change the column headers of the columns when the user given data is in the
-            form of a pandas DF while creating the NumPandasTraj. This method is mainly
+            form of a pandas DF while creating the PTRAILDataFrame. This method is mainly
             used when the user reads in data from a csv because the CSV file might
             contain different names for the columns.
 
@@ -254,7 +254,7 @@ class NumPandasTraj(DataFrame):
     @property
     def latitude(self):
         """
-            Accessor method for the latitude column of the NumPandasTraj DataFrame.
+            Accessor method for the latitude column of the PTRAILDataFrame DataFrame.
 
             Returns
             -------
@@ -274,7 +274,7 @@ class NumPandasTraj(DataFrame):
     @property
     def longitude(self):
         """
-            Accessor method for the longitude column of the NumPandasTraj DataFrame.
+            Accessor method for the longitude column of the PTRAILDataFrame DataFrame.
 
             Returns
             -------
@@ -294,7 +294,7 @@ class NumPandasTraj(DataFrame):
     @property
     def datetime(self):
         """
-            Accessor method for the DateTime column of the NumPandasTraj DataFrame.
+            Accessor method for the DateTime column of the PTRAILDataFrame DataFrame.
 
             Returns
             -------
@@ -379,7 +379,7 @@ class NumPandasTraj(DataFrame):
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The sorted dataframe.
         """
         return self.sort_values([const.TRAJECTORY_ID, const.DateTime], ascending=ascending)

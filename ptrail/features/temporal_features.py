@@ -24,26 +24,26 @@ from typing import Optional, Text
 import numpy as np
 import pandas as pd
 
-from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.features.helper_functions import Helpers as helpers
 from ptrail.utilities import constants as const
 
 
 class TemporalFeatures:
     @staticmethod
-    def create_date_column(dataframe: NumPandasTraj):
+    def create_date_column(dataframe: PTRAILDataFrame):
         """
             From the DateTime column already present in the data, extract only the date
             and then add another column containing just the date.
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
-                    The NumPandasTraj Dataframe on which the creation of the time column is to be done.
+                dataframe: PTRAILDataFrame
+                    The PTRAILDataFrame Dataframe on which the creation of the time column is to be done.
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The dataframe containing the resultant Date column.
 
         """
@@ -52,24 +52,24 @@ class TemporalFeatures:
         # From the DateTime value extract the dates and store them in Date column
         df['Date'] = df[const.DateTime].dt.date
 
-        # Return the dataframe by converting it to NumPandasTraj
-        return NumPandasTraj(df.reset_index(drop=True),
-                             const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Return the dataframe by converting it to PTRAILDataFrame
+        return PTRAILDataFrame(df.reset_index(drop=True),
+                               const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_time_column(dataframe: NumPandasTraj):
+    def create_time_column(dataframe: PTRAILDataFrame):
         """
             From the DateTime column already present in the data, extract only the time
             and then add another column containing just the time.
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
-                    The NumPandasTraj Dataframe on which the creation of the time column is to be done.
+                dataframe: PTRAILDataFrame
+                    The PTRAILDataFrame Dataframe on which the creation of the time column is to be done.
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The dataframe containing the resultant Time column.
 
         """
@@ -78,11 +78,11 @@ class TemporalFeatures:
         # From the DateTime column extract the time and store them in the Time column
         dataframe['Time'] = dataframe[const.DateTime].dt.time
 
-        # Return the dataframe by converting it into NumPandasTraj type
-        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Return the dataframe by converting it into PTRAILDataFrame type
+        return PTRAILDataFrame(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_day_of_week_column(dataframe: NumPandasTraj):
+    def create_day_of_week_column(dataframe: PTRAILDataFrame):
         """
             Create a column called Day_Of_Week which contains the day of the week
             on which the trajectory point is recorded. This is calculated on the basis
@@ -90,12 +90,12 @@ class TemporalFeatures:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing the entire data on which the operation is to be performed
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The dataframe containing the resultant Day_of_week column.
         """
         dataframe = dataframe.reset_index()
@@ -103,23 +103,23 @@ class TemporalFeatures:
         # From the DateTime column extract the time and store them in the Time column
         dataframe['Day_Of_Week'] = dataframe[const.DateTime].dt.day_name()
 
-        # Return the dataframe by converting it into NumPandasTraj type
-        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Return the dataframe by converting it into PTRAILDataFrame type
+        return PTRAILDataFrame(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_weekend_indicator_column(dataframe: NumPandasTraj):
+    def create_weekend_indicator_column(dataframe: PTRAILDataFrame):
         """
             Create a column called Weekend which indicates whether the point data is collected
             on either a Saturday or a Sunday.
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which the operation is to be performed.
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The dataframe containing the resultant Weekend column.
 
             References
@@ -142,11 +142,11 @@ class TemporalFeatures:
             dataframe['Weekend'] = False
             dataframe.at[index_fd, 'Weekend'] = True
 
-        # Return the dataframe by converting it into NumPandasTraj
-        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Return the dataframe by converting it into PTRAILDataFrame
+        return PTRAILDataFrame(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_time_of_day_column(dataframe: NumPandasTraj):
+    def create_time_of_day_column(dataframe: PTRAILDataFrame):
         """
             Create a Time_Of_Day column in the dataframe using parallelization which indicates at what time of the
             day was the point data captured.
@@ -154,12 +154,12 @@ class TemporalFeatures:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which the calculation is to be done.
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The dataframe containing the resultant Time_Of_Day column.
 
             References
@@ -183,10 +183,10 @@ class TemporalFeatures:
         ]
         # Map the conditions to the different periods of  the day
         dataframe['Time_Of_Day'] = np.select(conditions, const.TIME_OF_DAY)
-        return NumPandasTraj(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return PTRAILDataFrame(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def get_traj_duration(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
+    def get_traj_duration(dataframe: PTRAILDataFrame, traj_id: Optional[Text] = None):
         """
             Accessor method for the duration of a trajectory specified by the user.
 
@@ -197,7 +197,7 @@ class TemporalFeatures:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing the resultant column if inplace is True.
                 traj_id: Optional[Text]
                     The trajectory id for which the duration is required.
@@ -231,7 +231,7 @@ class TemporalFeatures:
                 return small.max() - small.min()
 
     @staticmethod
-    def get_start_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
+    def get_start_time(dataframe: PTRAILDataFrame, traj_id: Optional[Text] = None):
         """
             Get the starting time of the trajectory.
 
@@ -243,7 +243,7 @@ class TemporalFeatures:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which the operations are to be performed.
                 traj_id: Optional[Text]
                     The trajectory for which the start time is required.
@@ -283,7 +283,7 @@ class TemporalFeatures:
             return filt_two[const.DateTime].iloc[0]
 
     @staticmethod
-    def get_end_time(dataframe: NumPandasTraj, traj_id: Optional[Text] = None):
+    def get_end_time(dataframe: PTRAILDataFrame, traj_id: Optional[Text] = None):
         """
             Get the ending time of the trajectory.
 
@@ -295,7 +295,7 @@ class TemporalFeatures:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which the operations are to be performed.
                 traj_id: Optional[Text]
                     The trajectory for which the end time is required.

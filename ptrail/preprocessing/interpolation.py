@@ -19,7 +19,7 @@ from typing import Optional, Text, Union
 import pandas
 import pandas as pd
 
-from ptrail.core.TrajectoryDF import NumPandasTraj as NumTrajDF
+from ptrail.core.TrajectoryDF import PTRAILDataFrame as NumTrajDF
 from ptrail.preprocessing.helpers import Helpers as helper
 from ptrail.utilities import constants as const
 
@@ -63,7 +63,7 @@ class Interpolation:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing the original dataset.
                 time_jump: float
                     The maximum time difference between 2 consecutive points.
@@ -72,7 +72,7 @@ class Interpolation:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The dataframe containing the interpolated trajectory points.
         """
         # First, lets split the dataframe into smaller chunks containing
@@ -139,7 +139,7 @@ class Interpolation:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe containing the original data.
                 time_jump: float
                     The maximum time difference between 2 points. If the time difference between

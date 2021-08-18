@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 import ptrail.utilities.constants as const
-from ptrail.core.TrajectoryDF import NumPandasTraj
+from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.preprocessing.helpers import Helpers as helper
 from ptrail.utilities.exceptions import *
 
@@ -29,7 +29,7 @@ NUM_CPU = ceil((num * 2) / 3)
 
 class Filters:
     @staticmethod
-    def remove_duplicates(dataframe: NumPandasTraj):
+    def remove_duplicates(dataframe: PTRAILDataFrame):
         """
         Drop duplicates based on the four following columns:
             1. Trajectory ID
@@ -42,7 +42,7 @@ class Filters:
 
         Returns
         -------
-            NumPandasTraj
+            PTRAILDataFrame
                 The dataframe with dropped duplicates.
         """
         return dataframe.reset_index().drop_duplicates(
@@ -50,14 +50,14 @@ class Filters:
             keep='first')
 
     @staticmethod
-    def filter_by_traj_id(dataframe: NumPandasTraj, traj_id: Text):
+    def filter_by_traj_id(dataframe: PTRAILDataFrame, traj_id: Text):
         """
             Extract all the trajectory points of a particular trajectory specified
             by the trajectory's ID.
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe on which the filtering by ID is to be done.
                 traj_id: Text
                     The ID of the trajectory which is to be extracted.
@@ -124,14 +124,14 @@ class Filters:
                 lat_two, lon_two)
 
     @staticmethod
-    def filter_by_bounding_box(dataframe: NumPandasTraj, bounding_box: tuple, inside: bool = True):
+    def filter_by_bounding_box(dataframe: PTRAILDataFrame, bounding_box: tuple, inside: bool = True):
         """
             Given a bounding box, filter out all the points that are within/outside
             the bounding box and return a dataframe containing the filtered points.
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe from which the data is to be filtered out.
                 bounding_box: tuple
                     The bounding box which is to be used to filter the data.
@@ -141,7 +141,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The filtered dataframe.
         """
         filt = (
@@ -151,10 +151,10 @@ class Filters:
                 & (dataframe[const.LONG] <= bounding_box[3])
         )
         df = dataframe.loc[filt] if inside else dataframe.loc[~filt]
-        return NumPandasTraj(df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return PTRAILDataFrame(df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def filter_by_date(dataframe: NumPandasTraj, start_date: Optional[Text] = None, end_date: Optional[Text] = None):
+    def filter_by_date(dataframe: PTRAILDataFrame, start_date: Optional[Text] = None, end_date: Optional[Text] = None):
         """
             Filter the dataset by user-given time range.
 
@@ -172,7 +172,7 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe that is to be filtered.
                 start_date: Optional[Text]
                     The start date from which the points are to be filtered.
@@ -181,7 +181,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The filtered dataframe containing the resultant data.
 
             Raises
@@ -225,8 +225,8 @@ class Filters:
                     filt = np.logical_and(dataframe['Date'] >= start_date, dataframe['Date'] <= end_date)
                     filtered_df = dataframe.loc[filt].reset_index()
 
-            # Convert the smaller dataframe back to NumPandasTraj and return it.
-            return NumPandasTraj(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            # Convert the smaller dataframe back to PTRAILDataFrame and return it.
+            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
         except KeyError:
             # Ask the user first to create a date.
@@ -234,7 +234,7 @@ class Filters:
                                           f"create_date_column() function first before running this filter.")
 
     @staticmethod
-    def filter_by_datetime(dataframe: NumPandasTraj, start_dateTime: Optional[Text] = None,
+    def filter_by_datetime(dataframe: PTRAILDataFrame, start_dateTime: Optional[Text] = None,
                            end_dateTime: Optional[Text] = None):
         """
             Filter the dataset by user-given time range.
@@ -253,7 +253,7 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe that is to be filtered.
                 start_dateTime: Optional[Text]
                     The start dateTime from which the points are to be filtered.
@@ -262,7 +262,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj
+                PTRAILDataFrame
                     The filtered dataframe containing the resultant data.
         """
         # Reset Index and create a variable for storing filtered DataFrame.
@@ -299,11 +299,11 @@ class Filters:
                                       dataframe[const.DateTime] <= end_dateTime)
                 filtered_df = dataframe.loc[filt].reset_index()
 
-        # Convert the smaller dataframe back to NumPandasTraj and return it.
-        return NumPandasTraj(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Convert the smaller dataframe back to PTRAILDataFrame and return it.
+        return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def filter_by_max_speed(dataframe: NumPandasTraj, max_speed: float):
+    def filter_by_max_speed(dataframe: PTRAILDataFrame, max_speed: float):
         """
             Remove the data points which have speed more than a user given speed.
 
@@ -313,15 +313,15 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe which is to be filtered.
                 max_speed: float
                     The speed threshold above which the points are to be removed.
 
             Returns
             -------
-                NumPandasTraj:
-                    NumPandasTraj Dataframe containing the resultant dataframe.
+                PTRAILDataFrame:
+                    PTRAILDataFrame Dataframe containing the resultant dataframe.
 
             Raises
             ------
@@ -336,8 +336,8 @@ class Filters:
             filt = dataframe['Speed_prev_to_curr'].fillna(max_speed + 1) <= max_speed
             filtered_df = dataframe.loc[filt].reset_index(drop=True)
 
-            # Convert the smaller dataframe back to NumPandasTraj and return it.
-            return NumPandasTraj(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            # Convert the smaller dataframe back to PTRAILDataFrame and return it.
+            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
             raise MissingColumnsException(f"The column 'Speed_prev_to_curr is not present in the dataset. "
                                           f"Please run the function create_speed_from_prev_column() before"
@@ -354,15 +354,15 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe which is to be filtered.
                 min_speed: float
                     The speed threshold below which the points are to be removed.
 
             Returns
             -------
-                NumPandasTraj:
-                    NumPandasTraj Dataframe containing the resultant dataframe.
+                PTRAILDataFrame:
+                    PTRAILDataFrame Dataframe containing the resultant dataframe.
 
             Raises
             ------
@@ -377,8 +377,8 @@ class Filters:
             filt = dataframe['Speed_prev_to_curr'].fillna(min_speed - 1) >= min_speed
             filtered_df = dataframe.loc[filt].reset_index()
 
-            # Convert the smaller dataframe back to NumPandasTraj and return it.
-            return NumPandasTraj(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            # Convert the smaller dataframe back to PTRAILDataFrame and return it.
+            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
             raise MissingColumnsException(f"The column 'Speed_prev_to_curr is not present in the dataset. "
                                           f"Please run the function create_speed_from_prev_column() before"
@@ -396,7 +396,7 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe which is to be filtered.
                 min_distance: float
                     The consecutive distance threshold below which the points are to
@@ -404,7 +404,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The filtered dataframe.
 
             Raises
@@ -421,8 +421,8 @@ class Filters:
             filt = dataframe['Distance_prev_to_curr'].fillna(min_distance - 1) >= min_distance
             filtered_df = dataframe.loc[filt].reset_index(drop=True)
 
-            # Convert the smaller dataframe back to NumPandasTraj and return it.
-            return NumPandasTraj(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            # Convert the smaller dataframe back to PTRAILDataFrame and return it.
+            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
             raise MissingColumnsException(f"The column 'Distance_prev_to_curr is not present in the dataset. "
                                           f"Please run the function create_distance_between_consecutive_column() before"
@@ -440,7 +440,7 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe which is to be filtered.
                 max_distance: float
                     The consecutive distance threshold above which the points are to
@@ -448,7 +448,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The filtered dataframe.
 
             Raises
@@ -465,8 +465,8 @@ class Filters:
             filt = dataframe['Distance_prev_to_curr'].fillna(max_distance + 1) <= max_distance
             filtered_df = dataframe.loc[filt]
 
-            # Convert the smaller dataframe back to NumPandasTraj and return it.
-            return NumPandasTraj(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            # Convert the smaller dataframe back to PTRAILDataFrame and return it.
+            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
             raise MissingColumnsException(f"The column 'Distance_prev_to_curr is not present in the dataset. "
                                           f"Please run the function create_distance_between_consecutive_column() before"
@@ -489,7 +489,7 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe which is to be filtered.
                 max_distance: float
                     The maximum distance between 2 consecutive points.
@@ -498,7 +498,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The filtered dataframe.
         """
         try:
@@ -536,7 +536,7 @@ class Filters:
 
             Parameters
             ----------
-            dataframe: NumPandasTraj
+            dataframe: PTRAILDataFrame
                 The dataframe which is to be filtered.
             min_distance: float
                 The minimum distance between 2 consecutive points.
@@ -545,7 +545,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The filtered dataframe.
         """
         try:
@@ -568,7 +568,7 @@ class Filters:
                                           f"create_speed_from_prev_column() first before running the function.")
 
     @staticmethod
-    def filter_outliers_by_consecutive_distance(dataframe: NumPandasTraj):
+    def filter_outliers_by_consecutive_distance(dataframe: PTRAILDataFrame):
         """
             Check the outlier points based on distance between 2 consecutive points.
             Outlier formula:
@@ -581,12 +581,12 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe which is to be filtered.
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The dataframe which has been filtered.
 
             Raises
@@ -611,7 +611,7 @@ class Filters:
                                      dataframe['Distance_prev_to_curr'] < higher)
 
             filtered_df = dataframe.loc[df_filt]
-            return NumPandasTraj(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
         except KeyError:
             raise MissingColumnsException(f"The column 'Distance_prev_to_curr' is missing in the dataset. "
@@ -632,12 +632,12 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe which is to be filtered.
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The dataframe which has been filtered.
 
             Raises
@@ -670,7 +670,7 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe from which trajectories with few points are to be
                     removed.
                 num_min_points: Optional[int], default = 2
@@ -679,7 +679,7 @@ class Filters:
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The filtered dataframe which does not contain the trajectories
                     with few points anymore.
         """
@@ -688,9 +688,9 @@ class Filters:
         # or equal points than specified by the user.
         filt = dataframe[const.TRAJECTORY_ID].map(dataframe[const.TRAJECTORY_ID].value_counts()) >= num_min_points
 
-        # Apply the filter, convert the resultant dataframe to NumPandasTraj and return it.
+        # Apply the filter, convert the resultant dataframe to PTRAILDataFrame and return it.
         df = dataframe[filt]
-        return NumPandasTraj(df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return PTRAILDataFrame(df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def hampel_outlier_detection(dataframe, column_name: Text):
@@ -706,14 +706,14 @@ class Filters:
 
             Parameters
             ----------
-                dataframe: NumPandasTraj
+                dataframe: PTRAILDataFrame
                     The dataframe from which the outliers are to be removed.
                 column_name: Text
                     The column on te basis of which the outliers are to be detected.
 
             Returns
             -------
-                NumPandasTraj:
+                PTRAILDataFrame:
                     The dataframe with the outliers removed.
 
             Raises
@@ -751,9 +751,9 @@ class Filters:
                       "sure to generate them again as outlier detection drops the point from "
                       "the dataframe and does not run the kinematic features again.")
 
-        # Convert the results back to NumPandasTraj and return the resultant dataframe.
-        return NumPandasTraj(pd.concat(return_list),
-                             const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        # Convert the results back to PTRAILDataFrame and return the resultant dataframe.
+        return PTRAILDataFrame(pd.concat(return_list),
+                               const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def _hampel(dataframe, column_name: Text, return_list: list):
