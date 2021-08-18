@@ -1,10 +1,8 @@
 from .core.TrajectoryDF import PTRAILDataFrame
-
 from .features import helper_functions
+from .features import semantic_features
 from .features import spatial_features
 from .features import temporal_features
-from .features import semantic_features
-
 from .preprocessing import filters
 from .preprocessing import helpers
 from .preprocessing import interpolation
@@ -15,4 +13,4 @@ from .utilities import (
     exceptions,
 )
 
-__version__ = "0.1 Beta"
+__version__ = "0.3 Beta"

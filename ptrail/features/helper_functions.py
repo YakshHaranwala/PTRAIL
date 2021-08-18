@@ -12,14 +12,13 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: 2nd June, 2021
-    | Version: 0.2 Beta
+    | Version: 0.3 Beta
 """
-
+import os
 from math import ceil
 
 import numpy as np
 import pandas as pd
-import psutil
 
 from ptrail.utilities import constants as const
 from ptrail.utilities.DistanceCalculator import FormulaLog as calc
@@ -548,7 +547,7 @@ class Helpers:
         """
         # Based on the Operating system, get the number of CPUs available for
         # multiprocessing.
-        num = psutil.cpu_count()
+        num = os.cpu_count()
         num = int(num)
         NUM_CPU = ceil((num * 2) / 3)
 
