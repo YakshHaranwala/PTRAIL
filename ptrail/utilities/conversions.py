@@ -4,7 +4,7 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: 1st June, 2021
-    | Version: 0.2 Beta
+    | Version: 0.3 Beta
 
 """
 from typing import Text

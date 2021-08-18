@@ -8,7 +8,7 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
     | Date: 21st June, 2021
-    | Version: 0.2 Beta
+    | Version: 0.3 Beta
 """
 import itertools
 import multiprocessing as mlp

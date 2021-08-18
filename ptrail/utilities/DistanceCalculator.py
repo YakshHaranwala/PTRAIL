@@ -4,7 +4,7 @@
 
     | Authors: Salman Haidri, Yaksh J Haranwala
     | Date: 28th May, 2021
-    | Version: 0.2 Beta
+    | Version: 0.3 Beta
 """
 
 import numpy as np
