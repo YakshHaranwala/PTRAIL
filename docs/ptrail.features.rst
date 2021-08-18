@@ -28,6 +28,14 @@ ptrail.features.temporal\_features module
    :undoc-members:
    :show-inheritance:
 
+ptrail.features.semantic\_features module
+-----------------------------------------
+
+.. automodule:: ptrail.features.semantic_features
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

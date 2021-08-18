@@ -7,5 +7,4 @@ ptrail
    ptrail.core
    ptrail.features
    ptrail.preprocessing
-   ptrail.semantics
    ptrail.utilities

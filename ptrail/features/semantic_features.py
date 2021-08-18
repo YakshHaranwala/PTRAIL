@@ -24,7 +24,7 @@ import pandas as pd
 from shapely.geometry import Polygon
 
 from ptrail.core.TrajectoryDF import NumPandasTraj
-from ptrail.semantics.helpers import SemanticHelpers
+from ptrail.features.helper_functions import Helpers
 from ptrail.utilities.DistanceCalculator import FormulaLog
 
 num = os.cpu_count()
@@ -156,7 +156,7 @@ class SemanticFeatures:
                     at that point is nearby the POI.
 
         """
-        df_chunks = SemanticHelpers._df_split_helper(df)
+        df_chunks = Helpers._df_split_helper(df)
         print(len(df_chunks))
 
         # Here, create 2/3rds number of processes as there are CPUs in the system. Some CPUs are
@@ -164,7 +164,7 @@ class SemanticFeatures:
         # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
         # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
         mp_pool = multiprocessing.Pool(NUM_CPU)
-        results = mp_pool.starmap(SemanticHelpers.visited_poi_helper,
+        results = mp_pool.starmap(Helpers.visited_poi_helper,
                                   zip(df_chunks,
                                       itertools.repeat(surrounding_data),
                                       itertools.repeat(dist_column_label),

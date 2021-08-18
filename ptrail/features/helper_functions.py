@@ -482,6 +482,53 @@ class Helpers:
         # Set the index to traj_id and return it.
         return df.set_index(const.TRAJECTORY_ID)
 
+    # ------------------------------------ Semantic Helpers ------------------------------------- #
+    @staticmethod
+    def visited_poi_helper(df, surrounding_data, dist_column_label, nearby_threshold):
+        """
+            Given a Trajectory dataframe and another dataset with the surrounding data,
+            find whether the given object is nearby a point of interest or not.
+
+            Parameters
+            ----------
+                df:
+                    The dataframe containing the trajectory data.
+                surrounding_data:
+                    The dataframe containing the data of the surroundings.
+                dist_column_label: Text
+                    The label of the column containing the distance of the coords from
+                    the nearest POI.
+                nearby_threshold: int
+                    The maximum distance between the POI and the current location of the object
+                    within which the object is considered to be crossing/visiting the POI.
+
+            Returns
+            -------
+                The original dataframe with another column added to it indicating whether
+                each point is within
+        """
+        # A boolean list to store if that point in trajectory lies around a POI.
+        POI = []
+        df2 = surrounding_data.copy()
+
+        # Loop for every point in the dataframe and create a distance column with distance from every point in the
+        # surrounding data. Then use this distance column and the distance of POI column and compare each value.
+        # Store the comparison in an array True if they lie within the threshold else false. And if any of the
+        # value in it is true then that point in the dataframe was near a POI.
+        for i in range(len(df)):
+            dist_array = Helpers.distance_from_given_point_helper(df2, (df['lat'][i], df['lon'][i]))[
+                f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
+            poi_array = df2[dist_column_label].to_numpy()
+
+            dist_comp = np.abs(poi_array - dist_array) <= nearby_threshold
+            POI.append(np.any(dist_comp))
+
+        # Append the boolean list containing whether each point was near the POI of interest or not
+        df['Nearby_POI'] = POI
+        print('Finished')
+
+        return df
+
     # ------------------------------------ General Utilities ------------------------------------ #
     @staticmethod
     def _get_partition_size(size):
