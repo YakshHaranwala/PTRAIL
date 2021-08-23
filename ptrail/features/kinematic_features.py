@@ -35,7 +35,7 @@ num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
 
 
-class SpatialFeatures:
+class KinematicFeatures:
     @staticmethod
     def get_bounding_box(dataframe: PTRAILDataFrame):
         """
@@ -428,7 +428,7 @@ class SpatialFeatures:
             #   3. Divide the 2 values to calculate the speed.
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = SpatialFeatures.create_distance_between_consecutive_column(dataframe)
+            dataframe = KinematicFeatures.create_distance_between_consecutive_column(dataframe)
             distances = dataframe.reset_index()['Distance_prev_to_curr']
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
@@ -470,7 +470,7 @@ class SpatialFeatures:
             # the speed column and then follow the steps mentioned above
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = SpatialFeatures.create_speed_from_prev_column(dataframe)
+            dataframe = KinematicFeatures.create_speed_from_prev_column(dataframe)
             speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
@@ -511,7 +511,7 @@ class SpatialFeatures:
             # the speed column and then follow the steps mentioned above
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = SpatialFeatures.create_acceleration_from_prev_column(dataframe)
+            dataframe = KinematicFeatures.create_acceleration_from_prev_column(dataframe)
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
@@ -600,7 +600,7 @@ class SpatialFeatures:
             # Similar to the step above but just makes the Bearing column first
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = SpatialFeatures.create_bearing_column(dataframe)
+            dataframe = KinematicFeatures.create_bearing_column(dataframe)
             bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
@@ -639,7 +639,7 @@ class SpatialFeatures:
             # Similar to the step above but just makes the Bearing column first
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = SpatialFeatures.create_bearing_rate_column(dataframe)
+            dataframe = KinematicFeatures.create_bearing_rate_column(dataframe)
             bearing_rate_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
@@ -681,7 +681,7 @@ class SpatialFeatures:
             # First, calculate the distance by calling the distance_between_consecutive_column() function
             # and convert it into a numpy array and then sum the array using nansum() to make sure that
             # NaN values are considered as zeros.
-            distances = SpatialFeatures.create_distance_between_consecutive_column(filtered_df)[
+            distances = KinematicFeatures.create_distance_between_consecutive_column(filtered_df)[
                 'Distance_prev_to_curr'].to_numpy()
             return np.nansum(distances)
         else:

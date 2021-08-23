@@ -35,7 +35,7 @@ from hampel import hampel
 from scipy.interpolate import CubicSpline
 
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
-from ptrail.features.spatial_features import SpatialFeatures as spatial
+from ptrail.features.kinematic_features import KinematicFeatures as spatial
 from ptrail.utilities import constants as const
 from ptrail.utilities.exceptions import *
 

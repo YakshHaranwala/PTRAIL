@@ -12,10 +12,10 @@ ptrail.features.helper\_functions module
    :undoc-members:
    :show-inheritance:
 
-ptrail.features.spatial\_features module
-----------------------------------------
+ptrail.features.kinematic\_features module
+------------------------------------------
 
-.. automodule:: ptrail.features.spatial_features
+.. automodule:: ptrail.features.kinematic_features
    :members:
    :undoc-members:
    :show-inheritance:
