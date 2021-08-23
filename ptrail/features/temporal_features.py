@@ -127,9 +127,9 @@ class TemporalFeatures:
                 Universidade Federal Do Cear ́a, 2019.
 
         """
-        dataframe = dataframe.reset_index()
         # Check if Day_of_Week column is present in the dataframe
         if 'Day_Of_Week' in dataframe.columns:
+            dataframe = dataframe.reset_index()
             # store the weekend days in a series
             fd = np.logical_or(dataframe['Day_Of_Week'] == const.WEEKEND[0],
                                dataframe['Day_Of_Week'] == const.WEEKEND[1])
@@ -139,8 +139,23 @@ class TemporalFeatures:
             # indicates that it's a weekend
             dataframe['Weekend'] = False
             dataframe.at[index_fd, 'Weekend'] = True
+            # Return the dataframe by converting it into PTRAILDataFrame
+        else:
+            # If the dataframe does not contain the Day_Of_Week column already,
+            # then call the method and create the column.
+            dataframe = TemporalFeatures.create_day_of_week_column(dataframe)
+            dataframe = dataframe.reset_index()
+            # store the weekend days in a series
+            fd = np.logical_or(dataframe['Day_Of_Week'] == const.WEEKEND[0],
+                               dataframe['Day_Of_Week'] == const.WEEKEND[1])
+            # store the index of the weekends
+            index_fd = dataframe[fd].index
+            # initialize the Weekend column with False and then update all the indexes which
+            # indicates that it's a weekend
+            dataframe['Weekend'] = False
+            dataframe.at[index_fd, 'Weekend'] = True
+            # Return the dataframe by converting it into PTRAILDataFrame
 
-        # Return the dataframe by converting it into PTRAILDataFrame
         return PTRAILDataFrame(dataframe, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod

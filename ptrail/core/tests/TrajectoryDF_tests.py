@@ -1,6 +1,5 @@
 import datetime
 import unittest
-from operator import itemgetter
 
 import folium
 import numpy as np
