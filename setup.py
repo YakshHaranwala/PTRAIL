@@ -19,7 +19,7 @@ REQUIRED_PKGS = ['numpy>=1.20',
 setup(
     name='ptrail',
     packages=find_packages(),
-    version='0.3 Beta',
+    version='0.3.1 Beta',
     license='new BSD',
     python_requires='>=3.6',
     description='PTRAIL: A Mobility-data Preprocessing Library using parallel computation.',

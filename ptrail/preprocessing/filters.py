@@ -4,8 +4,6 @@
     several others.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
-    | Date: 8th June, 2021
-    | Version: 0.3 Beta
 """
 import itertools
 import math

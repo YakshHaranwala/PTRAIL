@@ -5,9 +5,6 @@
     PTRAILDataFrame which is mentioned in the documentation of the constructor.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
-    | Date: May 26, 2021.
-    | Version: 0.3 Beta
-
 """
 import random
 from parser import ParserError
@@ -90,7 +87,7 @@ class PTRAILDataFrame(DataFrame):
             data_set.sort_values([const.TRAJECTORY_ID, const.DateTime], inplace=True)
             super(PTRAILDataFrame, self).__init__(data_set)
 
-    # ------------------------------ General Utilities ----------------------------- #
+    # ------------------------------ General (Private) Utilities ----------------------------- #
     def _rename_df_col_headers(self, data: DataFrame, lat: Text, lon: Text,
                                datetime: Text, traj_id: Text):
         """

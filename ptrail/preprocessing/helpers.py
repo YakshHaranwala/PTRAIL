@@ -21,9 +21,6 @@
     are used in splitting up dataframes for running the code in parallel.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
-    | Date: 16th June, 2021
-    | Version: 0.3 Beta
-
 """
 import math
 import os

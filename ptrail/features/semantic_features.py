@@ -7,9 +7,6 @@
     library.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
-    | Date: August 3rd, 2021.
-    | Version: 0.3 Beta
-
 """
 import itertools
 import multiprocessing

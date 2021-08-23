@@ -4,9 +4,6 @@
     The purpose of the file is to store all exceptions in one place.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
-    | Date: June 1st, 2021.
-    | Version: 0.3 Beta
-
 """
 
 

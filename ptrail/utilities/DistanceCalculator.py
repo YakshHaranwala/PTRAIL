@@ -3,8 +3,6 @@
     distance between 2 points on the surface of earth depending on the CRS being used.
 
     | Authors: Salman Haidri, Yaksh J Haranwala
-    | Date: 28th May, 2021
-    | Version: 0.3 Beta
 """
 
 import numpy as np

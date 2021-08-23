@@ -8,8 +8,6 @@
 
 
     | Authors: Yaksh J Haranwala, Salman Haidri
-    | Date: 2nd June, 2021
-    | Version: 0.3 Beta
 
     References
     ----------
