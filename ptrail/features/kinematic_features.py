@@ -281,6 +281,11 @@ class KinematicFeatures:
             -------
                 float:
                     The total distance covered on that date by that trajectory ID.
+
+            Raises
+            ------
+                KeyError:
+                    Traj_id is not present in the arguments passed.
         """
         # First, reset the index of the dataframe.
         # Then, filter the dataframe based on Date and Trajectory ID if given by user.
