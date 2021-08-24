@@ -53,7 +53,6 @@ class TemporalFeaturesTest(unittest.TestCase):
 
     def test_traj_duration(self):
         new_df = TemporalFeatures.get_traj_duration(self._test_df)
-        self.assertGreaterEqual(len(new_df), 1)
         if len(new_df) > 1:
             self.assertIsNotNone(new_df['Traj_Duration'])
             self.assertIsInstance(new_df['Traj_Duration'][0], pd.Timedelta)
@@ -63,7 +62,6 @@ class TemporalFeaturesTest(unittest.TestCase):
 
     def test_start_time(self):
         new_df = TemporalFeatures.get_start_time(self._test_df)
-        self.assertGreaterEqual(len(new_df), 1)
         if len(new_df) > 1:
             self.assertIsNotNone(new_df['DateTime'])
             self.assertIsInstance(new_df['DateTime'][0], datetime.datetime)
@@ -73,7 +71,6 @@ class TemporalFeaturesTest(unittest.TestCase):
 
     def test_end_time(self):
         new_df = TemporalFeatures.get_end_time(self._test_df)
-        self.assertGreaterEqual(len(new_df), 1)
         if len(new_df) > 1:
             self.assertIsNotNone(new_df['DateTime'])
             self.assertIsInstance(new_df['DateTime'][0], datetime.datetime)

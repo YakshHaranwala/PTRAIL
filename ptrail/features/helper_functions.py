@@ -291,7 +291,7 @@ class Helpers:
             Returns
             -------
                 pandas.core.dataframe.DataFrame
-                    The dataframe containing the resultant Within_x_m_from_(x,y) column.
+                    The dataframe containing the resultant Within_X_m_from_(x,y) column.
         """
         # First, lets fetch the latitude and longitude columns from the dataset and store it
         # in a numpy array.

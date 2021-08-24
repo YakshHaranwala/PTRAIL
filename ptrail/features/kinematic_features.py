@@ -263,7 +263,7 @@ class KinematicFeatures:
                                    const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def get_distance_travelled_by_date_and_traj_id(dataframe: PTRAILDataFrame, date, traj_id=None):
+    def get_distance_travelled_by_date_and_traj_id(dataframe: PTRAILDataFrame, date, traj_id):
         """
             Given a date and trajectory ID, calculate the total distance
             covered in the trajectory on that particular date.
@@ -291,21 +291,24 @@ class KinematicFeatures:
         # Then, filter the dataframe based on Date and Trajectory ID if given by user.
         dataframe = dataframe.reset_index()
         filt = dataframe.loc[dataframe[const.DateTime].dt.date == pd.to_datetime(date)]
-        small = filt.loc[filt[const.TRAJECTORY_ID] == traj_id] if traj_id is not None else filt
+        small = filt.loc[filt[const.TRAJECTORY_ID] == traj_id]
 
-        # First, lets fetch the latitude and longitude columns from the dataset and store it
-        # in a numpy array.
-        traj_ids = np.array(small.reset_index()[const.TRAJECTORY_ID])
-        latitudes = np.array(small[const.LAT])
-        longitudes = np.array(small[const.LONG])
-        distances = np.zeros(len(traj_ids))
+        if len(small) > 0:
+            # First, lets fetch the latitude and longitude columns from the dataset and store it
+            # in a numpy array.
+            traj_ids = np.array(small.reset_index()[const.TRAJECTORY_ID])
+            latitudes = np.array(small[const.LAT])
+            longitudes = np.array(small[const.LONG])
+            distances = np.zeros(len(traj_ids))
 
-        # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
-        # each of the values in the distance numpy array.
-        for i in range(len(latitudes) - 1):
-            distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i + 1], longitudes[i + 1])
+            # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
+            # each of the values in the distance numpy array.
+            for i in range(len(latitudes) - 1):
+                distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i + 1], longitudes[i + 1])
 
-        return np.sum(distances)  # Sum all the distances and return the total path length.
+            return np.sum(distances)  # Sum all the distances and return the total path length.
+        else:
+            raise KeyError(f"The Trajectory ID: {traj_id} is not present in the Dataset.")
 
     @staticmethod
     def create_point_within_range_column(dataframe: PTRAILDataFrame, coordinates: tuple,
@@ -506,7 +509,7 @@ class KinematicFeatures:
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
+            dataframe['Jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
             return dataframe
 
         except KeyError:
@@ -518,7 +521,7 @@ class KinematicFeatures:
             acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
+            dataframe['Jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
             return dataframe
 
     @staticmethod
