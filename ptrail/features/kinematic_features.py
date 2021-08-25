@@ -186,7 +186,7 @@ class KinematicFeatures:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The data where speed is to be calculated.
+                    The data where distance is to be calculated.
 
             Returns
             -------
@@ -231,7 +231,7 @@ class KinematicFeatures:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The data where speed is to be calculated.
+                    The data where distance is to be calculated.
 
             Returns
             -------
@@ -423,8 +423,13 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             # Assign the new column and return the NumPandasTrajDF.
-            dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy()
-            return dataframe
+            dataframe['Speed_prev_to_curr'] = (distances / time_deltas.dropna()).to_numpy()
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
         except KeyError:
             # If the Distance_prev_to_curr column is not present in the Dataframe and a KeyError
@@ -440,7 +445,12 @@ class KinematicFeatures:
 
             # Assign the column and return the NumPandasTrajDF.
             dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy(dtype=np.float64)
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
     @staticmethod
     def create_acceleration_from_prev_column(dataframe: PTRAILDataFrame):
