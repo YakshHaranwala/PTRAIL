@@ -187,12 +187,12 @@ class TemporalFeatures:
         # different periods of time
         hours = dataframe[const.DateTime].dt.hour
         conditions = [
+            (hours >= 0) & (hours <= 4),
             (hours > 4) & (hours <= 8),
             (hours > 8) & (hours <= 12),
             (hours > 12) & (hours <= 16),
             (hours > 16) & (hours <= 20),
-            (hours > 20) & (hours <= 0),
-            (hours > 0) & (hours <= 4),
+            (hours > 20) & (hours <= 24)
         ]
         # Map the conditions to the different periods of  the day
         dataframe['Time_Of_Day'] = np.select(conditions, const.TIME_OF_DAY)
