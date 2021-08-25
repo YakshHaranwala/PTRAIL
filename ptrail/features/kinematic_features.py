@@ -741,3 +741,25 @@ class KinematicFeatures:
         else:
             filtered_df = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
             return filtered_df.groupby([const.LAT, const.LONG]).ngroups
+
+    @staticmethod
+    def generate_kinematic_features(dataframe: PTRAILDataFrame):
+        """
+            Generate all the Kinematic features with a single call of this function.
+
+            Parameters
+            ----------
+                dataframe: PTRAILDataFrame
+                    The dataframe on which the features are to be generated.
+
+            Returns
+            -------
+                PTRAILDataFrame:
+                    The dataframe enriched with Kinematic Features.
+        """
+        to_return = KinematicFeatures.create_distance_between_consecutive_column(dataframe)
+        to_return = KinematicFeatures.create_distance_from_start_column(to_return)
+        to_return = KinematicFeatures.create_jerk_from_prev_column(to_return)
+        to_return = KinematicFeatures.create_rate_of_bearing_rate_column(to_return)
+
+        return to_return

@@ -346,3 +346,26 @@ class TemporalFeatures:
             filt = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
             filt_two = filt.loc[filt[const.DateTime] == filt[const.DateTime].max()]
             return filt_two[const.DateTime].iloc[0]
+    
+    @staticmethod
+    def generate_temporal_features(dataframe: PTRAILDataFrame):
+        """
+            Generate all the temporal features with a single call of this function.
+            
+            Parameters
+            ----------
+                dataframe: PTRAILDataFrame
+                    The dataframe on which the features are to be generated.
+            
+            Returns
+            -------
+                PTRAILDataFrame:
+                    The dataframe enriched with Temporal Features.
+        """
+        to_return = TemporalFeatures.create_date_column(dataframe)
+        to_return = TemporalFeatures.create_time_column(to_return)
+        to_return = TemporalFeatures.create_day_of_week_column(to_return)
+        to_return = TemporalFeatures.create_weekend_indicator_column(to_return)
+        to_return = TemporalFeatures.create_time_of_day_column(to_return)
+
+        return to_return
