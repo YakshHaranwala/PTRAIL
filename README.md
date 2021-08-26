@@ -67,3 +67,7 @@ PTRAIL is a state-of-the art Mobility Data Preprocessing Library that mainly dea
 <h2> Binder </h2>
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/YakshHaranwala/PTRAIL.git/HEAD)
+
+<!-------------------- MISC ------------------------------------>
+<h2> Miscellaneous </h2>
+[![Downloads](https://static.pepy.tech/personalized-badge/ptrail?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/ptrail)
