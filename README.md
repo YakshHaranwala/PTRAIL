@@ -72,5 +72,3 @@ PTRAIL is a state-of-the art Mobility Data Preprocessing Library that mainly dea
 <h2> Miscellaneous </h2>
 
 [![Downloads](https://static.pepy.tech/personalized-badge/ptrail?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/ptrail)
-
-![Visitors (Since Aug 26, 2021)](https://visitor-badge.glitch.me/badge?page_id=YakshHaranwala/PTRAIL)
