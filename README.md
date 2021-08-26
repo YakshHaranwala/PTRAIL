@@ -64,6 +64,6 @@ PTRAIL is a state-of-the art Mobility Data Preprocessing Library that mainly dea
 <a href='https://github.com/YakshHaranwala/PTRAIL/tree/main/examples' target='_blank'> <i> PTRAIL Examples </i> </a>
 
 <!--------------------- Binder Link ---------------------------->
-<h2> Examples </h2>
+<h2> Binder </h2>
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/YakshHaranwala/PTRAIL.git/HEAD)
