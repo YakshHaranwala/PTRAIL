@@ -71,6 +71,10 @@ class SemanticFeatures:
                     The Dataframe containing a new column indicating whether the animal
                     has visited the pasture or not.
 
+            Raises
+            ------
+                KeyError:
+                    The column or the location name does not exist.
         """
         df = df.reset_index()
 
@@ -150,7 +154,7 @@ class SemanticFeatures:
             -------
                 PTRAILDataFrame:
                     The dataframe containing the new column indicating whether the object
-                    at that point is nearby the POI.
+                    at that point is near.
 
         """
         df_chunks = Helpers._df_split_helper(df)
