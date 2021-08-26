@@ -508,23 +508,25 @@ class Helpers:
         POI = []
         df2 = surrounding_data.copy()
 
-        # Loop for every point in the dataframe and create a distance column with distance from every point in the
-        # surrounding data. Then use this distance column and the distance of POI column and compare each value.
-        # Store the comparison in an array True if they lie within the threshold else false. And if any of the
-        # value in it is true then that point in the dataframe was near a POI.
-        for i in range(len(df)):
-            dist_array = Helpers.distance_from_given_point_helper(df2, (df['lat'][i], df['lon'][i]))[
-                f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
-            poi_array = df2[dist_column_label].to_numpy()
+        try:
+            # Loop for every point in the dataframe and create a distance column with distance from every point in the
+            # surrounding data. Then use this distance column and the distance of POI column and compare each value.
+            # Store the comparison in an array True if they lie within the threshold else false. And if any of the
+            # value in it is true then that point in the dataframe was near a POI.
+            for i in range(len(df)):
+                dist_array = Helpers.distance_from_given_point_helper(df2, (df['lat'][i], df['lon'][i]))[
+                    f'Distance_from_{df["lat"][i], df["lon"][i]}'].to_numpy()
+                poi_array = df2[dist_column_label].to_numpy()
 
-            dist_comp = np.abs(poi_array - dist_array) <= nearby_threshold
-            POI.append(np.any(dist_comp))
+                dist_comp = np.abs(poi_array - dist_array) <= nearby_threshold
+                POI.append(np.any(dist_comp))
 
-        # Append the boolean list containing whether each point was near the POI of interest or not
-        df['Nearby_POI'] = POI
-        print('Finished')
+            # Append the boolean list containing whether each point was near the POI of interest or not
+            df['Nearby_POI'] = POI
 
-        return df
+            return df
+        except KeyError:
+            raise KeyError(f"The column {dist_column_label} does not exist in the dataset.")
 
     # ------------------------------------ General Utilities ------------------------------------ #
     @staticmethod

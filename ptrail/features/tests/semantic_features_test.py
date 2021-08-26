@@ -1,6 +1,7 @@
 import unittest
 from json import JSONDecodeError
 
+import numpy as np
 import pandas as pd
 from shapely.geometry import Polygon
 
@@ -21,11 +22,44 @@ class SemanticTests(unittest.TestCase):
     coords = list(zip(mini_pasture['lon'], (mini_pasture['lat'])))
     poly = Polygon(coords)
 
-    def test_visited_location(self):
-        pass
+    single_traj = starkey_traj.reset_index().loc[
+        starkey_traj.reset_index()['traj_id'] == '880109D01']
+    single_traj = PTRAILDataFrame(single_traj,
+                                  latitude='lat',
+                                  longitude='lon',
+                                  datetime='DateTime',
+                                  traj_id='traj_id')
 
-    def test_visited_poi(self):
-        pass
+    def test_visited_location_positive(self):
+        visited_location = SemanticFeatures.visited_location(df=self.starkey_traj,
+                                                             geo_layers=self.starkey_habitat,
+                                                             visited_location_name='BEAR',
+                                                             location_column_name='CowPast')
+        self.assertIsNotNone(visited_location['Visited_BEAR'])
+        self.assertIsInstance(visited_location['Visited_BEAR'][0], np.int64)
+
+    def test_visited_location_negative(self):
+        with self.assertRaises(KeyError):
+            visited_location = SemanticFeatures.visited_location(df=self.starkey_traj,
+                                                                 geo_layers=self.starkey_habitat,
+                                                                 visited_location_name='FAKE_NAME',
+                                                                 location_column_name='CowPast')
+
+    def test_visited_poi_positive(self):
+        water_visited = SemanticFeatures.visited_poi(df=self.single_traj,
+                                                     surrounding_data=self.mini_pasture,
+                                                     dist_column_label='DistEWat',
+                                                     nearby_threshold=10)
+        self.assertIsNotNone(water_visited['Nearby_POI'])
+        self.assertIsInstance(water_visited['Nearby_POI'][0], np.bool_)
+
+    def test_visited_poi_negative(self):
+        with self.assertRaises(KeyError):
+            water_visited = SemanticFeatures.visited_poi(df=self.single_traj,
+                                                         surrounding_data=self.mini_pasture,
+                                                         dist_column_label='Fake_Name',
+                                                         nearby_threshold=10)
+
 
     def test_trajectories_inside_polygon(self):
         traj_inside_poly = SemanticFeatures.trajectories_inside_polygon(df=self.starkey_traj,

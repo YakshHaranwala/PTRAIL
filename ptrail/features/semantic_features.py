@@ -81,45 +81,48 @@ class SemanticFeatures:
         # First, filter out the geo_layers dataset to include only the points of the location
         # specified by the user.
         geo_layers = geo_layers.loc[geo_layers[location_column_name] == visited_location_name]
-
-        # Now for the trajectory dataset and the geo layers dataset both, convert them to a
-        # GeoDataFrame with the geometry of lat-lon for each point.
-        df1 = gpd.GeoDataFrame(df,
-                               geometry=gpd.points_from_xy(df["lon"],
-                                                           df["lat"]),
-                               crs={"init": "epsg:4326"})
-
-        df2 = gpd.GeoDataFrame(geo_layers,
-                               geometry=gpd.points_from_xy(geo_layers["lon"],
-                                                           geo_layers["lat"]),
-                               crs={"init": "epsg:4326"})
-
-        # Now, using GeoPandas, find where the trajectory points and the geo-layers
-        # point intersect.
-        intersection = gpd.overlay(df1, df2, how='intersection')
-
-        # Now, in the original dataframe, check which points have intersected
-        # with the geo-layers dataset and which ones have not.
-        merged = pd.merge(df, intersection, how='outer', indicator=True)['_merge']
-
-        # Finally, replace the truth value of the points that have intersected to 1
-        # and set it to 0 for the points that have not intersected.
-        merged = merged.replace('both', 1)
-        merged = merged.replace('left_only', 0)
-        merged = merged.replace('right_only', 0)
-
-        # Assign the resultant column to the original df and drop the unnecessary column
-        # of geometry.
-        df[f'Visited_{visited_location_name}'] = merged
-        df = df.drop(columns='geometry')
-
-        # return merged
-        return PTRAILDataFrame(df,
-                               latitude='lat',
-                               longitude='lon',
-                               datetime='DateTime',
-                               traj_id='traj_id')
-
+        
+        if len(geo_layers) > 0:
+            # Now for the trajectory dataset and the geo layers dataset both, convert them to a
+            # GeoDataFrame with the geometry of lat-lon for each point.
+            df1 = gpd.GeoDataFrame(df,
+                                   geometry=gpd.points_from_xy(df["lon"],
+                                                               df["lat"]),
+                                   crs={"init": "epsg:4326"})
+    
+            df2 = gpd.GeoDataFrame(geo_layers,
+                                   geometry=gpd.points_from_xy(geo_layers["lon"],
+                                                               geo_layers["lat"]),
+                                   crs={"init": "epsg:4326"})
+    
+            # Now, using GeoPandas, find where the trajectory points and the geo-layers
+            # point intersect.
+            intersection = gpd.overlay(df1, df2, how='intersection')
+    
+            # Now, in the original dataframe, check which points have intersected
+            # with the geo-layers dataset and which ones have not.
+            merged = pd.merge(df, intersection, how='outer', indicator=True)['_merge']
+    
+            # Finally, replace the truth value of the points that have intersected to 1
+            # and set it to 0 for the points that have not intersected.
+            merged = merged.replace('both', 1)
+            merged = merged.replace('left_only', 0)
+            merged = merged.replace('right_only', 0)
+    
+            # Assign the resultant column to the original df and drop the unnecessary column
+            # of geometry.
+            df[f'Visited_{visited_location_name}'] = merged
+            df = df.drop(columns='geometry')
+    
+            # return merged
+            return PTRAILDataFrame(df,
+                                   latitude='lat',
+                                   longitude='lon',
+                                   datetime='DateTime',
+                                   traj_id='traj_id')
+        else:
+            raise KeyError(f"The {visited_location_name} or {location_column_name} does not exist in the dataset.")
+        
     @staticmethod
     def visited_poi(df: PTRAILDataFrame,
                     surrounding_data: Union[gpd.GeoDataFrame, pd.DataFrame, PTRAILDataFrame],
