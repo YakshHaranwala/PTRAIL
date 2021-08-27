@@ -370,7 +370,7 @@ class Helpers:
             # First, extract the column from the dataframe and then obtain the
             # outlier indices which are to be removed.
             col = df[column_name]
-            outlier_indices = hampel(col, window_size=len(df)//10)
+            outlier_indices = hampel(col)
 
             # Now, drop the indices given out by the hampel filter.
             to_return = df.drop(df.index[outlier_indices])

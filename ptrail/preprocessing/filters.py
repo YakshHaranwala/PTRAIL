@@ -262,6 +262,11 @@ class Filters:
             -------
                 PTRAILDataFrame
                     The filtered dataframe containing the resultant data.
+
+            Raises
+            ------
+                ValueError:
+                    When the start datetime is later than the end datetime.
         """
         # Reset Index and create a variable for storing filtered DataFrame.
         dataframe = dataframe.reset_index()
@@ -453,8 +458,7 @@ class Filters:
             ------
                 KeyError:
                     The column 'Distance_prev_to_curr' is not present in the dataframe.
-
-                """
+            """
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values greater than the maximum consecutive distance.
@@ -498,6 +502,11 @@ class Filters:
             -------
                 PTRAILDataFrame:
                     The filtered dataframe.
+
+            Raises
+            ------
+                KeyError:
+                    The column 'Distance_prev_to_curr' or 'Speed_prev_to_curr' is not present in the dataframe.
         """
         try:
             # filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)
