@@ -170,7 +170,7 @@ class FiltersTest(unittest.TestCase):
             filt_df = Filters.filter_outliers_by_consecutive_distance(dataframe=self._gulls)
 
     def test_filter_outliers_by_consecutive_speed_positive(self):
-        new_df = KinematicFeatures.create_speed_from_prev_column(dataframe=self._gulls)
+        new_df = KinematicFeatures.create_speed_column(dataframe=self._gulls)
         filt_df = Filters.filter_outliers_by_consecutive_speed(dataframe=new_df)
         self.assertGreaterEqual(len(new_df), len(filt_df))
 
@@ -191,7 +191,7 @@ class FiltersTest(unittest.TestCase):
     def test_hampel_negative(self):
         with self.assertRaises(MissingColumnsException):
             filt_df = Helpers.hampel_help(df=self._gulls,
-                                          column_name='Distance_prev_to_curr')
+                                          column_name='Distance')
 
 
 if __name__ == '__main__':

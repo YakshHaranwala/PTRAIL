@@ -646,7 +646,7 @@ class KinematicFeatures:
             # And then adding the column to the dataframe
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            bearing_rate_deltas = dataframe.reset_index()['Bearing_rate_from_prev'].diff()
+            bearing_rate_deltas = dataframe.reset_index()['Bearing_Rate'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
@@ -656,7 +656,7 @@ class KinematicFeatures:
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             dataframe = KinematicFeatures.create_bearing_rate_column(dataframe)
-            bearing_rate_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
+            bearing_rate_deltas = dataframe.reset_index()['Bearing'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
