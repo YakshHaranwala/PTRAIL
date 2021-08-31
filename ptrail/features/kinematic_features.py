@@ -172,7 +172,7 @@ class KinematicFeatures:
                 return start_loc[const.LAT][0], start_loc[const.LONG][0]
 
     @staticmethod
-    def create_distance_between_consecutive_column(dataframe: PTRAILDataFrame):
+    def create_distance_column(dataframe: PTRAILDataFrame):
         """
             Create a column called Dist_prev_to_curr containing distance between 2 consecutive points.
             The distance calculated is the Great-Circle (Haversine) distance.
@@ -182,6 +182,11 @@ class KinematicFeatures:
                 When the trajectory ID changes in the data, then the distance calculation again starts
                 from the first point of the new trajectory ID and the distance-value of the first point
                 of the new Trajectory ID will be set to 0.
+
+            Note
+            ----
+                The Distance calculated here is the distance between 2 consecutive points of the same
+                trajectory. Furthermore, the distance yielded is in metres (m).
 
             Parameters
             ----------
@@ -228,6 +233,11 @@ class KinematicFeatures:
                 starts from the first point of the new trajectory ID and the first distance of the
                 new trajectory ID will be set to 0.
 
+            Note
+            ----
+                The Distance calculated here is the distance between the start point and the current points of the same
+                trajectory. Furthermore, the distance yielded is in metres (m).
+
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
@@ -263,10 +273,14 @@ class KinematicFeatures:
                                    const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def get_distance_travelled_by_date_and_traj_id(dataframe: PTRAILDataFrame, date, traj_id):
+    def distance_travelled_by_date_and_traj_id(dataframe: PTRAILDataFrame, date, traj_id):
         """
             Given a date and trajectory ID, calculate the total distance
             covered in the trajectory on that particular date.
+
+            Note
+            ----
+                The distance yielded is in metres (m).
 
             Parameters
             ----------
@@ -319,6 +333,10 @@ class KinematicFeatures:
             create_distance_from_point() and then comparing each point using the condition if it's within the
             range and appending the values in a column and attaching it to the dataframe.
 
+            Note
+            ----
+                The dist_range parameter is given in metres.
+
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
@@ -351,10 +369,14 @@ class KinematicFeatures:
         return PTRAILDataFrame(result.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_distance_from_given_point_column(dataframe: PTRAILDataFrame, coordinates: tuple):
+    def create_distance_from_point_column(dataframe: PTRAILDataFrame, coordinates: tuple):
         """
             Given a point, this function calculates the distance between that point and all the
             points present in the dataframe and adds that column into the dataframe.
+
+            Note
+            ----
+                The distance yielded here is in metres.
 
             Parameters
             ----------
@@ -389,7 +411,7 @@ class KinematicFeatures:
         return PTRAILDataFrame(answer.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def create_speed_from_prev_column(dataframe: PTRAILDataFrame):
+    def create_speed_column(dataframe: PTRAILDataFrame):
         """
             Create a column containing speed of the object from the previous point
             to the current point.
@@ -399,6 +421,11 @@ class KinematicFeatures:
                 When the trajectory ID changes in the data, then the speed calculation again
                 starts from the first point of the new trajectory ID and the speed of the
                 first point of the new trajectory ID will be set to 0.
+
+            Note
+            ----
+                The Speed calculated here is the speed between 2 consecutive points of the same
+                trajectory. Furthermore, the speed yielded is in metres/second (m/s).
 
             Parameters
             ----------
@@ -419,11 +446,11 @@ class KinematicFeatures:
             # calculate the speed.
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            distances = dataframe.reset_index()['Distance_prev_to_curr']
+            distances = dataframe.reset_index()['Distance']
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             # Assign the new column and return the NumPandasTrajDF.
-            dataframe['Speed_prev_to_curr'] = (distances / time_deltas.dropna()).to_numpy()
+            dataframe['Speed'] = (distances / time_deltas.dropna()).to_numpy()
             dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
             return PTRAILDataFrame(data_set=dataframe.reset_index(),
                                    datetime='DateTime',
@@ -434,17 +461,17 @@ class KinematicFeatures:
         except KeyError:
             # If the Distance_prev_to_curr column is not present in the Dataframe and a KeyError
             # is thrown, then catch it and the overridden behaviour is as follows:
-            #   1. Calculate the distance by calling the create_distance_between_consecutive_column() function.
+            #   1. Calculate the distance by calling the create_distance_column() function.
             #   2. Calculate the time deltas.
             #   3. Divide the 2 values to calculate the speed.
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = KinematicFeatures.create_distance_between_consecutive_column(dataframe)
-            distances = dataframe.reset_index()['Distance_prev_to_curr']
+            dataframe = KinematicFeatures.create_distance_column(dataframe)
+            distances = dataframe.reset_index()['Distance']
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             # Assign the column and return the NumPandasTrajDF.
-            dataframe['Speed_prev_to_curr'] = (distances / time_deltas).to_numpy(dtype=np.float64)
+            dataframe['Speed'] = (distances / time_deltas).to_numpy(dtype=np.float64)
             dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
             return PTRAILDataFrame(data_set=dataframe.reset_index(),
                                    datetime='DateTime',
@@ -453,10 +480,15 @@ class KinematicFeatures:
                                    longitude='lon')
 
     @staticmethod
-    def create_acceleration_from_prev_column(dataframe: PTRAILDataFrame):
+    def create_acceleration_column(dataframe: PTRAILDataFrame):
         """
             Create a column containing acceleration of the object from the previous to the current
             point.
+
+            Note
+            ----
+                The acceleration calculated here is the acceleration between 2 consecutive points of the same
+                trajectory. Furthermore, the acceleration yielded is in metres/second^2 (m/s^2).
 
             Parameters
             ----------
@@ -475,10 +507,10 @@ class KinematicFeatures:
             # the dataframe
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
+            speed_deltas = dataframe.reset_index()['Speed'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Acceleration_prev_to_curr'] = (speed_deltas / time_deltas).to_numpy()
+            dataframe['Acceleration'] = (speed_deltas / time_deltas).to_numpy()
             return dataframe
 
         except KeyError:
@@ -486,18 +518,23 @@ class KinematicFeatures:
             # the speed column and then follow the steps mentioned above
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = KinematicFeatures.create_speed_from_prev_column(dataframe)
-            speed_deltas = dataframe.reset_index()['Speed_prev_to_curr'].diff()
+            dataframe = KinematicFeatures.create_speed_column(dataframe)
+            speed_deltas = dataframe.reset_index()['Speed'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Acceleration_prev_to_curr'] = (speed_deltas / time_deltas).to_numpy()
+            dataframe['Acceleration'] = (speed_deltas / time_deltas).to_numpy()
             return dataframe
 
     @staticmethod
-    def create_jerk_from_prev_column(dataframe: PTRAILDataFrame):
+    def create_jerk_column(dataframe: PTRAILDataFrame):
         """
             Create a column containing jerk of the object from previous to the current
             point.
+
+            Note
+            ----
+                The jerk calculated here is the jerk between 2 consecutive points of the same
+                trajectory. Furthermore, the jerk yielded is in metres/second^3 (m/s^3).
 
             Parameters
             ----------
@@ -516,10 +553,10 @@ class KinematicFeatures:
             # the dataframe
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
+            acceleration_deltas = dataframe.reset_index()['Acceleration'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
+            dataframe['Jerk'] = (acceleration_deltas / time_deltas).to_numpy()
             return dataframe
 
         except KeyError:
@@ -527,11 +564,11 @@ class KinematicFeatures:
             # the speed column and then follow the steps mentioned above
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            dataframe = KinematicFeatures.create_acceleration_from_prev_column(dataframe)
-            acceleration_deltas = dataframe.reset_index()['Acceleration_prev_to_curr'].diff()
+            dataframe = KinematicFeatures.create_acceleration_column(dataframe)
+            acceleration_deltas = dataframe.reset_index()['Acceleration'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Jerk_prev_to_curr'] = (acceleration_deltas / time_deltas).to_numpy()
+            dataframe['Jerk'] = (acceleration_deltas / time_deltas).to_numpy()
             return dataframe
 
     @staticmethod
@@ -542,6 +579,12 @@ class KinematicFeatures:
             follows:
                 Bearing is the horizontal angle between the direction of an object and another
                 object, or between the object and the True North.
+
+            Note
+            ----
+                The bearing calculated here is the bearing between 2 consecutive points of the same
+                trajectory. Furthermore, the bearing yielded is in degrees.
+
 
             Parameters
             ----------
@@ -581,7 +624,9 @@ class KinematicFeatures:
             multi_pool.join()
 
             # merge the smaller pieces and then return the dataframe converted to PTRAILDataFrame.
-            return PTRAILDataFrame(pd.concat(result), const.LAT, const.LONG,
+            dataframe = pd.concat(result)
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(dataframe, const.LAT, const.LONG,
                                    const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
@@ -589,6 +634,11 @@ class KinematicFeatures:
         """
             Calculates the bearing rate of the consecutive points. And adding that column into
             the dataframe
+
+            Note
+            ----
+                The bearing calculated here is the bearing between 2 consecutive points of the same
+                trajectory. Furthermore, the bearing yielded is in degrees/second.
 
             Parameters
             ----------
@@ -607,27 +657,33 @@ class KinematicFeatures:
             # And then adding the column to the dataframe
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
-            bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
+            bearing_deltas = dataframe.reset_index()['Bearing'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Bearing_rate_from_prev'] = (bearing_deltas / time_deltas).to_numpy()
+            dataframe['Bearing_Rate'] = (bearing_deltas / time_deltas).to_numpy()
             return dataframe
         except KeyError:
             # Similar to the step above but just makes the Bearing column first
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
             #             does not account for time difference when it is negative.
             dataframe = KinematicFeatures.create_bearing_column(dataframe)
-            bearing_deltas = dataframe.reset_index()['Bearing_between_consecutive'].diff()
+            bearing_deltas = dataframe.reset_index()['Bearing'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Bearing_rate_from_prev'] = (bearing_deltas / time_deltas).to_numpy()
+            dataframe['Bearing_Rate'] = (bearing_deltas / time_deltas).to_numpy()
             return dataframe
 
     @staticmethod
-    def create_rate_of_bearing_rate_column(dataframe: PTRAILDataFrame):
+    def create_rate_of_br_column(dataframe: PTRAILDataFrame):
         """
             Calculates the rate of bearing rate of the consecutive points.
             And then adding that column into the dataframe.
+
+            Note
+            ----
+                The rate of bearing rate calculated here is the rate of bearing rate between 2
+                consecutive points of the same trajectory.
+                Furthermore, the bearing yielded is in degrees.
 
             Parameters
             ----------
@@ -649,7 +705,7 @@ class KinematicFeatures:
             bearing_rate_deltas = dataframe.reset_index()['Bearing_Rate'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
+            dataframe['Rate_of_bearing_rate'] = (bearing_rate_deltas / time_deltas).to_numpy()
             return dataframe
         except KeyError:
             # Similar to the step above but just makes the Bearing column first
@@ -659,7 +715,7 @@ class KinematicFeatures:
             bearing_rate_deltas = dataframe.reset_index()['Bearing'].diff()
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-            dataframe['Rate_of_bearing_rate_from_prev'] = (bearing_rate_deltas / time_deltas).to_numpy()
+            dataframe['Rate_of_bearing_rate'] = (bearing_rate_deltas / time_deltas).to_numpy()
             return dataframe
 
     @staticmethod
@@ -697,8 +753,8 @@ class KinematicFeatures:
             # First, calculate the distance by calling the distance_between_consecutive_column() function
             # and convert it into a numpy array and then sum the array using nansum() to make sure that
             # NaN values are considered as zeros.
-            distances = KinematicFeatures.create_distance_between_consecutive_column(filtered_df)[
-                'Distance_prev_to_curr'].to_numpy()
+            distances = KinematicFeatures.create_distance_column(filtered_df)[
+                'Distance'].to_numpy()
             return np.nansum(distances)
         else:
             raise MissingTrajIDException(f"The Trajectory ID '{traj_id}' is not present in the data."
@@ -767,9 +823,9 @@ class KinematicFeatures:
                 PTRAILDataFrame:
                     The dataframe enriched with Kinematic Features.
         """
-        to_return = KinematicFeatures.create_distance_between_consecutive_column(dataframe)
+        to_return = KinematicFeatures.create_distance_column(dataframe)
         to_return = KinematicFeatures.create_distance_from_start_column(to_return)
-        to_return = KinematicFeatures.create_jerk_from_prev_column(to_return)
-        to_return = KinematicFeatures.create_rate_of_bearing_rate_column(to_return)
+        to_return = KinematicFeatures.create_jerk_column(to_return)
+        to_return = KinematicFeatures.create_rate_of_br_column(to_return)
 
         return to_return

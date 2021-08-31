@@ -91,7 +91,7 @@ class FiltersTest(unittest.TestCase):
                                                  start_dateTime='2009-05-31 00:00:00')
 
     def test_filter_by_max_speed_positive(self):
-        new_df = KinematicFeatures.create_speed_from_prev_column(self._gulls)
+        new_df = KinematicFeatures.create_speed_column(self._gulls)
         filt_df = Filters.filter_by_max_speed(dataframe=new_df,
                                               max_speed=5)
         self.assertGreaterEqual(len(new_df), len(filt_df))
@@ -102,7 +102,7 @@ class FiltersTest(unittest.TestCase):
                                                   max_speed=5)
 
     def test_filter_by_min_speed_positive(self):
-        new_df = KinematicFeatures.create_speed_from_prev_column(self._gulls)
+        new_df = KinematicFeatures.create_speed_column(self._gulls)
         filt_df = Filters.filter_by_min_speed(dataframe=new_df,
                                               min_speed=1)
         self.assertGreaterEqual(len(new_df), len(filt_df))
@@ -113,7 +113,7 @@ class FiltersTest(unittest.TestCase):
                                                   min_speed=1)
 
     def test_filter_by_min_consecutive_distance_positive(self):
-        new_df = KinematicFeatures.create_distance_between_consecutive_column(dataframe=self._gulls)
+        new_df = KinematicFeatures.create_distance_column(dataframe=self._gulls)
         filt_df = Filters.filter_by_min_consecutive_distance(dataframe=new_df,
                                                              min_distance=1000)
         self.assertGreaterEqual(len(new_df), len(filt_df))
@@ -124,7 +124,7 @@ class FiltersTest(unittest.TestCase):
                                                                  min_distance=1000)
 
     def test_filter_by_max_consecutive_distance_positive(self):
-        new_df = KinematicFeatures.create_distance_between_consecutive_column(dataframe=self._gulls)
+        new_df = KinematicFeatures.create_distance_column(dataframe=self._gulls)
         filt_df = Filters.filter_by_max_consecutive_distance(dataframe=new_df,
                                                              max_distance=10000)
         self.assertGreaterEqual(len(new_df), len(filt_df))
@@ -135,7 +135,7 @@ class FiltersTest(unittest.TestCase):
                                                                  max_distance=10000)
 
     def test_filter_by_max_distance_and_speed_positive(self):
-        new_df = KinematicFeatures.create_speed_from_prev_column(self._gulls)
+        new_df = KinematicFeatures.create_speed_column(self._gulls)
         filt_df = Filters.filter_by_max_distance_and_speed(dataframe=new_df,
                                                            max_speed=25,
                                                            max_distance=1000)
@@ -148,7 +148,7 @@ class FiltersTest(unittest.TestCase):
                                                                max_distance=1000)
 
     def test_filter_by_min_distance_and_speed_positive(self):
-        new_df = KinematicFeatures.create_speed_from_prev_column(self._gulls)
+        new_df = KinematicFeatures.create_speed_column(self._gulls)
         filt_df = Filters.filter_by_min_distance_and_speed(dataframe=new_df,
                                                            min_speed=5,
                                                            min_distance=10)
@@ -161,7 +161,7 @@ class FiltersTest(unittest.TestCase):
                                                                min_distance=10)
 
     def test_filter_outliers_by_consecutive_distance_positive(self):
-        new_df = KinematicFeatures.create_distance_between_consecutive_column(dataframe=self._gulls)
+        new_df = KinematicFeatures.create_distance_column(dataframe=self._gulls)
         filt_df = Filters.filter_outliers_by_consecutive_distance(dataframe=new_df)
         self.assertGreaterEqual(len(new_df), len(filt_df))
 
@@ -183,9 +183,9 @@ class FiltersTest(unittest.TestCase):
         self.assertGreater(len(self._atlantic), len(filt_df))
 
     def test_hampel_positive(self):
-        new_df = KinematicFeatures.create_distance_between_consecutive_column(self._atlantic)
+        new_df = KinematicFeatures.create_distance_column(self._atlantic)
         filt_df = Filters.hampel_outlier_detection(dataframe=new_df,
-                                                   column_name='Distance_prev_to_curr')
+                                                   column_name='Distance')
         self.assertGreater(len(self._atlantic), len(filt_df))
 
     def test_hampel_negative(self):

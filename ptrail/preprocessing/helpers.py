@@ -199,16 +199,16 @@ class Helpers:
         # First, create a distance between the consecutive points of the dataframe,
         # then, calculate the mean and standard deviation of all the distances between
         # consecutive points.
-        df1 = spatial.create_distance_between_consecutive_column(dataframe)
-        d_mean = (df1['Distance_prev_to_curr'].mean(skipna=True))
-        d_std = (df1['Distance_prev_to_curr'].std(skipna=True))
+        df1 = spatial.create_distance_column(dataframe)
+        d_mean = (df1['Distance'].mean(skipna=True))
+        d_std = (df1['Distance'].std(skipna=True))
 
         # Now, create a bearing between the consecutive points of the dataframe,
         # then, calculate the mean and standard deviation of all the bearings between
         # consecutive points.
         df = spatial.create_bearing_column(df1)
-        b_mean = df['Bearing_between_consecutive'].mean(skipna=True)
-        b_std = df['Bearing_between_consecutive'].std(skipna=True)
+        b_mean = df['Bearing'].mean(skipna=True)
+        b_std = df['Bearing'].std(skipna=True)
 
         calc_a = np.random.normal(d_mean, d_std, 1) / 1000
         calc_b = np.radians(np.random.normal(b_mean, b_std, 1))

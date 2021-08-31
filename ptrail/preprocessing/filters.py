@@ -329,20 +329,20 @@ class Filters:
             Raises
             ------
                 KeyError:
-                    The column 'Speed_prev_to_curr' is not present in the dataframe.
+                    The column 'Speed' is not present in the dataframe.
         """
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values lesser than the max speed
             # The NaNs are filled with max_speed+1 to avoid data loss as well as
             # to avoid false positives in calculation and comparison.
-            filt = dataframe['Speed_prev_to_curr'].fillna(max_speed + 1) <= max_speed
+            filt = dataframe['Speed'].fillna(max_speed + 1) <= max_speed
             filtered_df = dataframe.loc[filt].reset_index(drop=True)
 
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Speed_prev_to_curr is not present in the dataset. "
+            raise MissingColumnsException(f"The column 'Speed is not present in the dataset. "
                                           f"Please run the function create_speed_from_prev_column() before"
                                           f" running this filter.")
 
@@ -370,20 +370,20 @@ class Filters:
             Raises
             ------
                 KeyError:
-                    The column 'Speed_prev_to_curr' is not present in the dataframe.
+                    The column 'Speed' is not present in the dataframe.
         """
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values lesser than the max speed
             # The NaNs are filled with min_speed-1 to avoid data loss as well as
             # to avoid false positives in calculation and comparison.
-            filt = dataframe['Speed_prev_to_curr'].fillna(min_speed - 1) >= min_speed
+            filt = dataframe['Speed'].fillna(min_speed - 1) >= min_speed
             filtered_df = dataframe.loc[filt].reset_index()
 
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Speed_prev_to_curr is not present in the dataset. "
+            raise MissingColumnsException(f"The column 'Speed is not present in the dataset. "
                                           f"Please run the function create_speed_from_prev_column() before"
                                           f" running this filter.")
 
@@ -413,7 +413,7 @@ class Filters:
             Raises
             ------
                 KeyError:
-                    The column 'Distance_prev_to_curr' is not present in the dataframe.
+                    The column 'Distance' is not present in the dataframe.
 
         """
         try:
@@ -421,13 +421,13 @@ class Filters:
             # Filter out all the values lesser than the minimum consecutive distance.
             # The NaNs are filled with min_distance-1 to avoid data loss as well as
             # to avoid false positives in calculation and comparison.
-            filt = dataframe['Distance_prev_to_curr'].fillna(min_distance - 1) >= min_distance
+            filt = dataframe['Distance'].fillna(min_distance - 1) >= min_distance
             filtered_df = dataframe.loc[filt].reset_index(drop=True)
 
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Distance_prev_to_curr is not present in the dataset. "
+            raise MissingColumnsException(f"The column 'Distance is not present in the dataset. "
                                           f"Please run the function create_distance_between_consecutive_column() before"
                                           f" running this filter.")
 
@@ -457,20 +457,20 @@ class Filters:
             Raises
             ------
                 KeyError:
-                    The column 'Distance_prev_to_curr' is not present in the dataframe.
+                    The column 'Distance' is not present in the dataframe.
             """
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values greater than the maximum consecutive distance.
             # The NaNs are filled with max_distance+1 to avoid data loss as well as
             # to avoid false positives in calculation and comparison.
-            filt = dataframe['Distance_prev_to_curr'].fillna(max_distance + 1) <= max_distance
+            filt = dataframe['Distance'].fillna(max_distance + 1) <= max_distance
             filtered_df = dataframe.loc[filt]
 
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Distance_prev_to_curr is not present in the dataset. "
+            raise MissingColumnsException(f"The column 'Distance is not present in the dataset. "
                                           f"Please run the function create_distance_between_consecutive_column() before"
                                           f" running this filter.")
 
@@ -505,26 +505,26 @@ class Filters:
 
             Raises
             ------
-                KeyError:
-                    The column 'Distance_prev_to_curr' or 'Speed_prev_to_curr' is not present in the dataframe.
+                MissingColumnsException:
+                    The column 'Distance' or 'Speed' is not present in the dataframe.
         """
         try:
             # filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)
             # filtered_df = Filters.filter_by_max_speed(filt, max_speed)
 
             # Filter the dataframe based on maximum distance and speed.
-            filt = np.logical_and(dataframe['Distance_prev_to_curr'].fillna(max_distance + 1) <= max_distance,
-                                  dataframe['Speed_prev_to_curr'].fillna(max_speed + 1) <= max_speed)
+            filt = np.logical_and(dataframe['Distance'].fillna(max_distance + 1) <= max_distance,
+                                  dataframe['Speed'].fillna(max_speed + 1) <= max_speed)
             filtered_df = dataframe.loc[filt]
 
             return filtered_df  # Return the df filtered on the basis of 2 constraints.
         except KeyError:
             # The system asks the user to only run create_speed_from_prev_column() function because
-            # running create_speed_from_prev_column() function create the 'Distance_prev_to_curr'
+            # running create_speed_from_prev_column() function create the 'Distance'
             # function automatically if the column is already not present.
-            raise MissingColumnsException(f"Either of the columns 'Distance_prev_to_curr' or 'Speed_prev_to_curr'"
+            raise MissingColumnsException(f"Either of the columns 'Distance' or 'Speed'"
                                           f"are missing in the dataset. Please run the function "
-                                          f"create_speed_from_prev_column() first before running the function.")
+                                          f"create_speed_column() first before running the function.")
 
     @staticmethod
     def filter_by_min_distance_and_speed(dataframe, min_distance: float, min_speed: float):
@@ -554,25 +554,30 @@ class Filters:
             -------
                 PTRAILDataFrame:
                     The filtered dataframe.
+
+            Raises
+            ------
+                MissingColumnsException:
+                    Either of Distance or Speed column are missing from the dataset.
         """
         try:
             # filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)
             # filtered_df = Filters.filter_by_max_speed(filt, max_speed)
 
             # Filter the dataframe based on minimum distance and speed.
-            filt = np.logical_and(dataframe['Distance_prev_to_curr'] >= min_distance,
-                                  dataframe['Speed_prev_to_curr'] >= min_speed)
+            filt = np.logical_and(dataframe['Distance'] >= min_distance,
+                                  dataframe['Speed'] >= min_speed)
             filtered_df = dataframe.loc[filt]
 
             # Return the df filtered on the basis of 2 constraints.
             return filtered_df
         except KeyError:
             # The system asks the user to only run create_speed_from_prev_column() function because
-            # running create_speed_from_prev_column() function create the 'Distance_prev_to_curr'
+            # running create_speed_from_prev_column() function create the 'Distance'
             # function automatically if the column is already not present.
-            raise MissingColumnsException(f"Either of the columns 'Distance_prev_to_curr' or 'Speed_prev_to_curr'"
+            raise MissingColumnsException(f"Either of the columns 'Distance' or 'Speed'"
                                           f"are missing in the dataset. Please run the function "
-                                          f"create_speed_from_prev_column() first before running the function.")
+                                          f"create_speed_column() first before running the function.")
 
     @staticmethod
     def filter_outliers_by_consecutive_distance(dataframe: PTRAILDataFrame):
@@ -599,13 +604,13 @@ class Filters:
             Raises
             ------
                 KeyError:
-                    The column 'Distance_prev_to_curr' is not present in the dataset.
+                    The column 'Distance' is not present in the dataset.
         """
         try:
             # Find the lower and higher quantile first along with the inter-quantile range.
             dataframe = dataframe.reset_index()
-            q_low = dataframe['Distance_prev_to_curr'].quantile(0.25)
-            q_high = dataframe['Distance_prev_to_curr'].quantile(0.75)
+            q_low = dataframe['Distance'].quantile(0.25)
+            q_high = dataframe['Distance'].quantile(0.75)
             iqr = q_high - q_low
             cut_off = iqr * 1.5  # Cut off value.
 
@@ -614,14 +619,14 @@ class Filters:
             higher = q_high + cut_off
 
             # Filter out the dataframe based on the range calculated and return it.
-            df_filt = np.logical_and(dataframe['Distance_prev_to_curr'] > lower,
-                                     dataframe['Distance_prev_to_curr'] < higher)
+            df_filt = np.logical_and(dataframe['Distance'] > lower,
+                                     dataframe['Distance'] < higher)
 
             filtered_df = dataframe.loc[df_filt]
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
         except KeyError:
-            raise MissingColumnsException(f"The column 'Distance_prev_to_curr' is missing in the dataset. "
+            raise MissingColumnsException(f"The column 'Distance' is missing in the dataset. "
                                           f"Please run the function create_distance_between_consecutive_column() "
                                           f"before running this filter.")
 
@@ -650,23 +655,23 @@ class Filters:
             Raises
             ------
                 KeyError:
-                The column 'Distance_prev_to_curr' is not present in the dataset.
+                The column 'Distance' is not present in the dataset.
         """
         try:
-            q_low = dataframe['Speed_prev_to_curr'].quantile(0.25)
-            q_high = dataframe['Speed_prev_to_curr'].quantile(0.75)
+            q_low = dataframe['Speed'].quantile(0.25)
+            q_high = dataframe['Speed'].quantile(0.75)
             iqr = q_high - q_low
             cut_off = iqr * 1.5
 
             lower = q_low - cut_off
             higher = q_high + cut_off
 
-            df_filt = np.logical_and(dataframe['Speed_prev_to_curr'] > lower,
-                                     dataframe['Speed_prev_to_curr'] < higher)
+            df_filt = np.logical_and(dataframe['Speed'] > lower,
+                                     dataframe['Speed'] < higher)
             return dataframe.loc[df_filt]
 
         except KeyError:
-            raise MissingColumnsException(f"The column 'Speed_prev_to_curr' is missing in the dataset. "
+            raise MissingColumnsException(f"The column 'Speed' is missing in the dataset. "
                                           f"Please run the function create_speed_from_prev_column() "
                                           f"before running this filter.")
 

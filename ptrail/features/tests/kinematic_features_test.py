@@ -55,20 +55,20 @@ class KinematicFeaturesTest(unittest.TestCase):
         for i in range(len(ids_)):
             filt_df = new_df.reset_index().loc[new_df.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
             if len(filt_df) > 3:
-                self.assertIsInstance(filt_df['Distance_prev_to_curr'].iloc[1], float)
-                assert np.isnan(filt_df['Distance_prev_to_curr'].iloc[0])
+                self.assertIsInstance(filt_df['Distance'].iloc[1], float)
+                assert np.isnan(filt_df['Distance'].iloc[0])
 
     def test_dist_from_start(self):
         new_df = KinematicFeatures.create_distance_from_start_column(self._test_df)
-        self.assertIsNotNone(new_df['Distance_start_to_curr'])
+        self.assertIsNotNone(new_df['Distance_from_start'])
 
         ids_ = list(new_df.traj_id.value_counts().keys())
 
         for i in range(len(ids_)):
             filt_df = new_df.reset_index().loc[new_df.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
             if len(filt_df) > 3:
-                self.assertIsInstance(filt_df['Distance_start_to_curr'].iloc[1], float)
-                assert np.isnan(filt_df['Distance_start_to_curr'].iloc[0])
+                self.assertIsInstance(filt_df['Distance_from_start'].iloc[1], float)
+                assert np.isnan(filt_df['Distance_from_start'].iloc[0])
 
     def test_distance_travelled_by_date_traj_id_positive(self):
         dist = KinematicFeatures.distance_travelled_by_date_and_traj_id(dataframe=self._test_df,
@@ -87,8 +87,8 @@ class KinematicFeaturesTest(unittest.TestCase):
         new_df = KinematicFeatures.create_point_within_range_column(dataframe=self._test_df,
                                                                     coordinates=(0, 0),
                                                                     dist_range=100000)
-        self.assertIsNotNone(new_df['Within_100000_m_from_(0, 0)'])
-        self.assertIsInstance(new_df['Within_100000_m_from_(0, 0)'].iloc[0], np.bool_)
+        self.assertIsNotNone(new_df['Within_100000_m'])
+        self.assertIsInstance(new_df['Within_100000_m'].iloc[0], np.bool_)
 
     def test_distance_from_given_point(self):
         new_df = KinematicFeatures.create_distance_from_point_column(dataframe=self._test_df,
@@ -104,7 +104,7 @@ class KinematicFeaturesTest(unittest.TestCase):
         ids_ = list(new_df.traj_id.value_counts().keys())
         for i in range(len(ids_)):
             filt_df = new_df.reset_index().loc[new_df.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
-            assert np.isnan(filt_df['Speed_prev_to_curr'].iloc[0])
+            assert np.isnan(filt_df['Speed'].iloc[0])
 
     def test_acceleration_between_consecutive(self):
         new_df = KinematicFeatures.create_acceleration_column(self._test_df)
@@ -114,9 +114,9 @@ class KinematicFeaturesTest(unittest.TestCase):
         for i in range(len(ids_)):
             filt_df = new_df.reset_index().loc[new_df.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
             if len(filt_df) > 3:
-                assert np.isnan(filt_df['Acceleration_prev_to_curr'].iloc[0])
-                assert np.isnan(filt_df["Acceleration_prev_to_curr"].iloc[1])
-                self.assertIsInstance(filt_df['Acceleration_prev_to_curr'].iloc[2], float)
+                assert np.isnan(filt_df['Acceleration'].iloc[0])
+                assert np.isnan(filt_df["Acceleration"].iloc[1])
+                self.assertIsInstance(filt_df['Acceleration'].iloc[2], float)
 
     def test_jerk_between_consecutive(self):
         new_df = KinematicFeatures.create_jerk_column(self._test_df)
@@ -126,10 +126,10 @@ class KinematicFeaturesTest(unittest.TestCase):
         for i in range(len(ids_)):
             filt_df = new_df.reset_index().loc[new_df.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
             if len(filt_df) > 4:
-                assert np.isnan(filt_df['Jerk_prev_to_curr'].iloc[0])
-                assert np.isnan(filt_df['Jerk_prev_to_curr'].iloc[1])
-                assert np.isnan(filt_df["Jerk_prev_to_curr"].iloc[2])
-                self.assertIsInstance(filt_df['Jerk_prev_to_curr'].iloc[3], float)
+                assert np.isnan(filt_df['Jerk'].iloc[0])
+                assert np.isnan(filt_df['Jerk'].iloc[1])
+                assert np.isnan(filt_df["Jerk"].iloc[2])
+                self.assertIsInstance(filt_df['Jerk'].iloc[3], float)
 
     def test_bearing(self):
         new_df = KinematicFeatures.create_bearing_column(self._test_df)

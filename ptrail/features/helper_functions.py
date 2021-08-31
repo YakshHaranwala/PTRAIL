@@ -177,11 +177,11 @@ class Helpers:
             # Check whether the IDs are changing in the dataset and if they are, then assign
             # Nan as the value to the first point of the new Trajectory ID.
             if size_id <= 1:
-                dataframe.at[val, 'Distance_prev_to_curr'] = np.nan
+                dataframe.at[val, 'Distance'] = np.nan
             else:
                 prev_lat = curr_lat.shift(1)
                 prev_lon = curr_lon.shift(1)
-                dataframe.at[val, 'Distance_prev_to_curr'] = \
+                dataframe.at[val, 'Distance'] = \
                     calc.haversine_distance(prev_lat, prev_lon, curr_lat, curr_lon)
 
         return dataframe.reset_index()  # Reset the index and return the dataframe.
@@ -230,10 +230,10 @@ class Helpers:
             # Check whether the IDs are changing in the dataset and if they are, then assign
             # Nan as the value to the first point of the new Trajectory ID.
             if size_id <= 1:
-                dataframe.at[val, 'Distance_start_to_curr'] = np.nan
+                dataframe.at[val, 'Distance_from_start'] = np.nan
 
             else:
-                dataframe.at[val, 'Distance_start_to_curr'] = \
+                dataframe.at[val, 'Distance_from_start'] = \
                     calc.haversine_distance(start_lat, start_lon, curr_lat, curr_lon)
 
         return dataframe.reset_index()  # Reset the index and return the dataframe.
@@ -308,7 +308,7 @@ class Helpers:
 
         # Now, assign the column containing the results calculated above and
         # return the dataframe.
-        dataframe[f'Within_{dist_range}_m_from_{coordinates}'] = distances
+        dataframe[f'Within_{dist_range}_m'] = distances
         return dataframe
 
     @staticmethod
@@ -345,11 +345,11 @@ class Helpers:
             # Check whether the IDs are changing in the dataset and if they are, then assign
             # Nan as the value to the first point of the new Trajectory ID.
             if size_id <= 1:
-                dataframe.at[val, 'Bearing_between_consecutive'] = np.nan
+                dataframe.at[val, 'Bearing'] = np.nan
             else:
                 prev_lat = curr_lat.shift(1)
                 prev_lon = curr_lon.shift(1)
-                dataframe.at[val, 'Bearing_between_consecutive'] = \
+                dataframe.at[val, 'Bearing'] = \
                     calc.bearing_calculation(prev_lat, prev_lon, curr_lat, curr_lon)
 
         return dataframe.reset_index()
