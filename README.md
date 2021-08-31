@@ -72,3 +72,20 @@ PTRAIL is a state-of-the art Mobility Data Preprocessing Library that mainly dea
 <h2> Miscellaneous </h2>
 
 [![Downloads](https://static.pepy.tech/personalized-badge/ptrail?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/ptrail)
+
+<!------------------- Citation ---------------------------------->
+<h2> Citation </h2>
+
+To cite PTRAIL in your academic work, please use the following citation: 
+
+```bibtex
+@misc{haidri2021ptrail,
+      title={PTRAIL -- A python package for parallel trajectory data preprocessing}, 
+      author={Salman Haidri and Yaksh J. Haranwala and Vania Bogorny and Chiara Renso and Vinicius Prado da Fonseca and Amilcar Soares},
+      year={2021},
+      eprint={2108.13202},
+      url={https://arxiv.org/abs/2108.13202},
+      archivePrefix={arXiv},
+      primaryClass={cs.DC}
+}
+```
