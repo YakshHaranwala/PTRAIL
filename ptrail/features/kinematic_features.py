@@ -511,7 +511,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Acceleration'] = (speed_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
         except KeyError:
             # When Speed column is not present then first call create_speed_from_prev_column() function to make
@@ -523,7 +528,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Acceleration'] = (speed_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
     @staticmethod
     def create_jerk_column(dataframe: PTRAILDataFrame):
@@ -557,7 +567,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Jerk'] = (acceleration_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
         except KeyError:
             # When Speed column is not present then first call create_speed_from_prev_column() function to make
@@ -569,7 +584,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Jerk'] = (acceleration_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
     @staticmethod
     def create_bearing_column(dataframe: PTRAILDataFrame):
@@ -661,7 +681,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Bearing_Rate'] = (bearing_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
         except KeyError:
             # Similar to the step above but just makes the Bearing column first
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
@@ -671,7 +696,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Bearing_Rate'] = (bearing_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
     @staticmethod
     def create_rate_of_br_column(dataframe: PTRAILDataFrame):
@@ -706,7 +736,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Rate_of_bearing_rate'] = (bearing_rate_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
         except KeyError:
             # Similar to the step above but just makes the Bearing column first
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
@@ -716,7 +751,12 @@ class KinematicFeatures:
             time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
             dataframe['Rate_of_bearing_rate'] = (bearing_rate_deltas / time_deltas).to_numpy()
-            return dataframe
+            dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
+            return PTRAILDataFrame(data_set=dataframe.reset_index(),
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
+                                   latitude='lat',
+                                   longitude='lon')
 
     @staticmethod
     def get_distance_travelled_by_traj_id(dataframe: PTRAILDataFrame, traj_id: Text):
@@ -829,3 +869,45 @@ class KinematicFeatures:
         to_return = KinematicFeatures.create_rate_of_br_column(to_return)
 
         return to_return
+
+    @staticmethod
+    def generate_kinematic_stats(dataframe: PTRAILDataFrame):
+        """
+            Generate the statistics of kinematic features for each unique trajectory in
+            the dataframe.
+
+            Parameters
+            ----------
+                dataframe: PTRAILDataFrame
+                    The dataframe containing the trajectory data.
+
+            Returns
+            -------
+                pandas.core.dataframe.DataFrame:
+                    A pandas dataframe containing stats for all kinematic features for
+                    each unique trajectory in the dataframe.
+        """
+        # Generate kinematic features on the entire dataframe.
+        ptdf = KinematicFeatures.generate_kinematic_features(dataframe)
+
+        # Then, lets break down the entire dataframe into pieces containing data of
+        # 1 trajectory in each piece.
+        ids_ = list(dataframe.traj_id.value_counts().keys())
+
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        df_chunks = []
+        for i in range(len(ids_)):
+            small_df = ptdf.reset_index().loc[ptdf.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
+            df_chunks.append(small_df)
+
+        results = []
+        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
+        # kept free at all times in order to not block up the system.
+        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
+        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
+        mp_pool = multiprocessing.Pool(NUM_CPU)
+        results = mp_pool.map(helpers.stats_helper, df_chunks)
+        mp_pool.close()
+        mp_pool.join()
+
+        return pd.concat(results)
