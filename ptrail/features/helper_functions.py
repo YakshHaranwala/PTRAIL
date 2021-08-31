@@ -479,6 +479,17 @@ class Helpers:
         # Set the index to traj_id and return it.
         return df.set_index(const.TRAJECTORY_ID)
 
+    @staticmethod
+    def stats_helper(df):
+        new_df = df.reset_index()[['traj_id', 'Distance', 'Distance_from_start', 'Speed',
+                                   'Acceleration', 'Jerk', 'Bearing', 'Bearing_Rate',
+                                   'Rate_of_bearing_rate']]
+        stats = new_df.reset_index(drop=True).describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9]).transpose()
+        stats['traj_id'] = new_df['traj_id'].iloc[0]
+        stats = stats[['traj_id', 'mean', 'std', 'min', '10%',
+                       '25%', '50%', '75%', '90%', 'max']]
+        return stats.reset_index().rename(columns={'index': 'Columns'}).set_index(['traj_id', 'Columns'])
+
     # ------------------------------------ Semantic Helpers ------------------------------------- #
     @staticmethod
     def visited_poi_helper(df, surrounding_data, dist_column_label, nearby_threshold):
