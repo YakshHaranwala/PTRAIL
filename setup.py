@@ -13,7 +13,7 @@ REQUIRED_PKGS = ['numpy>=1.20',
                  'scikit-learn >= 0.24.2',
                  'osmnx >= 1.1.1',
                  'geopandas >= 0.8.1',
-                 'shapely >= 1.7.1'
+                 'shapely >= 1.7.1',
                  ]
 
 setup(

@@ -24,7 +24,7 @@ autodoc_mock_imports = ["scipy",
                         'scikit-learn',
                         'osmnx',
                         'geopandas',
-                        'shapely'
+                        'shapely',
                         ]
 
 # -- Project information -----------------------------------------------------
