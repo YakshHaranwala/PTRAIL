@@ -6,6 +6,7 @@ from .features import temporal_features
 from .preprocessing import filters
 from .preprocessing import helpers
 from .preprocessing import interpolation
+from .visualization import visualization
 from .utilities import (
     constants,
     conversions,
