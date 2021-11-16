@@ -25,8 +25,24 @@ import ptrail.utilities.constants as const
 class TrajectoryPlotter:
     @staticmethod
     def _create_multi_select(dataset, animal):
+        """
+            Create the multiple selection widget.
+            Parameters
+            ----------
+                dataset: PTRAILDataFrame
+                    The dataset from which the IDs are to be selected.
+                animal: str
+                    The animal for which the list is to be presented.
+
+            Returns
+            -------
+                ipywidgets.widgets.SelectMultiple
+                    Multiple selection widget.
+
+        """
         dataset = dataset.reset_index()
 
+        # Select the animal based on the parameter passed.
         to_select = None
         if animal.lower() == 'deer':
             to_select = dataset.loc[dataset.Species == 'D', 'traj_id'].unique()
@@ -35,13 +51,21 @@ class TrajectoryPlotter:
         elif animal.lower() == 'cattle':
             to_select = dataset.loc[dataset.Species == 'C', 'traj_id'].unique()
 
+        # Create the multi select widget and return it.
         ids_ = widgets.SelectMultiple(options=to_select, value=(to_select[0], to_select[1]),
                                       description="Trajectory ID: ", disabled=False)
-
         return ids_
 
     @staticmethod
     def _create_radio():
+        """
+            Create the radio button for selecting the animal.
+
+            Returns
+            -------
+                ipywidgets.widget.RadioButtons
+                    The Radio button for selecting the animal.
+        """
         radio = widgets.RadioButtons(options=['Cattle', 'Deer', 'Elk'],
                                      value='Cattle', description='Animal: ',
                                      disabled=False)
@@ -49,6 +73,21 @@ class TrajectoryPlotter:
 
     @staticmethod
     def _filter_dataset(dataset, _id):
+        """
+            Filter the dataset based on the ids given by the method below.
+
+            Parameters
+            ----------
+                dataset: PTRAILDataFrame
+                    The dataset from which the data is to be filtered.
+                _id: tuple
+                    The tuple containing the IDs that are required.
+
+            Return
+            ------
+                PTRAILDataFrame
+                    The filtered dataframe.
+        """
         filtered_df = dataset.reset_index().loc[dataset.reset_index()['traj_id'].isin(_id)]
         return PTRAILDataFrame(filtered_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
@@ -71,14 +110,19 @@ class TrajectoryPlotter:
                 folium.folium.Map
                     The map with plotted trajectory.
         """
-
+        # Create the radio button.
         animal = TrajectoryPlotter._create_radio()
 
+        # Create the multi selection button.
         selector = TrajectoryPlotter._create_multi_select(dataset, animal.value)
+
+        # Display the multi selector and the radio buttons next to each other.
         display(widgets.HBox([animal, selector]))
 
+        # Filter the dataset according the values of the widgets above.
         dataset = TrajectoryPlotter._filter_dataset(dataset, selector.value)
 
+        # The southwest and northeast bouds.
         sw = dataset[['lat', 'lon']].min().values.tolist()
         ne = dataset[['lat', 'lon']].max().values.tolist()
 
@@ -133,5 +177,6 @@ class TrajectoryPlotter:
                             weight=weight,
                             opacity=opacity).add_to(map_)
 
+        # Fit the map within its bounds and return it.
         map_.fit_bounds([sw, ne])
         return map_
