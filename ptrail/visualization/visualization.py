@@ -13,16 +13,47 @@
     | Authors: Yaksh J Haranwala, Salman Haidri
 """
 import random
-
 import folium
+
+import ipywidgets as widgets
+from IPython.core.display import display
 
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 import ptrail.utilities.constants as const
 
 
-class Visualization:
+class TrajectoryPlotter:
     @staticmethod
-    def plot_folium_traj(dataset: PTRAILDataFrame, weight: float = 3, opacity: float = 0.8):
+    def _create_multi_select(dataset, animal):
+        dataset = dataset.reset_index()
+
+        to_select = None
+        if animal.lower() == 'deer':
+            to_select = dataset.loc[dataset.Species == 'D', 'traj_id'].unique()
+        elif animal.lower() == 'elk':
+            to_select = dataset.loc[dataset.Species == 'E', 'traj_id'].unique()
+        elif animal.lower() == 'cattle':
+            to_select = dataset.loc[dataset.Species == 'C', 'traj_id'].unique()
+
+        ids_ = widgets.SelectMultiple(options=to_select, value=(to_select[0], to_select[1]),
+                                      description="Trajectory ID: ", disabled=False)
+
+        return ids_
+
+    @staticmethod
+    def _create_radio():
+        radio = widgets.RadioButtons(options=['Cattle', 'Deer', 'Elk'],
+                                     value='Cattle', description='Animal: ',
+                                     disabled=False)
+        return radio
+
+    @staticmethod
+    def _filter_dataset(dataset, _id):
+        filtered_df = dataset.reset_index().loc[dataset.reset_index()['traj_id'].isin(_id)]
+        return PTRAILDataFrame(filtered_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+
+    @staticmethod
+    def plot_folium_traj(dataset, weight: float = 3, opacity: float = 0.8):
         """
             Use folium to plot the trajectory on a map.
 
@@ -40,6 +71,14 @@ class Visualization:
                 folium.folium.Map
                     The map with plotted trajectory.
         """
+
+        animal = TrajectoryPlotter._create_radio()
+
+        selector = TrajectoryPlotter._create_multi_select(dataset, animal.value)
+        display(widgets.HBox([animal, selector]))
+
+        dataset = TrajectoryPlotter._filter_dataset(dataset, selector.value)
+
         sw = dataset[['lat', 'lon']].min().values.tolist()
         ne = dataset[['lat', 'lon']].max().values.tolist()
 
@@ -60,22 +99,33 @@ class Visualization:
             for j in range(len(small_df)):
                 locations.append((small_df['lat'].iloc[j], small_df['lon'].iloc[j]))
 
+            # Create text frame.
+            iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {ids_[i]} ' + '<br>' +
+                                   f'Latitude: {locations[0][0]}' + '<br>' +
+                                   f'Longitude: {locations[0][1]} </font>')
+
             # Create start and end markers for the trajectory.
+            popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
+
             folium.Marker([small_df['lat'].iloc[0], small_df['lon'].iloc[0]],
                           color='green',
-                          popup=f'Trajectory ID: {ids_[i]} \n'
-                                f'Latitude: {locations[0][0]} \n'
-                                f'Longitude: {locations[0][1]}',
+                          popup=popup,
                           marker_color='green',
-                          icon=folium.Icon(icon_color='green', icon=None)).add_to(map_)
+                          icon=folium.Icon(icon_color='green', icon='circle', prefix='fa')).add_to(map_)
+
+            # Create text frame.
+            iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {ids_[i]} ' + '<br>' +
+                                   f'Latitude: {locations[0][0]}' + '<br>' +
+                                   f'Longitude: {locations[0][1]} </font>')
+
+            # Create start and end markers for the trajectory.
+            popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
 
             folium.Marker([small_df['lat'].iloc[-1], small_df['lon'].iloc[-1]],
                           color='green',
-                          popup=f'Trajectory ID: {ids_[i]} \n'
-                                f'Latitude: {locations[-1][0]} \n'
-                                f'Longitude: {locations[-1][1]}',
+                          popup=popup,
                           marker_color='red',
-                          icon=folium.Icon(icon_color='red', icon=None)).add_to(map_)
+                          icon=folium.Icon(icon_color='red', icon='circle', prefix='fa')).add_to(map_)
 
             # Add trajectory to map.
             folium.PolyLine(locations,
