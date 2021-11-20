@@ -23,6 +23,13 @@ import ptrail.utilities.constants as const
 
 
 class TrajectoryPlotter:
+    # Class variables to handle the ipywidgets.
+    _dataset = None
+    _weight = None
+    _opacity = None
+    _selector = None
+    _animal = None
+
     @staticmethod
     def _create_multi_select(dataset, animal):
         """
@@ -52,12 +59,12 @@ class TrajectoryPlotter:
             to_select = dataset.loc[dataset.Species == 'C', 'traj_id'].unique()
 
         # Create the multi select widget and return it.
-        ids_ = widgets.SelectMultiple(options=to_select, value=(to_select[0], to_select[1]),
+        ids_ = widgets.SelectMultiple(options=to_select, value=(to_select[0],),
                                       description="Trajectory ID: ", disabled=False)
         return ids_
 
     @staticmethod
-    def _create_radio():
+    def _create_radio(value="Cattle"):
         """
             Create the radio button for selecting the animal.
 
@@ -67,7 +74,7 @@ class TrajectoryPlotter:
                     The Radio button for selecting the animal.
         """
         radio = widgets.RadioButtons(options=['Cattle', 'Deer', 'Elk'],
-                                     value='Cattle', description='Animal: ',
+                                     value=value, description='Animal: ',
                                      disabled=False)
         return radio
 
@@ -92,37 +99,27 @@ class TrajectoryPlotter:
         return PTRAILDataFrame(filtered_df.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def plot_folium_traj(dataset, weight: float = 3, opacity: float = 0.8):
+    def _plot(value):
         """
-            Use folium to plot the trajectory on a map.
+            Show the folium map and plot the trajectories on it.
 
             Parameters
             ----------
-                dataset:
-
-                weight: float
-                    The weight of the trajectory line on the map.
-                opacity: float
-                    The opacity of the trajectory line on the map.
+                value: ipywidgets.widget.MultiSelect
+                    The Trajectory selector.
 
             Returns
             -------
-                folium.folium.Map
-                    The map with plotted trajectory.
+                None
+
         """
-        # Create the radio button.
-        animal = TrajectoryPlotter._create_radio()
-
-        # Create the multi selection button.
-        selector = TrajectoryPlotter._create_multi_select(dataset, animal.value)
-
-        # Display the multi selector and the radio buttons next to each other.
-        display(widgets.HBox([animal, selector]))
+        # Register the observer for the animal radio buttons.
+        TrajectoryPlotter._animal.observe(TrajectoryPlotter._animal_observe, names="value")
 
         # Filter the dataset according the values of the widgets above.
-        dataset = TrajectoryPlotter._filter_dataset(dataset, selector.value)
+        dataset = TrajectoryPlotter._filter_dataset(TrajectoryPlotter._dataset, value)
 
-        # The southwest and northeast bouds.
+        # The southwest and northeast bounds.
         sw = dataset[['lat', 'lon']].min().values.tolist()
         ne = dataset[['lat', 'lon']].max().values.tolist()
 
@@ -174,9 +171,80 @@ class TrajectoryPlotter:
             # Add trajectory to map.
             folium.PolyLine(locations,
                             color=colors[i],
-                            weight=weight,
-                            opacity=opacity).add_to(map_)
+                            weight=TrajectoryPlotter._weight,
+                            opacity=TrajectoryPlotter._opacity).add_to(map_)
 
         # Fit the map within its bounds and return it.
         map_.fit_bounds([sw, ne])
-        return map_
+        display(map_)
+
+    @staticmethod
+    def _animal_observe(change):
+        """
+            This is the observer that changes the multi selection list when the
+            value of the Animal radio button is changed.
+
+            Parameters
+            ----------
+                change: dict
+                    The dictionary that contains the new and old values of the
+                    radio button.
+
+            Returns
+            -------
+                None
+        """
+        to_select = None
+        if change['new'].lower() == 'deer':
+            to_select = TrajectoryPlotter._dataset.reset_index().loc[
+                TrajectoryPlotter._dataset.reset_index().Species == 'D', 'traj_id'].unique()
+        elif change['new'].lower() == 'elk':
+            to_select = TrajectoryPlotter._dataset.reset_index().loc[
+                TrajectoryPlotter._dataset.reset_index().Species == 'E', 'traj_id'].unique()
+        elif change['new'].lower() == 'cattle':
+            to_select = TrajectoryPlotter._dataset.reset_index().loc[
+                TrajectoryPlotter._dataset.reset_index().Species == 'C', 'traj_id'].unique()
+
+        # Based on the new selection, modify the options of the MultiSelector.
+        TrajectoryPlotter._selector.options = to_select
+
+        # Also, modify the value of the MultiSelector.
+        # WARNING: Do not remove the comma since teh value expects a tuple!
+        TrajectoryPlotter._selector.value = to_select[0],
+
+    @staticmethod
+    def show_trajectories(dataset, weight: float = 3, opacity: float = 0.8):
+        """
+            Use folium to plot the trajectory on a map.
+
+            Parameters
+            ----------
+                dataset:
+
+                weight: float
+                    The weight of the trajectory line on the map.
+                opacity: float
+                    The opacity of the trajectory line on the map.
+
+            Returns
+            -------
+                folium.folium.Map
+                    The map with plotted trajectory.
+        """
+        # Set the dataset, weight and opacity as the class variables.
+        TrajectoryPlotter._dataset = dataset
+        TrajectoryPlotter._weight = weight
+        TrajectoryPlotter._opacity = opacity
+
+        # Create the radio button.
+        TrajectoryPlotter._animal = TrajectoryPlotter._create_radio()
+
+        # Create the multi selection button.
+        TrajectoryPlotter._selector = TrajectoryPlotter._create_multi_select(TrajectoryPlotter._dataset,
+                                                                             TrajectoryPlotter._animal.value)
+
+        # Create the widgets.
+        ie = widgets.interactive_output(TrajectoryPlotter._plot, {'value': TrajectoryPlotter._selector})
+
+        # Display the multi selector and the radio buttons next to each other.
+        display(widgets.HBox([TrajectoryPlotter._animal, TrajectoryPlotter._selector]), ie)
