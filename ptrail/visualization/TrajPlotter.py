@@ -1,7 +1,7 @@
 """
-    The visualization file contains several data visualization types
-    like trajectory visualizer, radar maps, bar charts etc. It is to be noted
-    that ipywidgets are used to make the visualizations in this module interactive.
+    This File contains TrajectoryPlotter for the Starkey dataset. An interactive experience
+    is added to this plot in order to view the trajectory of an individual or multiple animals
+    together.
 
     Warning
     -------

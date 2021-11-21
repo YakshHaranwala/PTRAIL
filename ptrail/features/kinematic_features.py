@@ -318,7 +318,8 @@ class KinematicFeatures:
             # Now, lets calculate the Great-Circle (Haversine) distance between the 2 points and store
             # each of the values in the distance numpy array.
             for i in range(len(latitudes) - 1):
-                distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i], latitudes[i + 1], longitudes[i + 1])
+                distances[i + 1] = calc.haversine_distance(latitudes[i], longitudes[i],
+                                                           latitudes[i + 1], longitudes[i + 1])
 
             return np.sum(distances)  # Sum all the distances and return the total path length.
         else:
