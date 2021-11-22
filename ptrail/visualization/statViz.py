@@ -16,14 +16,14 @@ import pandas as pd
 
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.features.kinematic_features import KinematicFeatures as kin
-import ptrail.utilities.constants as const
+from ptrail.features.temporal_features import TemporalFeatures as temp
 
 import plotly.express as px
 
 
 class StatViz:
     @staticmethod
-    def trajectory_distance_treemap(dataset: PTRAILDataFrame, map_date: str, path: list):
+    def trajectory_distance_treemap(dataset: PTRAILDataFrame, path: list):
         """
             Plot a treemap of distance travelled by the moving object on a particular
             date.
@@ -51,9 +51,9 @@ class StatViz:
         dist_df = pd.DataFrame(columns=['traj_id', 'distance'])
         for val in traj_ids:
             try:
-                distance = kin.distance_travelled_by_date_and_traj_id(dataframe=dataset,
-                                                                      date=map_date, traj_id=val)
-                dist_df.loc[val] = distance
+                distance = kin.get_distance_travelled_by_traj_id(dataframe=dataset, traj_id=val)
+                duration = temp.get_traj_duration(dataframe=dataset, traj_id=val)
+                dist_df.loc[val] = distance / int(duration.dt.days)
 
             except KeyError:
                 # If the animal's trajectory is not recorded on the date given in, just skip it.
@@ -84,5 +84,3 @@ class StatViz:
         tree_map.update_traces(root_color="cornsilk")
 
         return tree_map
-
-
