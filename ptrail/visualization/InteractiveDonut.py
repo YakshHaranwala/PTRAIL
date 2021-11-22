@@ -106,7 +106,7 @@ class InteractiveDonut:
         # Add text to the centre of the plot.
         my_text = plt.Text(-0.3, -0.15, f'Breakdown of\n'
                                         f'  animals in\n' +
-                                        pasture_name)
+                           pasture_name)
 
         # Custom wedges
         plt.pie(x=data.values(), labels=data.keys(),
@@ -116,7 +116,51 @@ class InteractiveDonut:
         p.gca().add_artist(my_circle)
         p.gca().add_artist(my_text)
 
+        stats = InteractiveDonut.__get_pasture_stats(pasture_name)
+
+        plt.gcf().text(0.9, 0.5, stats, fontsize=12)
         plt.tight_layout()
+
+    @staticmethod
+    def __get_pasture_stats(pasture: str):
+        """
+            Given the habitat dataset and the name of the pasture,
+            return a text string containing the following information:
+                | 1. Average Canopy Cover
+                | 2. Average ground elevation
+                | 3. Number of water bodies inside the pasture
+                | 4. Average distance to nearest open road
+
+            Parameters
+            ----------
+                pasture: str
+                    The name of the pasture for which the stats are to be calculated.
+
+            Returns
+            -------
+                str:
+                    String containing the habitat stats.
+        """
+        # First, filter the dataset by pasture.
+        pasture_df = InteractiveDonut.__habitat_data.loc[InteractiveDonut.__habitat_data['CowPast'] == pasture]
+
+        # Calculate the average canopy cover of the pasture.
+        mean_canopy = pasture_df['Canopy'].mean()
+
+        # Calculate the average elevation.
+        mean_elev = pasture_df['Elev'].mean()
+
+        # Calculate the average distance to nearest open road.
+        mean_open_dist = pasture_df['DistOPEN'].mean()
+
+        # Calculate the number of water bodies inside the pasture.
+        num_water = len(pasture_df.loc[pasture_df['DistEWat'] == 0])
+
+        return f"{pasture} Description\n\n" \
+               f"Average Canopy Cover: {round(mean_canopy, 2)} %\n" \
+               f"Average Ground Elevation: {round(mean_elev, 2)} m\n" \
+               f"Number of water bodies: {num_water} \n" \
+               f"Average Distance to Nearest Road: {round(mean_open_dist, 2)} m\n"
 
     @staticmethod
     def _get_count_by_pasture(habitat: gpd.GeoDataFrame, trajectories: PTRAILDataFrame):
