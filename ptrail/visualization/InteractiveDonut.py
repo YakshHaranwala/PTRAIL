@@ -94,9 +94,11 @@ class InteractiveDonut:
             else:
                 cattle += 1
 
-        # Store the value and label values for the donut plot.
-        values = [deer, elk, cattle]
-        labels = ['Deer', 'Elk', 'Cattle']
+        # Convert the data created above to a dict.
+        data = {'Deer': deer, 'Elk': elk, 'Cattle': cattle}
+
+        # Sort the above dictionary by values.
+        data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1])}
 
         # Create a circle at the center of the plot
         my_circle = plt.Circle((0, 0), 0.65, color='white')
@@ -107,7 +109,7 @@ class InteractiveDonut:
                                         pasture_name)
 
         # Custom wedges
-        plt.pie(x=values, labels=labels,
+        plt.pie(x=data.values(), labels=data.keys(),
                 wedgeprops={'linewidth': 2, 'edgecolor': 'white'},
                 startangle=90)
         p = plt.gcf()
