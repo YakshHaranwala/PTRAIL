@@ -12,6 +12,8 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
 """
+from random import random, randint
+
 import pandas as pd
 
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
@@ -74,13 +76,15 @@ class StatViz:
 
         dist_df['Species'] = species
 
+        palette = ['#B42F32', '#DF6747', '#E3E3CD', '#878D92', '#49494D']
         # Draw the treemap using plotly.
-        tree_map = px.treemap(data_frame=dist_df, values='distance', path=path)
+        tree_map = px.treemap(data_frame=dist_df, values='distance', path=path,
+                              color_discrete_sequence=palette)
 
         # Arrange the margins.
         tree_map.update_layout(margin=dict(t=50, l=25, r=25, b=25))
 
         # Set the color of the root of the treemap.
-        tree_map.update_traces(root_color="cornsilk")
+        tree_map.update_traces(root_color=palette[3])
 
         return tree_map

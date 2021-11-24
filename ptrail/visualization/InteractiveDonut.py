@@ -225,10 +225,14 @@ class InteractiveDonut:
                                         '     by Pastures')
 
         # Custom wedges
+        palette = ['#377eb8', '#ff7f00', '#4daf4a',
+                   '#f781bf', '#a65628', '#984ea3',
+                   '#999999', '#e41a1c', '#dede00']
         plt.pie(x=areas['area'], labels=areas['pasture'],
                 wedgeprops={'linewidth': 2, 'edgecolor': 'white'},
-                startangle=90)
+                startangle=90, colors=palette, rotatelabels=True)
         p = plt.gcf()
+        p.set_size_inches(7, 5)
         p.gca().add_artist(my_circle)
         p.gca().add_artist(my_text)
 
