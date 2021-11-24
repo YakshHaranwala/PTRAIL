@@ -12,8 +12,6 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
 """
-from random import random, randint
-
 import pandas as pd
 
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
