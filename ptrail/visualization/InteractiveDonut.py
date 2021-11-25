@@ -1,7 +1,7 @@
 """
-    This File contains the visualization that is a Donut chart depicting the area of
-    each pasture is sq. km. It is an interactive visualization since upon clicking each
-    ring of the donut, a dot plot showing the distribution of animals is also shown.
+    This File contains the visualization that is a Donut chart depicting the breakdown
+    of animals by each pasture. The user can change the pasture to see the breakdown of
+    individual pastures.
 
     Warning
     -------
@@ -60,7 +60,7 @@ class InteractiveDonut:
                                                        description='Pasture',
                                                        disabled=False)
 
-        # Create the widgets.
+        # Show the plot.
         ie = widgets.interactive_output(InteractiveDonut.__plot_pasture_donut,
                                         {'pasture_name': InteractiveDonut.__dropdown})
 
