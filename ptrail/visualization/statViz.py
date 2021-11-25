@@ -77,7 +77,7 @@ class StatViz:
         palette = ['#B42F32', '#DF6747', '#E3E3CD', '#878D92', '#49494D']
         # Draw the treemap using plotly.
         tree_map = px.treemap(data_frame=dist_df, values='distance', path=path,
-                              color_discrete_sequence=palette)
+                              color_discrete_sequence=palette, title="Average Distance Travelled Per Day")
 
         # Arrange the margins.
         tree_map.update_layout(margin=dict(t=50, l=25, r=25, b=25))
