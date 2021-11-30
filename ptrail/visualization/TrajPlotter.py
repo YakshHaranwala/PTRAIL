@@ -124,7 +124,8 @@ class TrajectoryPlotter:
         ne = dataset[['lat', 'lon']].max().values.tolist()
 
         # Create a map with the initial point.
-        map_ = folium.Map(location=(dataset.latitude[0], dataset.longitude[0]))
+        map_ = folium.Map(location=(dataset.latitude[0], dataset.longitude[0]),
+                          disable_3d=True, zoom_start=True)
 
         ids_ = list(dataset.traj_id.value_counts().keys())
         colors = ["#" + ''.join([random.choice('123456789BCDEF') for j in range(6)])
