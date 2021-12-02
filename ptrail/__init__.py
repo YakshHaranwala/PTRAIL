@@ -7,6 +7,10 @@ from .preprocessing import filters
 from .preprocessing import helpers
 from .preprocessing import interpolation
 from .visualization import TrajPlotter
+from .visualization import HydrationTrends
+from .visualization import statViz
+from .visualization import InteractiveDonut
+
 from .utilities import (
     constants,
     conversions,

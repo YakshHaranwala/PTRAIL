@@ -8,3 +8,4 @@ ptrail
    ptrail.features
    ptrail.preprocessing
    ptrail.utilities
+   ptrail.visualization

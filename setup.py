@@ -12,12 +12,17 @@ REQUIRED_PKGS = ['numpy>=1.20',
                  'osmnx >= 1.1.1',
                  'geopandas >= 0.8.1',
                  'shapely >= 1.7.1',
+                 'IPython >= 7.27.0',
+                 'ipywidgets >= 7.6.5',
+                 'plotly >= 5.3.1',
+                 'matplotlib >= 3.3.4',
+                 'seaborn >= 0.11.2'
                  ]
 
 setup(
     name='ptrail',
     packages=find_packages(),
-    version='0.4.1 Beta',
+    version='0.5 Beta',
     license='new BSD',
     python_requires='>=3.6',
     description='PTRAIL: A Mobility-data Preprocessing Library using parallel computation.',
