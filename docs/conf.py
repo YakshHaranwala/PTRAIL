@@ -24,6 +24,11 @@ autodoc_mock_imports = ["scipy",
                         'osmnx',
                         'geopandas',
                         'shapely',
+                        'IPython',
+                        'ipywidgets',
+                        'plotly',
+                        'matplotlib',
+                        'seaborn'
                         ]
 
 # -- Project information -----------------------------------------------------

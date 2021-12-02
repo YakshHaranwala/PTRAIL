@@ -1,0 +1,13 @@
+scipy
+hampel
+pandas
+numpy
+folium
+osmnx
+geopandas
+shapely
+IPython
+ipywidgets
+plotly
+matplotlib
+seaborn
