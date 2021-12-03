@@ -10,7 +10,7 @@
         will further be integrated into the library as a general class of visualizers in
         the time to come.
 
-    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Authors: Yaksh J Haranwala
 """
 import random
 import folium

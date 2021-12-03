@@ -12,7 +12,7 @@
         the time to come. Some of the visualization types may or may not work with other
         datasets.
 
-    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Authors: Yaksh J Haranwala
 """
 import pandas as pd
 from IPython.core.display import display

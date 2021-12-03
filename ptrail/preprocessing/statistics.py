@@ -4,6 +4,8 @@
     The main purpose of this module is to get the dataframe ready for Machine
     Learning tasks such as clustering, calssification etc.
 
+    | Author: Yaksh J Haranwala
+
 """
 
 import pandas as pd
