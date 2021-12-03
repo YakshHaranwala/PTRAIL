@@ -119,7 +119,7 @@ class Statistics:
             Returns
             -------
                 pd.core.dataframe.DataFrame:
-                    The dataframe above which is
+                    The dataframe above which is pivoted and has rows converted to columns.
         """
         # Get all the unique trajectory IDs.
         ids_ = list(dataframe.index.get_level_values('traj_id').unique())
