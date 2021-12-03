@@ -28,6 +28,14 @@ ptrail.preprocessing.interpolation module
    :undoc-members:
    :show-inheritance:
 
+ptrail.preprocessing.statistics module
+--------------------------------------
+
+.. automodule:: ptrail.preprocessing.statistics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

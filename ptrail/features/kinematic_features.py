@@ -871,43 +871,4 @@ class KinematicFeatures:
 
         return to_return
 
-    @staticmethod
-    def generate_kinematic_stats(dataframe: PTRAILDataFrame):
-        """
-            Generate the statistics of kinematic features for each unique trajectory in
-            the dataframe.
 
-            Parameters
-            ----------
-                dataframe: PTRAILDataFrame
-                    The dataframe containing the trajectory data.
-
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame:
-                    A pandas dataframe containing stats for all kinematic features for
-                    each unique trajectory in the dataframe.
-        """
-        # Generate kinematic features on the entire dataframe.
-        ptdf = KinematicFeatures.generate_kinematic_features(dataframe)
-
-        # Then, lets break down the entire dataframe into pieces containing data of
-        # 1 trajectory in each piece.
-        ids_ = list(dataframe.traj_id.value_counts().keys())
-
-        # Get the ideal number of IDs by which the dataframe is to be split.
-        df_chunks = []
-        for i in range(len(ids_)):
-            small_df = ptdf.reset_index().loc[ptdf.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
-            df_chunks.append(small_df)
-
-        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
-        # kept free at all times in order to not block up the system.
-        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
-        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
-        mp_pool = multiprocessing.Pool(NUM_CPU)
-        results = mp_pool.map(helpers.stats_helper, df_chunks)
-        mp_pool.close()
-        mp_pool.join()
-
-        return pd.concat(results)

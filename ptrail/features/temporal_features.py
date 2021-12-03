@@ -21,16 +21,10 @@ from typing import Optional, Text
 
 import numpy as np
 import pandas as pd
-import os
 
-from math import ceil
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.features.helper_functions import Helpers as helpers
 from ptrail.utilities import constants as const
-
-
-num = os.cpu_count()
-NUM_CPU = ceil((num * 2) / 3)
 
 
 class TemporalFeatures:
@@ -352,39 +346,6 @@ class TemporalFeatures:
             filt = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id]
             filt_two = filt.loc[filt[const.DateTime] == filt[const.DateTime].max()]
             return filt_two[const.DateTime].iloc[0]
-
-    @staticmethod
-    def segment_traj_by_week(df: PTRAILDataFrame):
-        """
-            Given a dataframe containing trajectory data, segment all
-            the trajectories by each week.
-
-            Parameters
-            ----------
-                df: PTRAILDataFrame
-                    The dataframe containing trajectory data.
-
-            Returns
-            -------
-                pandas.core.dataframe.DataFrame:
-                    The dataframe containing segmented trajectories
-                    with a new column added called segment_id
-        """
-        # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe=df)
-
-        # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
-        # kept free at all times in order to not block up the system.
-        # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
-        # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
-        pool = multiprocessing.Pool(NUM_CPU)
-        results = pool.map(helpers.split_traj_helper, df_chunks)
-        pool.close()
-        pool.join()
-
-        to_return = pd.concat(results).reset_index().set_index(['traj_id', 'seg_id', 'DateTime'])
-
-        return to_return.drop(columns=['index'])
 
     @staticmethod
     def generate_temporal_features(dataframe: PTRAILDataFrame):
