@@ -17,6 +17,7 @@ from math import ceil
 
 import numpy as np
 import pandas as pd
+import datetime as dt
 
 from ptrail.utilities import constants as const
 from ptrail.utilities.DistanceCalculator import FormulaLog as calc
@@ -136,6 +137,111 @@ class Helpers:
                                                                           1: const.TRAJECTORY_ID})
         # Return the dataframe by setting Trajectory id as index
         return df.set_index(const.TRAJECTORY_ID)
+
+    @staticmethod
+    def split_traj_helper(df):
+        df = df.reset_index()
+        # First, create the date column and get all the unique traj_ids
+        # in the dataframe..
+        df['Date'] = df[const.DateTime].dt.date
+        ids_ = list(df.traj_id.value_counts().keys())
+
+        # Get the ideal number of IDs by which the dataframe is to be split.
+        df_chunks = []
+        for i in range(len(ids_)):
+            small_df = df.reset_index().loc[df.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
+            df_chunks.append(small_df)
+
+        # Now, iterate over the entire dataframe and then segment
+        # the trajectories by 1 week each.
+        results = []
+        for i in range(len(ids_)):
+            # Take the traj_df of a single Trajectory out from the
+            # list of chunks and find their max and min timestamps.
+            traj = df_chunks[i]
+            t_max = traj.reset_index()[const.DateTime].max()
+            t_min = traj.reset_index()[const.DateTime].min()
+
+            # For iteration purposes, set t_1 to min and t_2 to
+            # t_1 + 7 days.
+            t_1 = t_min
+            t_2 = t_1 + dt.timedelta(days=7)
+            seg_id = 1
+
+            # Now, segment the trajectories into smaller segments
+            # wherein each segment contains the points of a span
+            # of 7 days only.
+            while t_2 < t_max:
+                if t_2 < t_max:
+                    seg = Helpers.filt_df_by_date(traj,
+                                                  start_date=t_1.strftime('%Y-%m-%d'),
+                                                  end_date=t_max.strftime('%Y-%m-%d'))
+                    # Once filtered, assign the segment with a segment ID.
+                    seg['seg_id'] = seg_id
+
+                    # Increment the segment id, t_1 and t_2 values by
+                    # 1, 7 days and 7 days respectively to continue
+                    # the iteration.
+                    t_1 += dt.timedelta(days=7)
+                    t_2 += dt.timedelta(days=7)
+                    results.append(seg.drop(columns=['index', 'level_0']))
+
+                # If, t_2 is greater than the max time present in the
+                # trajectory, then assign t_2 = max and proceed
+                # further with segmentation.
+                elif t_2 >= t_max:
+                    seg = Helpers.filt_df_by_date(traj,
+                                                  start_date=t_1.strftime('%Y-%m-%d'),
+                                                  end_date=t_max.strftime('%Y-%m-%d'))
+                    # Once filtered, assign the segment with a segment ID.
+                    seg['seg_id'] = seg_id
+
+                    # Increment the segment id, t_1 and t_2 values by
+                    # 1, 7 days and 7 days respectively to continue
+                    # the iteration.
+                    t_1 += dt.timedelta(days=7)
+                    t_2 += dt.timedelta(days=7)
+                    results.append(seg.drop(columns=['index', 'level_0']))
+                seg_id += 1
+
+        # Finally, concat the dataframes, set the index as
+        # [traj_id, seg_id, DateTime].
+        return pd.concat(results).reset_index().set_index(['traj_id', 'seg_id', 'DateTime'])
+
+    @staticmethod
+    def filt_df_by_date(dataframe, start_date, end_date):
+        # Convert the user-given string dates to pandas datetime format.
+        start_date = pd.to_datetime(start_date) if start_date is not None else None
+        end_date = pd.to_datetime(end_date) if end_date is not None else None
+
+        # Case-1: No start and end date are give. Hence just return the original dataframe.
+        if start_date is None and end_date is None:
+            filtered_df = dataframe
+
+        # Case-2: No start_date is given. Hence, return all the points upto and including
+        #         the points on the end date.
+        elif start_date is None and end_date is not None:
+            filt = dataframe['Date'] <= end_date
+            filtered_df = dataframe.loc[filt]
+
+        # Case-3: No end date is given. Hence, return all the point after and including the
+        #         points on the start date.
+        elif start_date is not None and end_date is None:
+            filt = dataframe['Date'] >= start_date
+            filtered_df = dataframe.loc[filt]
+
+        # Case-4: Both the start date and end date are given. Hence, return the points between
+        #         and including the points on start and end date.
+        else:
+            if end_date < start_date:
+                raise ValueError(f"End Date should be later than Start Date.")
+            else:
+                filt = np.logical_and(dataframe['Date'] >= start_date, dataframe['Date'] <= end_date)
+                filtered_df = dataframe.loc[filt].reset_index()
+
+        # Convert the smaller dataframe back to PTRAILDataFrame and return it.
+        return filtered_df
+
 
     # -------------------------------------- Spatial Helpers ----------------------------------------------- #
     @staticmethod
