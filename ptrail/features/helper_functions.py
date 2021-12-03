@@ -22,6 +22,8 @@ import datetime as dt
 from ptrail.utilities import constants as const
 from ptrail.utilities.DistanceCalculator import FormulaLog as calc
 
+pd.options.mode.chained_assignment = None
+
 
 class Helpers:
     # ------------------------------------ Temporal Helpers --------------------------------------#
@@ -241,7 +243,6 @@ class Helpers:
 
         # Convert the smaller dataframe back to PTRAILDataFrame and return it.
         return filtered_df
-
 
     # -------------------------------------- Spatial Helpers ----------------------------------------------- #
     @staticmethod
@@ -587,14 +588,44 @@ class Helpers:
 
     @staticmethod
     def stats_helper(df):
+        """
+            Generate the stats of the kinematic features present in the Dataframe.
+
+            Parameters
+            ----------
+                df: pandas.core.dataframe.DataFrame
+                    The dataframe containing the trajectory data and their features.
+
+            Returns
+            -------
+                pd.core.dataframe.DataFrame:
+                    A dataframe containing the stats of the given trajectory.
+
+        """
+        # Grab the columns that we need.
         new_df = df.reset_index()[['traj_id', 'Distance', 'Distance_from_start', 'Speed',
                                    'Acceleration', 'Jerk', 'Bearing', 'Bearing_Rate',
                                    'Rate_of_bearing_rate']]
+
+        # Generate the stats along with the needed percentiles and arrange the dataframe
+        # properly.
         stats = new_df.reset_index(drop=True).describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9]).transpose()
+
+        # Assign the traj_id column.
         stats['traj_id'] = new_df['traj_id'].iloc[0]
         stats = stats[['traj_id', 'mean', 'std', 'min', '10%',
                        '25%', '50%', '75%', '90%', 'max']]
-        return stats.reset_index().rename(columns={'index': 'Columns'}).set_index(['traj_id', 'Columns'])
+
+        # Assign the species column.
+        if 'D' in new_df['traj_id'].iloc[0]:
+            stats['Species'] = 0
+        elif 'E' in new_df['traj_id'].iloc[0]:
+            stats['Species'] = 1
+        else:
+            stats['Species'] = 2
+
+        return stats.reset_index().rename(
+            columns={'index': 'Columns'}).reset_index(drop=True).set_index(['traj_id', 'Columns'])
 
     # ------------------------------------ Semantic Helpers ------------------------------------- #
     @staticmethod

@@ -382,7 +382,9 @@ class TemporalFeatures:
         pool.close()
         pool.join()
 
-        return pd.concat(results).reset_index().set_index(['traj_id', 'seg_id', 'DateTime'])
+        to_return = pd.concat(results).reset_index().set_index(['traj_id', 'seg_id', 'DateTime'])
+
+        return to_return.drop(columns=['index'])
 
     @staticmethod
     def generate_temporal_features(dataframe: PTRAILDataFrame):

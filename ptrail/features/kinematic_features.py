@@ -901,7 +901,6 @@ class KinematicFeatures:
             small_df = ptdf.reset_index().loc[ptdf.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
             df_chunks.append(small_df)
 
-        results = []
         # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
         # kept free at all times in order to not block up the system.
         # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
