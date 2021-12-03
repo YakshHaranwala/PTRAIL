@@ -4,7 +4,7 @@ from setuptools import setup
 with open('README.md', 'r') as f:
     LONG_DESCRIPTION = f.read()
 
-REQUIRED_PKGS = ['numpy>=1.20',
+REQUIRED_PKGS = ['numpy >= 1.20',
                  'hampel >= 0.0.5',
                  'pandas >= 1.2.5',
                  'scipy >= 1.6.2',
@@ -22,7 +22,7 @@ REQUIRED_PKGS = ['numpy>=1.20',
 setup(
     name='ptrail',
     packages=find_packages(),
-    version='0.5.2 Beta',
+    version='0.5.3 Beta',
     license='new BSD',
     python_requires='>=3.6',
     description='PTRAIL: A Mobility-data Preprocessing Library using parallel computation.',
