@@ -144,5 +144,13 @@ class Statistics:
             pivoted[target_col_name] = target
             final_chunks.append(pivoted)
 
-        # concat all the smaller chunks and return a bigger dataframe.
-        return pd.concat(final_chunks)
+        # Concatenate the smaller chunks and reorder the columns.
+        to_return = pd.concat(final_chunks)
+
+        # Store the correct order of the columns to a variable and add the name
+        # of the target column to the end of it.
+        cols = const.ORDERED_COLS
+        cols.append(target_col_name)
+
+        # Reorder the final DF and return it.
+        return to_return[cols]
