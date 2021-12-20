@@ -526,7 +526,7 @@ class Helpers:
 
             # Append the boolean list containing whether each point was near the POI of interest or not
             df['Nearby_POI'] = POI
-
+            print("Done")
             return df
         except KeyError:
             raise KeyError(f"The column {dist_column_label} does not exist in the dataset.")
