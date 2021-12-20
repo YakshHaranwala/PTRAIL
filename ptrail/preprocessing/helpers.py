@@ -493,7 +493,7 @@ class Helpers:
         return filtered_df
 
     @staticmethod
-    def stats_helper(df):
+    def stats_helper(df, target_col_name):
         """
             Generate the stats of the kinematic features present in the Dataframe.
 
@@ -501,6 +501,9 @@ class Helpers:
             ----------
                 df: pandas.core.dataframe.DataFrame
                     The dataframe containing the trajectory data and their features.
+                target_col_name: str
+                    This is the 'y' value that is used for ML tasks, this is
+                    asked to append the species back at the end.
 
             Returns
             -------
@@ -521,14 +524,7 @@ class Helpers:
         stats['traj_id'] = new_df['traj_id'].iloc[0]
         stats = stats[['traj_id', 'mean', 'std', 'min', '10%',
                        '25%', '50%', '75%', '90%', 'max']]
-
-        # Assign the species column.
-        if 'D' in new_df['traj_id'].iloc[0]:
-            stats['Species'] = 0
-        elif 'E' in new_df['traj_id'].iloc[0]:
-            stats['Species'] = 1
-        else:
-            stats['Species'] = 2
+        stats[target_col_name] = df[target_col_name].iloc[0]
 
         return stats.reset_index().rename(
             columns={'index': 'Columns'}).reset_index(drop=True).set_index(['traj_id', 'Columns'])
