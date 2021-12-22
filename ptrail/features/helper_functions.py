@@ -17,7 +17,6 @@ from math import ceil
 
 import numpy as np
 import pandas as pd
-import datetime as dt
 
 from ptrail.utilities import constants as const
 from ptrail.utilities.DistanceCalculator import FormulaLog as calc
@@ -482,6 +481,7 @@ class Helpers:
                                                                           1: const.TRAJECTORY_ID})
         # Set the index to traj_id and return it.
         return df.set_index(const.TRAJECTORY_ID)
+
     # ------------------------------------ Semantic Helpers ------------------------------------- #
     @staticmethod
     def visited_poi_helper(df, surrounding_data, dist_column_label, nearby_threshold):
