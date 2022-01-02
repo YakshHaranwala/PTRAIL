@@ -27,7 +27,7 @@ NUM_CPU = ceil((num * 2) / 3)
 
 class Statistics:
     @staticmethod
-    def segment_traj_by_week(df: PTRAILDataFrame):
+    def segment_traj_by_days(df: PTRAILDataFrame, num_days):
         """
             Given a dataframe containing trajectory data, segment all
             the trajectories by each week.
@@ -36,6 +36,8 @@ class Statistics:
             ----------
                 df: PTRAILDataFrame
                     The dataframe containing trajectory data.
+                num_days: int
+                    The number of days that each segment is supposed to have.
 
             Returns
             -------
@@ -51,7 +53,7 @@ class Statistics:
         # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
         # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
         pool = multiprocessing.Pool(NUM_CPU)
-        results = pool.map(helpers.split_traj_helper, df_chunks)
+        results = pool.starmap(helpers.split_traj_helper, zip(df_chunks, itertools.repeat(num_days)))
         pool.close()
         pool.join()
 

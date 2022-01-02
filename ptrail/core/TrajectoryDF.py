@@ -6,11 +6,9 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
 """
-import random
 from parser import ParserError
 from typing import Dict, List, Union, Optional, Text
 
-import folium
 import numpy as np
 import pandas as pd
 import pandas.core.dtypes.common

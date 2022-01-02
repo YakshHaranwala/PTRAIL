@@ -389,21 +389,19 @@ class Helpers:
 
     # ------------------------------------------ Statistics Helpers ----------------------------------- #
     @staticmethod
-    def split_traj_helper(df):
-        df = df
+    def split_traj_helper(df, num_days):
         # First, create the date column and get all the unique traj_ids
-        # in the dataframe..
+        # in the dataframe.
         df['Date'] = df[const.DateTime].dt.date
         ids_ = list(df.traj_id.value_counts().keys())
 
-        # Get the ideal number of IDs by which the dataframe is to be split.
         df_chunks = []
         for i in range(len(ids_)):
             small_df = df.reset_index().loc[df.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
             df_chunks.append(small_df)
 
         # Now, iterate over the entire dataframe and then segment
-        # the trajectories by 1 week each.
+        # the trajectories by num_days each.
         results = []
         for i in range(len(ids_)):
             # Take the traj_df of a single Trajectory out from the
@@ -413,27 +411,30 @@ class Helpers:
             t_min = traj[const.DateTime].min()
 
             # For iteration purposes, set t_1 to min and t_2 to
-            # t_1 + 7 days.
+            # t_1 + num_days days.
             t_1 = t_min
-            t_2 = t_1 + dt.timedelta(days=7)
+            t_2 = t_1 + dt.timedelta(days=num_days)
             seg_id = 1
 
             # Now, segment the trajectories into smaller segments
             # wherein each segment contains the points of a span
-            # of 7 days only.
+            # of num_days days only.
             while t_2 < t_max:
                 if t_2 < t_max:
                     seg = Helpers.filt_df_by_date(traj,
                                                   start_date=t_1.strftime('%Y-%m-%d'),
-                                                  end_date=t_max.strftime('%Y-%m-%d'))
+                                                  end_date=t_2.strftime('%Y-%m-%d'))
                     # Once filtered, assign the segment with a segment ID.
                     seg['seg_id'] = seg_id
 
                     # Increment the segment id, t_1 and t_2 values by
-                    # 1, 7 days and 7 days respectively to continue
-                    # the iteration.
-                    t_1 += dt.timedelta(days=7)
-                    t_2 += dt.timedelta(days=7)
+                    # 1, num_days days each respectively to continue the iteration.
+                    t_1 += dt.timedelta(days=num_days)
+                    t_2 += dt.timedelta(days=num_days)
+
+                    if len(seg) > 0:
+                        seg_id += 1
+
                     results.append(seg.drop(columns=['index', 'level_0']))
 
                 # If, t_2 is greater than the max time present in the
@@ -447,16 +448,20 @@ class Helpers:
                     seg['seg_id'] = seg_id
 
                     # Increment the segment id, t_1 and t_2 values by
-                    # 1, 7 days and 7 days respectively to continue
-                    # the iteration.
-                    t_1 += dt.timedelta(days=7)
-                    t_2 += dt.timedelta(days=7)
+                    # 1, num_days each respectively to continue the iteration.
+                    t_1 += dt.timedelta(days=num_days)
+                    t_2 += dt.timedelta(days=num_days)
+
+                    if len(seg) > 0:
+                        seg_id += 1
+
                     results.append(seg.drop(columns=['index', 'level_0']))
-                seg_id += 1
+                    seg_id += 1
 
         # Finally, concat the dataframes, set the index as
         # [traj_id, seg_id, DateTime].
-        return pd.concat(results).reset_index().set_index(['traj_id', 'seg_id', 'DateTime'])
+        return pd.concat(results).reset_index().set_index(['traj_id', 'seg_id', 'DateTime']).sort_values(by=['traj_id',
+                                                                                                             'seg_id'])
 
     @staticmethod
     def filt_df_by_date(dataframe, start_date, end_date):
