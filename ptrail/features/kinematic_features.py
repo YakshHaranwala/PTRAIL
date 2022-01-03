@@ -199,7 +199,7 @@ class KinematicFeatures:
                     The dataframe containing the resultant Distance_prev_to_curr column.
         """
         # Case-1: The number of unique Trajectory IDs is less than 100.
-        if dataframe.traj_id.nunique() < const.MIN_IDS:
+        if dataframe.reset_index().traj_id.nunique() < const.MIN_IDS:
             result = helpers.distance_between_consecutive_helper(dataframe)
             return PTRAILDataFrame(result, const.LAT, const.LONG,
                                    const.DateTime, const.TRAJECTORY_ID)
@@ -249,7 +249,7 @@ class KinematicFeatures:
                     The dataframe containing the resultant Distance_start_to_curr column.
         """
         # Case-1: The number of unique Trajectory IDs is less than 100.
-        if dataframe.traj_id.nunique() < const.MIN_IDS:
+        if dataframe.reset_index().traj_id.nunique() < const.MIN_IDS:
             result = helpers.distance_from_start_helper(dataframe)
             return PTRAILDataFrame(result, const.LAT, const.LONG,
                                    const.DateTime, const.TRAJECTORY_ID)
@@ -625,7 +625,7 @@ class KinematicFeatures:
         #     cpu_count = cpu_count
 
         # Case-1: The number of unique Trajectory IDs is less than x.
-        if dataframe.traj_id.nunique() < const.MIN_IDS:
+        if dataframe.reset_index().traj_id.nunique() < const.MIN_IDS:
             result = helpers.bearing_helper(dataframe)
             return PTRAILDataFrame(result, const.LAT, const.LONG,
                                    const.DateTime, const.TRAJECTORY_ID)

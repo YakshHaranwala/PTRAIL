@@ -423,7 +423,7 @@ class Helpers:
                 if t_2 < t_max:
                     seg = Helpers.filt_df_by_date(traj,
                                                   start_date=t_1.strftime('%Y-%m-%d'),
-                                                  end_date=t_2.strftime('%Y-%m-%d'))
+                                                  end_date=t_max.strftime('%Y-%m-%d'))
                     # Once filtered, assign the segment with a segment ID.
                     seg['seg_id'] = seg_id
 
@@ -498,7 +498,7 @@ class Helpers:
         return filtered_df
 
     @staticmethod
-    def stats_helper(df, target_col_name):
+    def stats_helper(df, target_col_name, segmented):
         """
             Generate the stats of the kinematic features present in the Dataframe.
 
@@ -509,6 +509,8 @@ class Helpers:
                 target_col_name: str
                     This is the 'y' value that is used for ML tasks, this is
                     asked to append the species back at the end.
+                segmented: Optional[bool]
+                    Indicate whether the trajectory has segments or not.
 
             Returns
             -------
@@ -517,22 +519,42 @@ class Helpers:
 
         """
         # Grab the columns that we need.
-        new_df = df.reset_index()[['traj_id', 'Distance', 'Distance_from_start', 'Speed',
-                                   'Acceleration', 'Jerk', 'Bearing', 'Bearing_Rate',
-                                   'Rate_of_bearing_rate']]
+        if not segmented:
+            new_df = df.reset_index()[['traj_id', 'Distance', 'Distance_from_start', 'Speed',
+                                       'Acceleration', 'Jerk', 'Bearing', 'Bearing_Rate',
+                                       'Rate_of_bearing_rate']]
+            # Generate the stats along with the needed percentiles and arrange the dataframe
+            # properly.
+            stats = new_df.reset_index(drop=True).describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9]).transpose()
 
-        # Generate the stats along with the needed percentiles and arrange the dataframe
-        # properly.
-        stats = new_df.reset_index(drop=True).describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9]).transpose()
+            # Assign the traj_id column.
+            stats['traj_id'] = new_df['traj_id'].iloc[0]
+            stats = stats[['traj_id', 'mean', 'std', 'min', '10%',
+                           '25%', '50%', '75%', '90%', 'max']]
+            stats[target_col_name] = df[target_col_name].iloc[0]
 
-        # Assign the traj_id column.
-        stats['traj_id'] = new_df['traj_id'].iloc[0]
-        stats = stats[['traj_id', 'mean', 'std', 'min', '10%',
-                       '25%', '50%', '75%', '90%', 'max']]
-        stats[target_col_name] = df[target_col_name].iloc[0]
+            return stats.reset_index().rename(
+                columns={'index': 'Columns'}).reset_index(drop=True).set_index(['traj_id', 'Columns'])
+        else:
+            seg_id = df['seg_id'].iloc[0]
+            new_df = df.reset_index()[['traj_id', 'Distance', 'Distance_from_start', 'Speed',
+                                       'Acceleration', 'Jerk', 'Bearing', 'Bearing_Rate',
+                                       'Rate_of_bearing_rate']]
 
-        return stats.reset_index().rename(
-            columns={'index': 'Columns'}).reset_index(drop=True).set_index(['traj_id', 'Columns'])
+            # Generate the stats along with the needed percentiles and arrange the dataframe
+            # properly.
+            stats = new_df.reset_index(drop=True).describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9]).transpose()
+
+            # Assign the traj_id column.
+            stats['traj_id'] = new_df['traj_id'].iloc[0]
+            stats['seg_id'] = seg_id
+            stats = stats[['traj_id', 'seg_id', 'mean', 'std', 'min', '10%',
+                           '25%', '50%', '75%', '90%', 'max']]
+            stats[target_col_name] = df[target_col_name].iloc[0]
+
+            to_return = stats.reset_index().rename(
+                columns={'index': 'Columns'}).reset_index(drop=True).set_index(['traj_id', 'seg_id', 'Columns'])
+            return to_return
 
     # -------------------------------------- General Utilities ---------------------------------- #
     @staticmethod
@@ -588,7 +610,7 @@ class Helpers:
         """
         # First, create a list containing all the ids of the data and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = list(dataframe.traj_id.value_counts().keys())
+        ids_ = list(dataframe.reset_index().traj_id.value_counts().keys())
 
         # Get the ideal number of IDs by which the dataframe is to be split.
         split_factor = Helpers._get_partition_size(len(ids_))

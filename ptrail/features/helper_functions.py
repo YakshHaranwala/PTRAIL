@@ -591,7 +591,7 @@ class Helpers:
         """
         # First, create a list containing all the ids of the data and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
-        ids_ = list(dataframe.traj_id.value_counts().keys())
+        ids_ = list(dataframe.reset_index().traj_id.value_counts().keys())
 
         # Get the ideal number of IDs by which the dataframe is to be split.
         split_factor = Helpers._get_partition_size(len(ids_))

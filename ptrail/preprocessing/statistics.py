@@ -8,6 +8,7 @@
 
 """
 import itertools
+from typing import Optional
 
 import pandas as pd
 
@@ -19,7 +20,6 @@ from math import ceil
 
 import multiprocessing
 import os
-
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
@@ -62,7 +62,7 @@ class Statistics:
         return to_return.drop(columns=['index'])
 
     @staticmethod
-    def generate_kinematic_stats(dataframe: PTRAILDataFrame, target_col_name: str):
+    def generate_kinematic_stats(dataframe: PTRAILDataFrame, target_col_name: str, segmented: Optional[bool] = False):
         """
             Generate the statistics of kinematic features for each unique trajectory in
             the dataframe.
@@ -74,6 +74,8 @@ class Statistics:
                 target_col_name: str
                     This is the 'y' value that is used for ML tasks, this is
                     asked to append the species back at the end.
+                segmented: Optional[bool]
+                    Indicate whether the trajectory has segments or not.
 
             Returns
             -------
@@ -86,25 +88,39 @@ class Statistics:
 
         # Then, lets break down the entire dataframe into pieces containing data of
         # 1 trajectory in each piece.
-        ids_ = list(dataframe.traj_id.value_counts().keys())
+        ids_ = list(dataframe.reset_index().traj_id.value_counts().keys())
         df_chunks = []
-        for i in range(len(ids_)):
-            small_df = ptdf.reset_index().loc[ptdf.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
-            df_chunks.append(small_df)
+
+        if segmented:
+            segments = ptdf.reset_index()['seg_id'].unique()
+            for i in range(len(ids_)):
+                for seg in segments:
+                    df = ptdf.reset_index().loc[(ptdf.reset_index()['traj_id'] == ids_[i])
+                                                & (ptdf.reset_index()['seg_id'] == seg)]
+                    if len(df) > 0:
+                        df_chunks.append(df)
+                    else:
+                        continue
+        else:
+            for i in range(len(ids_)):
+                small_df = ptdf.reset_index().loc[ptdf.reset_index()[const.TRAJECTORY_ID] == ids_[i]]
+                df_chunks.append(small_df)
 
         # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
         # kept free at all times in order to not block up the system.
         # (Note: The blocking of system is mostly prevalent in Windows and does not happen very often
         # in Linux. However, out of caution some CPUs are kept free regardless of the system.)
         mp_pool = multiprocessing.Pool(NUM_CPU)
-        results = mp_pool.starmap(helpers.stats_helper, zip(df_chunks, itertools.repeat(target_col_name)))
+        results = mp_pool.starmap(helpers.stats_helper, zip(df_chunks,
+                                                            itertools.repeat(target_col_name),
+                                                            itertools.repeat(segmented)))
         mp_pool.close()
         mp_pool.join()
 
         return pd.concat(results)
 
     @staticmethod
-    def pivot_stats_df(dataframe, target_col_name: str):
+    def pivot_stats_df(dataframe, target_col_name: str, segmented: Optional[bool] = False):
         """
             Given a dataframe with stats present in it, melt the dataframe to make it
             ready for ML tasks. This is specifically for melting the type of dataframe
@@ -121,6 +137,8 @@ class Statistics:
                 target_col_name: str
                     This is the 'y' value that is used for ML tasks, this is
                     asked to append the species back at the end.
+                segmented: Optional[bool]
+                    Indicate whether the trajectory has segments or not.
 
             Returns
             -------
@@ -130,23 +148,45 @@ class Statistics:
         # Get all the unique trajectory IDs.
         ids_ = list(dataframe.index.get_level_values('traj_id').unique())
 
-        # Now for each unique trajectory ID, we pivot the DF.
         final_chunks = []
-        for val in ids_:
-            # separated the data for each trajectory id.
-            small = dataframe.loc[dataframe.index.get_level_values('traj_id') == val].reset_index().set_index('traj_id')
+        if not segmented:
+            for val in ids_:
+                # separated the data for each trajectory id.
+                small = dataframe.loc[dataframe.index.get_level_values('traj_id') == val].reset_index().set_index(
+                    'traj_id')
 
-            # Get the target value out and drop the target column.
-            target = small[target_col_name].iloc[0]
-            small = small.drop(columns=['Species'])
+                # Get the target value out and drop the target column.
+                target = small[target_col_name].iloc[0]
+                small = small.drop(columns=['Species'])
 
-            # Pivot the table now and adjust the column names.
-            pivoted = small.reset_index().pivot_table(index='traj_id', columns='Columns')
-            pivoted.columns = pivoted.columns.map('_'.join).str.strip('|')
+                # Pivot the table now and adjust the column names.
+                pivoted = small.reset_index().pivot_table(index='traj_id', columns='Columns')
+                pivoted.columns = pivoted.columns.map('_'.join).str.strip('|')
 
-            # Assign the target column again.
-            pivoted[target_col_name] = target
-            final_chunks.append(pivoted)
+                # Assign the target column again.
+                pivoted[target_col_name] = target
+                final_chunks.append(pivoted)
+        else:
+            for val in ids_:
+                segments = dataframe.index.get_level_values('seg_id').unique()
+                for seg in segments:
+                    small = dataframe.loc[(dataframe.index.get_level_values('traj_id') == val) &
+                                          (dataframe.index.get_level_values('seg_id') == seg)].reset_index().set_index(['traj_id', 'seg_id'])
+
+                    if len(small) <= 0:
+                        continue
+
+                    # Get the target value out and drop the target column.
+                    target = small[target_col_name].iloc[0]
+                    small = small.drop(columns=['Species'])
+
+                    # Pivot the table now and adjust the column names.
+                    pivoted = small.reset_index().pivot_table(index=['traj_id', 'seg_id'], columns='Columns')
+                    pivoted.columns = pivoted.columns.map('_'.join).str.strip('|')
+
+                    # Assign the target column again.
+                    pivoted[target_col_name] = target
+                    final_chunks.append(pivoted)
 
         # Concatenate the smaller chunks and reorder the columns.
         to_return = pd.concat(final_chunks)
