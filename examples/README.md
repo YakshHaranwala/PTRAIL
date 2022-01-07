@@ -98,4 +98,9 @@ of PTRAIL:
         <td> Experiments </td>
         <td> <a href="https://colab.research.google.com/drive/13WVFgrctxgkdL-yrEGFqM9mdOMR2PJaf?usp=sharing" target="_blank"> Click Here </a></td>
     </tr>
+    <tr>
+        <td> 12. </td>    
+        <td> BMDA_Trajectory_Classification </td>    
+        <td> <a href="https://colab.research.google.com/drive/1kJSn2umrmP52tuhnsE0hJZNjlncZbhS2?usp=sharing&authuser=1#scrollTo=43uZNrfCF__P" target="_blank"> Click Here </a></td>
+    </tr>
 </table>
