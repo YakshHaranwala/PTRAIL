@@ -52,11 +52,11 @@ class TrajectoryPlotter:
         # Select the animal based on the parameter passed.
         to_select = None
         if animal.lower() == 'deer':
-            to_select = dataset.loc[dataset.Species == 'D', 'traj_id'].unique()
+            to_select = dataset.loc[dataset.Species == 0, 'traj_id'].unique()
         elif animal.lower() == 'elk':
-            to_select = dataset.loc[dataset.Species == 'E', 'traj_id'].unique()
+            to_select = dataset.loc[dataset.Species == 1, 'traj_id'].unique()
         elif animal.lower() == 'cattle':
-            to_select = dataset.loc[dataset.Species == 'C', 'traj_id'].unique()
+            to_select = dataset.loc[dataset.Species == 2, 'traj_id'].unique()
 
         # Create the multi select widget and return it.
         ids_ = widgets.SelectMultiple(options=to_select, value=(to_select[0],),
@@ -198,13 +198,13 @@ class TrajectoryPlotter:
         to_select = None
         if change['new'].lower() == 'deer':
             to_select = TrajectoryPlotter._dataset.reset_index().loc[
-                TrajectoryPlotter._dataset.reset_index().Species == 'D', 'traj_id'].unique()
+                TrajectoryPlotter._dataset.reset_index().Species == 0, 'traj_id'].unique()
         elif change['new'].lower() == 'elk':
             to_select = TrajectoryPlotter._dataset.reset_index().loc[
-                TrajectoryPlotter._dataset.reset_index().Species == 'E', 'traj_id'].unique()
+                TrajectoryPlotter._dataset.reset_index().Species == 1, 'traj_id'].unique()
         elif change['new'].lower() == 'cattle':
             to_select = TrajectoryPlotter._dataset.reset_index().loc[
-                TrajectoryPlotter._dataset.reset_index().Species == 'C', 'traj_id'].unique()
+                TrajectoryPlotter._dataset.reset_index().Species == 2, 'traj_id'].unique()
 
         # Based on the new selection, modify the options of the MultiSelector.
         TrajectoryPlotter._selector.options = to_select

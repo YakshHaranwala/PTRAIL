@@ -73,7 +73,7 @@ class Statistics:
                     The dataframe containing the trajectory data.
                 target_col_name: str
                     This is the 'y' value that is used for ML tasks, this is
-                    asked to append the species back at the end.
+                    asked to append the target_col back at the end.
                 segmented: Optional[bool]
                     Indicate whether the trajectory has segments or not.
 
@@ -136,7 +136,7 @@ class Statistics:
                     The dataframe containing stats.
                 target_col_name: str
                     This is the 'y' value that is used for ML tasks, this is
-                    asked to append the species back at the end.
+                    asked to append the target_col back at the end.
                 segmented: Optional[bool]
                     Indicate whether the trajectory has segments or not.
 
@@ -157,7 +157,7 @@ class Statistics:
 
                 # Get the target value out and drop the target column.
                 target = small[target_col_name].iloc[0]
-                small = small.drop(columns=['Species'])
+                small = small.drop(columns=[target_col_name])
 
                 # Pivot the table now and adjust the column names.
                 pivoted = small.reset_index().pivot_table(index='traj_id', columns='Columns')
@@ -178,7 +178,7 @@ class Statistics:
 
                     # Get the target value out and drop the target column.
                     target = small[target_col_name].iloc[0]
-                    small = small.drop(columns=['Species'])
+                    small = small.drop(columns=[target_col_name])
 
                     # Pivot the table now and adjust the column names.
                     pivoted = small.reset_index().pivot_table(index=['traj_id', 'seg_id'], columns='Columns')

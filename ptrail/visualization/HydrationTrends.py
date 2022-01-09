@@ -166,9 +166,9 @@ class HydrationTrends:
 
         new_species = []
         for i in range(len(dataset)):
-            if dataset['Species'].iloc[i] == 'D':
+            if dataset['Species'].iloc[i] == 0:
                 new_species.append('Deer')
-            elif dataset['Species'].iloc[i] == 'E':
+            elif dataset['Species'].iloc[i] == 1:
                 new_species.append('Elk')
             else:
                 new_species.append('Cattle')

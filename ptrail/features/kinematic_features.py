@@ -458,7 +458,6 @@ class KinematicFeatures:
                                    traj_id='traj_id',
                                    latitude='lat',
                                    longitude='lon')
-
         except KeyError:
             # If the Distance_prev_to_curr column is not present in the Dataframe and a KeyError
             # is thrown, then catch it and the overridden behaviour is as follows:
