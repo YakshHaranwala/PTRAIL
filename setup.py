@@ -16,7 +16,8 @@ REQUIRED_PKGS = ['numpy >= 1.20',
                  'ipywidgets >= 7.6.5',
                  'plotly >= 5.3.1',
                  'matplotlib >= 3.3.4',
-                 'seaborn >= 0.11.2'
+                 'seaborn >= 0.11.2',
+                 'PyQt5'
                  ]
 
 setup(
