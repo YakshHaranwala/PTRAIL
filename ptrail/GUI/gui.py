@@ -153,12 +153,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.MapPane.setContentsMargins(0, 0, 0, 0)
         self.MapPane.setObjectName("MapPane")
 
-        # Add a frame to the pane and add a sample label to it.
-        # map_frame = QtWidgets.QFrame()
-        # map_frame.setGeometry(1, 1, 509, 519)
-        # map_frame.setFrameStyle(QtWidgets.QFrame.Panel)
-        # self.MapPane.addWidget(map_frame)
-
         label = QtWidgets.QLabel()
         label.setText("Map will go here.")
         self.MapPane.addWidget(label)
