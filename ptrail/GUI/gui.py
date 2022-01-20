@@ -88,15 +88,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Create the layout manager and set the size of the pane.
         self.dflayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.dflayoutmanager.setGeometry(QtCore.QRect(0, 520, 761, 231))
+        self.dflayoutmanager.setGeometry(QtCore.QRect(0, 520, 756, 236))
         self.dflayoutmanager.setObjectName("verticalLayoutWidget")
         self.DFPane = QtWidgets.QVBoxLayout(self.dflayoutmanager)
         self.DFPane.setContentsMargins(0, 0, 0, 0)
         self.DFPane.setObjectName("DFPane")
-
-        file_name = QtWidgets.QLabel()
-        file_name.setText("The dataframe will be displayed here.")
-        self.DFPane.addWidget(file_name)
 
     def setup_stats_palette(self):
         """
