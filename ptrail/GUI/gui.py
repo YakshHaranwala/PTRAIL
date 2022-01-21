@@ -88,7 +88,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Create the layout manager and set the size of the pane.
         self.dflayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.dflayoutmanager.setGeometry(QtCore.QRect(0, 520, 756, 236))
+        self.dflayoutmanager.setGeometry(QtCore.QRect(0, 525, 761, 231))
         self.dflayoutmanager.setObjectName("verticalLayoutWidget")
         self.DFPane = QtWidgets.QVBoxLayout(self.dflayoutmanager)
         self.DFPane.setContentsMargins(0, 0, 0, 0)
@@ -104,7 +104,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Create the layout manager and set the size of the pane.
         self.statslayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.statslayoutmanager.setGeometry(QtCore.QRect(760, 0, 361, 751))
+        self.statslayoutmanager.setGeometry(QtCore.QRect(765, 0, 361, 751))
         self.statslayoutmanager.setObjectName("gridLayoutWidget")
         self.StatsPane = QtWidgets.QGridLayout(self.statslayoutmanager)
         self.StatsPane.setContentsMargins(0, 0, 0, 0)
@@ -143,7 +143,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Add the layout manager and then finally set the size and shape.
         self.maplayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.maplayoutmanager.setGeometry(QtCore.QRect(250, 0, 511, 521))
+        self.maplayoutmanager.setGeometry(QtCore.QRect(255, 0, 511, 521))
         self.maplayoutmanager.setObjectName("gridLayoutWidget_2")
         self.MapPane = QtWidgets.QGridLayout(self.maplayoutmanager)
         self.MapPane.setContentsMargins(0, 0, 0, 0)

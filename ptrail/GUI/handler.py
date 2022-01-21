@@ -7,7 +7,11 @@
 """
 import pandas as pd
 from PyQt5 import QtWidgets
+
 from ptrail.GUI.Table import TableModel
+from ptrail.GUI.InputDialog import InputDialog
+
+from ptrail.core.TrajectoryDF import PTRAILDataFrame
 
 
 class GuiHandler:
@@ -31,11 +35,22 @@ class GuiHandler:
             # remove the item from layout
             self._window.DFPane.removeItem(item)
 
-        # Assign the dataframe.
-        self._data = pd.read_csv(filename)
+        # Create the input dialog item.
+        input_dialog = InputDialog(parent=self._window,
+                                   labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
+                                   title='Enter the column names: ')
 
-        # Set the table model and display the dataframe.
-        self._table = QtWidgets.QTableView()
-        self._model = TableModel(self._data)
-        self._table.setModel(self._model)
-        self._window.DFPane.addWidget(self._table)
+        # Get the input before displaying the dataframe.
+        if input_dialog.exec():
+            col_names = input_dialog.getInputs()
+
+            self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
+                                         traj_id=col_names[0],
+                                         datetime=col_names[1],
+                                         latitude=col_names[2],
+                                         longitude=col_names[3])
+            # Set the table model and display the dataframe.
+            self._table = QtWidgets.QTableView()
+            self._model = TableModel(self._data.reset_index(inplace=False))
+            self._table.setModel(self._model)
+            self._window.DFPane.addWidget(self._table)

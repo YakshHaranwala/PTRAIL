@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
         super(TableModel, self).__init__()
-        self._data = data.head()
+        self._data = data
 
     def headerData(self, section, orientation, role=QtCore.Qt.DisplayRole):
         if role != QtCore.Qt.DisplayRole:
