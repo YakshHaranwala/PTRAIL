@@ -6,7 +6,7 @@
     | Author: Yaksh J Haranwala
 """
 
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui, QtWebEngineWidgets
 import sys
 from ptrail.GUI.handler import GuiHandler
 
@@ -29,6 +29,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # MapPane variables.
         self.maplayoutmanager = None
         self.MapPane = None
+        self.map = None
+
 
         # CommandPalette variables
         self.cmdlayoutmanager = None
@@ -149,9 +151,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.MapPane.setContentsMargins(0, 0, 0, 0)
         self.MapPane.setObjectName("MapPane")
 
-        label = QtWidgets.QLabel()
-        label.setText("Map will go here.")
-        self.MapPane.addWidget(label)
+        self.map = QtWebEngineWidgets.QWebEngineView()
+        self.MapPane.addWidget(self.map)
+
 
     def setup_menubar(self):
         """
