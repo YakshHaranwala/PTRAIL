@@ -5,11 +5,10 @@
 
     | Authors: Yaksh J Haranwala
 """
-import io
 import random
 import folium
 import pandas as pd
-from PyQt5 import QtWidgets, QtWebEngineWidgets
+from PyQt5 import QtWidgets
 
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
@@ -40,41 +39,50 @@ class GuiHandler:
             -------
                 None
         """
-        # First, we clear out the DF pane area.
-        # This is done in order to make sure that 2 dataframes
-        # are not loaded simultaneously making the view cluttered.
-        for i in reversed(range(self._window.DFPane.count())):
-            item = self._window.DFPane.itemAt(i)
-            if isinstance(item, QtWidgets.QTableView):
-                item.widget().close()
+        try:
+            # First, we clear out the DF pane area.
+            # This is done in order to make sure that 2 dataframes
+            # are not loaded simultaneously making the view cluttered.
+            for i in reversed(range(self._window.DFPane.count())):
+                item = self._window.DFPane.itemAt(i)
+                if isinstance(item, QtWidgets.QTableView):
+                    item.widget().close()
 
-            # remove the item from layout
-            self._window.DFPane.removeItem(item)
+                # remove the item from layout
+                self._window.DFPane.removeItem(item)
 
-        # Create the input dialog item.
-        input_dialog = InputDialog(parent=self._window,
-                                   labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
-                                   title='Enter the column names: ')
+            # Create the input dialog item.
+            input_dialog = InputDialog(parent=self._window,
+                                       labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
+                                       title='Enter the column names: ')
 
-        # Get the input before displaying the dataframe.
-        if input_dialog.exec():
-            # Get the column names.
-            col_names = input_dialog.getInputs()
+            # Get the input before displaying the dataframe.
+            if input_dialog.exec():
+                # Get the column names.
+                col_names = input_dialog.getInputs()
 
-            # Read the data into a PTRAIL datafram
-            self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
-                                         traj_id=col_names[0],
-                                         datetime=col_names[1],
-                                         latitude=col_names[2],
-                                         longitude=col_names[3])
-            # Set the table model and display the dataframe.
-            self._table = QtWidgets.QTableView()
+                # Read the data into a PTRAIL datafram
+                self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
+                                             traj_id=col_names[0],
+                                             datetime=col_names[1],
+                                             latitude=col_names[2],
+                                             longitude=col_names[3])
+                # Set the table model and display the dataframe.
+                self._table = QtWidgets.QTableView()
 
-            # NOTE: whenever we update DFs, make sure to send the data after resetting
-            #       index and setting inplace as False.
-            self._model = TableModel(self._data.reset_index(inplace=False))
-            self._table.setModel(self._model)
-            self._window.DFPane.addWidget(self._table)
+                # NOTE: whenever we update DFs, make sure to send the data after resetting
+                #       index and setting inplace as False.
+                self._model = TableModel(self._data.reset_index(inplace=False))
+                self._table.setModel(self._model)
+                self._window.DFPane.addWidget(self._table)
+        except AttributeError:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setWindowTitle("Incorrect Column names")
+            msg.setText("Incorrect Column names provided.\n"
+                        "Please Enter the names again.")
+            msg.exec()
+            self.__init__(filename, self._window)
 
     def add_map(self, weight: float = 3, opacity: float = 0.8):
         """
@@ -110,25 +118,35 @@ class GuiHandler:
             locations = []
             for j in range(len(small_df)):
                 locations.append((small_df['lat'].iloc[j], small_df['lon'].iloc[j]))
-            #
-            # Create popup text for the
+
+
+            # Create text frame.
+            iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {ids_[i]} ' + '<br>' +
+                                   f'Latitude: {locations[0][0]}' + '<br>' +
+                                   f'Longitude: {locations[0][1]} </font>')
 
             # Create start and end markers for the trajectory.
+            popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
+
             folium.Marker([small_df['lat'].iloc[0], small_df['lon'].iloc[0]],
                           color='green',
-                          popup=f'Trajectory ID: {ids_[i]} \n'
-                                f'Latitude: {locations[0][0]} \n'
-                                f'Longitude: {locations[0][1]}',
+                          popup=popup,
                           marker_color='green',
-                          icon=folium.Icon(icon_color='green', icon=None)).add_to(map_)
+                          icon=folium.Icon(icon_color='green', icon='circle', prefix='fa')).add_to(map_)
+
+            # Create text frame.
+            iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {ids_[i]} ' + '<br>' +
+                                   f'Latitude: {locations[0][0]}' + '<br>' +
+                                   f'Longitude: {locations[0][1]} </font>')
+
+            # Create start and end markers for the trajectory.
+            popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
 
             folium.Marker([small_df['lat'].iloc[-1], small_df['lon'].iloc[-1]],
                           color='green',
-                          popup=f'Trajectory ID: {ids_[i]} \n'
-                                f'Latitude: {locations[-1][0]} \n'
-                                f'Longitude: {locations[-1][1]}',
+                          popup=popup,
                           marker_color='red',
-                          icon=folium.Icon(icon_color='red', icon=None)).add_to(map_)
+                          icon=folium.Icon(icon_color='red', icon='circle', prefix='fa')).add_to(map_)
 
             # Add trajectory to map.
             # folium.PolyLine(locations,
@@ -137,7 +155,4 @@ class GuiHandler:
             #                 opacity=opacity,).add_to(map_)
 
         map_.fit_bounds([sw, ne])
-
-        data = io.BytesIO()
-        map_.save(data, close_file=False)
-        self._window.map.setHtml(data.getvalue().decode())
+        self._window.map.setHtml(map_.get_root().render())
