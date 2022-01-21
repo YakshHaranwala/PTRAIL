@@ -1,4 +1,9 @@
-from typing import Any
+"""
+    This python module is the abstract definition of the Table view
+    for viewing the dataframe inside the GUI.
+
+    | Authors: Yaksh J Haranwala
+"""
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -24,6 +29,7 @@ class TableModel(QtCore.QAbstractTableModel):
             except (IndexError,):
                 return QtCore.QVariant()
 
+    #
     def data(self, index, role=Qt.DisplayRole):
         if index.isValid():
             if role == Qt.DisplayRole:

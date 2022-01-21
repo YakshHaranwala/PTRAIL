@@ -3,14 +3,13 @@
     backend. All the GUI's functionalities are handled in this
     class.
 
-    | Authors: Yaksh J Haranwala, Salman Haidri
+    | Authors: Yaksh J Haranwala
 """
 import pandas as pd
 from PyQt5 import QtWidgets
 
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
-
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 
 
@@ -42,8 +41,10 @@ class GuiHandler:
 
         # Get the input before displaying the dataframe.
         if input_dialog.exec():
+            # Get the column names.
             col_names = input_dialog.getInputs()
 
+            # Read the data into a PTRAIL datafram
             self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
                                          traj_id=col_names[0],
                                          datetime=col_names[1],
@@ -51,6 +52,9 @@ class GuiHandler:
                                          longitude=col_names[3])
             # Set the table model and display the dataframe.
             self._table = QtWidgets.QTableView()
+
+            # NOTE: whenever we update DFs, make sure to send the data after resetting
+            #       index and setting inplace as False.
             self._model = TableModel(self._data.reset_index(inplace=False))
             self._table.setModel(self._model)
             self._window.DFPane.addWidget(self._table)

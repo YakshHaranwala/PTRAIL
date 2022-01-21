@@ -1,6 +1,11 @@
-from typing import List
+"""
+    This class is an abstraction that can be used to create
+    input dialog boxes for virtually any number of inputs.
 
-from PyQt5 import QtWidgets, QtCore
+    | Authors: Yaksh J Haranwala
+"""
+from typing import List
+from PyQt5 import QtWidgets
 
 
 class InputDialog(QtWidgets.QDialog):
