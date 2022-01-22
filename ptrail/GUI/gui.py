@@ -15,6 +15,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, OuterWindow):
         super(Ui_MainWindow, self).__init__()
         # Main Window variables.
+        self.vlayout = None
         self.centralwidget = None
 
         # MenuBar variables
@@ -31,15 +32,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.MapPane = None
         self.map = None
 
-
         # CommandPalette variables
         self.cmdlayoutmanager = None
         self.CommandPalette = None
-        self.kinematic_list = None
-        self.temporal_list = None
-        self.semantic_list = None
-        self.ip_list = None
-        self.stats_list = None
+        self.feature_type = None
+        self.listWidget = None
         self.run_stats_btn = None
 
         # StatsPane variables.
@@ -64,8 +61,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         OuterWindow.setObjectName("OuterWindow")
         OuterWindow.resize(1125, 776)
+        
         self.centralwidget = QtWidgets.QWidget(OuterWindow)
-        self.centralwidget.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.vlayout = QtWidgets.QGridLayout(self.centralwidget)
         self.centralwidget.setObjectName("centralwidget")
 
         self.setup_menubar()
@@ -75,8 +73,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setup_df_pane()
         self.retranslateUi(OuterWindow)
 
-        OuterWindow.setMaximumSize(QtCore.QSize(1125, 776))
-        OuterWindow.setMinimumSize(QtCore.QSize(1125, 776))
         OuterWindow.setCentralWidget(self.centralwidget)
         QtCore.QMetaObject.connectSlotsByName(OuterWindow)
 
@@ -90,11 +86,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Create the layout manager and set the size of the pane.
         self.dflayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.dflayoutmanager.setGeometry(QtCore.QRect(0, 525, 761, 231))
         self.dflayoutmanager.setObjectName("verticalLayoutWidget")
         self.DFPane = QtWidgets.QVBoxLayout(self.dflayoutmanager)
         self.DFPane.setContentsMargins(0, 0, 0, 0)
         self.DFPane.setObjectName("DFPane")
+        self.vlayout.addWidget(self.dflayoutmanager, 3, 0)
 
     def setup_stats_palette(self):
         """
@@ -106,8 +102,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Create the layout manager and set the size of the pane.
         self.statslayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.statslayoutmanager.setGeometry(QtCore.QRect(765, 0, 361, 751))
         self.statslayoutmanager.setObjectName("gridLayoutWidget")
+        self.statslayoutmanager.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.StatsPane = QtWidgets.QGridLayout(self.statslayoutmanager)
         self.StatsPane.setContentsMargins(0, 0, 0, 0)
         self.StatsPane.setObjectName("StatsPane")
@@ -117,23 +113,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         stat_label.setText("Statistics ")
         self.StatsPane.addWidget(stat_label)
 
-    def setup_command_palette(self):
-        """
-            Set up the pane that displays the command palette.
-
-            Returns
-            -------
-                None
-        """
-        # Create the layout manager and set the size of the pane.
-        self.cmdlayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.cmdlayoutmanager.setGeometry(QtCore.QRect(0, 0, 251, 521))
-        self.cmdlayoutmanager.setObjectName("verticalLayoutWidget_2")
-        self.CommandPalette = QtWidgets.QVBoxLayout(self.cmdlayoutmanager)
-        self.CommandPalette.setContentsMargins(0, 0, 0, 0)
-        self.CommandPalette.setObjectName("CommandPalette")
-
-        self.command_palette_boxes()
+        self.vlayout.addWidget(self.statslayoutmanager, 0, 3)
 
     def setup_map_pane(self):
         """
@@ -145,7 +125,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Add the layout manager and then finally set the size and shape.
         self.maplayoutmanager = QtWidgets.QWidget(self.centralwidget)
-        self.maplayoutmanager.setGeometry(QtCore.QRect(255, 0, 511, 521))
         self.maplayoutmanager.setObjectName("gridLayoutWidget_2")
         self.MapPane = QtWidgets.QGridLayout(self.maplayoutmanager)
         self.MapPane.setContentsMargins(0, 0, 0, 0)
@@ -154,6 +133,111 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.map = QtWebEngineWidgets.QWebEngineView()
         self.MapPane.addWidget(self.map)
 
+        self.vlayout.addWidget(self.maplayoutmanager, 0, 1)
+
+    def setup_command_palette(self):
+        """
+            Set up the pane that displays the command palette.
+
+            Returns
+            -------
+                None
+        """
+        # Create the layout manager and set the size of the pane.
+        self.cmdlayoutmanager = QtWidgets.QWidget(self.centralwidget)
+        self.cmdlayoutmanager.setObjectName("verticalLayoutWidget_2")
+        self.CommandPalette = QtWidgets.QVBoxLayout(self.cmdlayoutmanager)
+        self.CommandPalette.setContentsMargins(0, 0, 0, 0)
+        self.CommandPalette.setObjectName("CommandPalette")
+
+        label = QtWidgets.QLabel()
+        label.setText("Command Palette")
+        label.setAlignment(QtCore.Qt.AlignCenter)
+        label.setFont(QtGui.QFont('Times font', 14))
+        self.CommandPalette.addWidget(label)
+
+        line = QtWidgets.QFrame()
+        line.setFrameShape(QtWidgets.QFrame.HLine)
+        self.CommandPalette.addWidget(line)
+
+        # ---------------------------------------------------------------------------------- #
+        # Declare the list containing the features and then individual lists of all features.
+        feature_types = [
+            'Kinematic Features', 'Temporal Features', 'Semantic Features', 'Interpolation', 'Statistics'
+        ]
+
+        # ------------------- Feature Selection List ---------------------- #
+        self.feature_type = QtWidgets.QComboBox()
+        self.feature_type.addItems(sorted(feature_types))
+        self.feature_type.setFont(QtGui.QFont('Times font', 12))
+        self.feature_type.currentIndexChanged.connect(self.add_tree_options)
+        self.CommandPalette.addWidget(self.feature_type)
+
+        # ------------------- Multi Selection Widget ----------------------#
+        self.listWidget = QtWidgets.QListWidget()
+        self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        ip_features = [
+            'Linear Interpolation', 'Cubic Interpolation', 'Kinematic Interpolation',
+            'Random-Walk Interpolation'
+        ]
+        self.listWidget.addItems(ip_features)
+        self.listWidget.setFont(QtGui.QFont("Times Font", 11))
+        self.CommandPalette.addWidget(self.listWidget)
+
+        # ------------- Add the run commands button. --------------------- #
+        self.run_stats_btn = QtWidgets.QPushButton("Run")
+        self.run_stats_btn.toggle()
+        self.run_stats_btn.setFont(QtGui.QFont('Times font', 12))
+        self.CommandPalette.addWidget(self.run_stats_btn)
+
+        self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0)
+
+    def add_tree_options(self):
+        ip_features = [
+            'Linear Interpolation', 'Cubic Interpolation', 'Kinematic Interpolation',
+            'Random-Walk Interpolation'
+        ]
+
+        kinematic_features = [
+            'All Kinematic Features', 'Bounding Box', 'Start Location', 'End Location',
+            'Distance', 'Distance from Start', 'Distance travelled by date and trajectory Id',
+            'Point within Range', 'Distance from Co-ordinates',
+            'Speed', 'Acceleration', 'Jerk', 'Bearing', 'Bearing Rate',
+            'Rate of Bearing Rate', 'Distance Travelled by traj Id', 'Number of Unique locations',
+        ]
+
+        semantic_features = [
+            'Visited Location', 'Visited POI', 'Trajectories Inside Polygon',
+            'Trajectories Intersect Inside Polygon', 'Nearest POI'
+        ]
+
+        stat_features = [
+            'Segment Trajectories', 'Generate Kinematic Statistics',
+            'Pivot Statistics DF'
+        ]
+
+        temporal_features = [
+            'All Temporal Features', 'Date', 'Time', 'Day of the Week',
+            'Weekend Indicator', 'Time of Day', 'Trajectory Duration', 'Start Time(s)',
+            'End Time(s)'
+        ]
+
+        self.listWidget.clear()
+
+        # Change the options of the list as per the current
+        # feature selection.
+        if self.feature_type.currentIndex() == 0:
+            self.listWidget.addItems(ip_features)
+        elif self.feature_type.currentIndex() == 1:
+            self.listWidget.addItems(kinematic_features)
+        elif self.feature_type.currentIndex() == 2:
+            self.listWidget.addItems(semantic_features)
+        elif self.feature_type.currentIndex() == 3:
+            self.listWidget.addItems(stat_features)
+        else:
+            self.listWidget.addItems(temporal_features)
+
+        self.listWidget.setFont(QtGui.QFont('Times font', 12))
 
     def setup_menubar(self):
         """
@@ -165,7 +249,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         # Create the Menu Bar.
         self.MenuBar = QtWidgets.QMenuBar(self.OuterWindow)
-        self.MenuBar.setGeometry(QtCore.QRect(0, 0, 1125, 23))
         self.MenuBar.setObjectName("MenuBar")
 
         # Create the File Menu.
@@ -252,86 +335,3 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SaveButton.setText(_translate("OuterWindow", "Save"))
         self.QuitButton.setText(_translate("OuterWindow", "Quit"))
         self.VersionInfoButton.setText(_translate("OuterWindow", "Version Info"))
-
-    def command_palette_boxes(self):
-        label = QtWidgets.QLabel()
-        label.setText("Command Palette")
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        label.setFont(QtGui.QFont('Times font', 14))
-        self.CommandPalette.addWidget(label)
-
-        line = QtWidgets.QFrame()
-        line.setFrameShape(QtWidgets.QFrame.HLine)
-        self.CommandPalette.addWidget(line)
-
-        # ------------- Create the kinematic Features drop down menu. --------------------- #
-        self.kinematic_list = QtWidgets.QComboBox()
-        kinematic_features = [
-            'All Kinematic Features', 'Bounding Box', 'Start Location', 'End Location',
-            'Distance', 'Distance from Start', 'Distance travelled by date and trajectory Id',
-            'Point within Range', 'Distance from Co-ordinates',
-            'Speed', 'Acceleration', 'Jerk', 'Bearing', 'Bearing Rate',
-            'Rate of Bearing Rate', 'Distance Travelled by traj Id', 'Number of Unique locations',
-        ]
-        self.kinematic_list.addItems(kinematic_features)
-        label1 = QtWidgets.QLabel()
-        label1.setText("Kinematic Features")
-        label1.setAlignment(QtCore.Qt.AlignCenter)
-        self.CommandPalette.addWidget(label1)
-        self.CommandPalette.addWidget(self.kinematic_list)
-
-        # ------------- Create the Temporal Features drop down menu. --------------------- #
-        self.temporal_list = QtWidgets.QComboBox()
-        temporal_features = [
-            'All Temporal Features', 'Date', 'Time', 'Day of the Week',
-            'Weekend Indicator', 'Time of Day', 'Trajectory Duration', 'Start Time(s)',
-            'End Times'
-        ]
-        self.temporal_list.addItems(temporal_features)
-        label2 = QtWidgets.QLabel()
-        label2.setText("Temporal Features")
-        label2.setAlignment(QtCore.Qt.AlignCenter)
-        self.CommandPalette.addWidget(label2)
-        self.CommandPalette.addWidget(self.temporal_list)
-
-        # ------------- Create the Semantic Features drop down menu. --------------------- #
-        self.semantic_list = QtWidgets.QComboBox()
-        semantic_features = [
-            'Visited Location', 'Visited POI', 'Trajectories Inside Polygon',
-            'Trajectories Intersect Inside Polygon', 'Nearest POI'
-        ]
-        self.semantic_list.addItems(semantic_features)
-        label3 = QtWidgets.QLabel()
-        label3.setText("Semantic Features")
-        label3.setAlignment(QtCore.Qt.AlignCenter)
-        self.CommandPalette.addWidget(label3)
-        self.CommandPalette.addWidget(self.semantic_list)
-
-        # ------------- Create the Semantic Features drop down menu. --------------------- #
-        self.ip_list = QtWidgets.QComboBox()
-        ip_features = [
-            'Linear Interpolation', 'Cubic Interpolation', 'Kinematic Interpolation',
-            'Random-Walk Interpolation'
-        ]
-        self.ip_list.addItems(ip_features)
-        label4 = QtWidgets.QLabel("Interpolation")
-        label4.setAlignment(QtCore.Qt.AlignCenter)
-        self.CommandPalette.addWidget(label4)
-        self.CommandPalette.addWidget(self.ip_list)
-
-        # ------------- Create the Semantic Features drop down menu. --------------------- #
-        self.stats_list = QtWidgets.QComboBox()
-        stat_features = [
-            'Segment Trajectories', 'Generate Kinematic Statistics',
-            'Pivot Statistics DF'
-        ]
-        self.stats_list.addItems(stat_features)
-        label5 = QtWidgets.QLabel("Statistical Features")
-        label5.setAlignment(QtCore.Qt.AlignCenter)
-        self.CommandPalette.addWidget(label5)
-        self.CommandPalette.addWidget(self.stats_list)
-
-        # ------------- Add the run commands button. --------------------- #
-        self.run_stats_btn = QtWidgets.QPushButton("Run Commands")
-        self.run_stats_btn.toggle()
-        self.CommandPalette.addWidget(self.run_stats_btn)
