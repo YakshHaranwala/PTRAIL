@@ -8,6 +8,9 @@
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtWebEngineWidgets
 import sys
+
+from PyQt5.QtWidgets import QListView, QSizePolicy
+
 from ptrail.GUI.handler import GuiHandler
 
 
@@ -61,15 +64,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         """
         OuterWindow.setObjectName("OuterWindow")
         OuterWindow.resize(1125, 776)
-        
+
         self.centralwidget = QtWidgets.QWidget(OuterWindow)
         self.vlayout = QtWidgets.QGridLayout(self.centralwidget)
         self.centralwidget.setObjectName("centralwidget")
 
         self.setup_menubar()
-        self.setup_map_pane()
         self.setup_command_palette()
         self.setup_stats_palette()
+        self.setup_map_pane()
         self.setup_df_pane()
         self.retranslateUi(OuterWindow)
 
@@ -149,16 +152,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.CommandPalette.setContentsMargins(0, 0, 0, 0)
         self.CommandPalette.setObjectName("CommandPalette")
 
-        label = QtWidgets.QLabel()
-        label.setText("Command Palette")
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        label.setFont(QtGui.QFont('Times font', 14))
-        self.CommandPalette.addWidget(label)
-
-        line = QtWidgets.QFrame()
-        line.setFrameShape(QtWidgets.QFrame.HLine)
-        self.CommandPalette.addWidget(line)
-
         # ---------------------------------------------------------------------------------- #
         # Declare the list containing the features and then individual lists of all features.
         feature_types = [
@@ -175,12 +168,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # ------------------- Multi Selection Widget ----------------------#
         self.listWidget = QtWidgets.QListWidget()
         self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.listWidget.setSizePolicy(QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored))
         ip_features = [
             'Linear Interpolation', 'Cubic Interpolation', 'Kinematic Interpolation',
             'Random-Walk Interpolation'
         ]
         self.listWidget.addItems(ip_features)
         self.listWidget.setFont(QtGui.QFont("Times Font", 11))
+        self.listWidget.setUniformItemSizes(True)
         self.CommandPalette.addWidget(self.listWidget)
 
         # ------------- Add the run commands button. --------------------- #
@@ -189,7 +184,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.run_stats_btn.setFont(QtGui.QFont('Times font', 12))
         self.CommandPalette.addWidget(self.run_stats_btn)
 
-        self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 1, -1)
+        self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 4, 1)
 
     def add_tree_options(self):
         ip_features = [
@@ -237,6 +232,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.listWidget.addItems(temporal_features)
 
         self.listWidget.setFont(QtGui.QFont('Times font', 12))
+        self.listWidget.setUniformItemSizes(True)
 
     def setup_menubar(self):
         """
@@ -303,7 +299,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # Limit the user to select only CSV files to load.
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()", "",
-                                                  ";csv Files (*.csv)", options=options)
+                                                            ";csv Files (*.csv)", options=options)
 
         # If the user selects a file, load it into a pandas dataframe and print its statistics.
         if fileName:
