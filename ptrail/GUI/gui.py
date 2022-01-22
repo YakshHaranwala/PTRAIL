@@ -90,7 +90,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.DFPane = QtWidgets.QVBoxLayout(self.dflayoutmanager)
         self.DFPane.setContentsMargins(0, 0, 0, 0)
         self.DFPane.setObjectName("DFPane")
-        self.vlayout.addWidget(self.dflayoutmanager, 3, 0)
+        self.vlayout.addWidget(self.dflayoutmanager, 3, 1, 1, 2)
 
     def setup_stats_palette(self):
         """
@@ -113,7 +113,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         stat_label.setText("Statistics ")
         self.StatsPane.addWidget(stat_label)
 
-        self.vlayout.addWidget(self.statslayoutmanager, 0, 3)
+        self.vlayout.addWidget(self.statslayoutmanager, 0, 3, 4, 1)
 
     def setup_map_pane(self):
         """
@@ -133,7 +133,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.map = QtWebEngineWidgets.QWebEngineView()
         self.MapPane.addWidget(self.map)
 
-        self.vlayout.addWidget(self.maplayoutmanager, 0, 1)
+        self.vlayout.addWidget(self.maplayoutmanager, 0, 1, 3, 2)
 
     def setup_command_palette(self):
         """
@@ -190,7 +190,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.run_stats_btn.setFont(QtGui.QFont('Times font', 12))
         self.CommandPalette.addWidget(self.run_stats_btn)
 
-        self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0)
+        self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 4, 1)
 
     def add_tree_options(self):
         ip_features = [
