@@ -103,7 +103,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Create the layout manager and set the size of the pane.
         self.statslayoutmanager = QtWidgets.QWidget(self.centralwidget)
         self.statslayoutmanager.setObjectName("gridLayoutWidget")
-        self.statslayoutmanager.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.StatsPane = QtWidgets.QGridLayout(self.statslayoutmanager)
         self.StatsPane.setContentsMargins(0, 0, 0, 0)
         self.StatsPane.setObjectName("StatsPane")
@@ -146,7 +145,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Create the layout manager and set the size of the pane.
         self.cmdlayoutmanager = QtWidgets.QWidget(self.centralwidget)
         self.cmdlayoutmanager.setObjectName("verticalLayoutWidget_2")
-        self.CommandPalette = QtWidgets.QVBoxLayout(self.cmdlayoutmanager)
+        self.CommandPalette = QtWidgets.QGridLayout(self.cmdlayoutmanager)
         self.CommandPalette.setContentsMargins(0, 0, 0, 0)
         self.CommandPalette.setObjectName("CommandPalette")
 
@@ -190,7 +189,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.run_stats_btn.setFont(QtGui.QFont('Times font', 12))
         self.CommandPalette.addWidget(self.run_stats_btn)
 
-        self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 4, 1)
+        self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 1, -1)
 
     def add_tree_options(self):
         ip_features = [
