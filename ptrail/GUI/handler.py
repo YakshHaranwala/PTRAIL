@@ -6,14 +6,24 @@
     | Authors: Yaksh J Haranwala
 """
 import random
-import folium
-import pandas as pd
-from PyQt5 import QtWidgets
+import re
 
+import folium
+
+import inspect
+import pandas as pd
+import ptrail.utilities.constants as const
+
+from PyQt5 import QtWidgets
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
-import ptrail.utilities.constants as const
+
+from ptrail.features.kinematic_features import KinematicFeatures
+from ptrail.features.temporal_features import TemporalFeatures
+from ptrail.features.semantic_features import SemanticFeatures
+from ptrail.preprocessing.statistics import Statistics
+from ptrail.preprocessing.filters import Filters
 
 
 class GuiHandler:
@@ -61,12 +71,12 @@ class GuiHandler:
                 # Get the column names.
                 col_names = input_dialog.getInputs()
 
-                # Read the data into a PTRAIL datafram
+                # Read the data into a PTRAIL dataframe.
                 self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
-                                             traj_id=col_names[0],
-                                             datetime=col_names[1],
-                                             latitude=col_names[2],
-                                             longitude=col_names[3])
+                                             traj_id=col_names[0].strip(),
+                                             datetime=col_names[1].strip(),
+                                             latitude=col_names[2].strip(),
+                                             longitude=col_names[3].strip())
                 # Set the table model and display the dataframe.
                 self._table = QtWidgets.QTableView()
 
@@ -75,6 +85,8 @@ class GuiHandler:
                 self._model = TableModel(self._data.reset_index(inplace=False))
                 self._table.setModel(self._model)
                 self._window.DFPane.addWidget(self._table)
+                self._window.run_stats_btn.setEnabled(True)
+
         except AttributeError:
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -156,3 +168,110 @@ class GuiHandler:
 
         map_.fit_bounds([sw, ne])
         self._window.map.setHtml(map_.get_root().render())
+
+    def run_command(self):
+        if self._window.feature_type.currentIndex() == 0:
+            self._run_filters()
+        elif self._window.feature_type.currentIndex() == 1:
+            self._run_ip()
+        elif self._window.feature_type.currentIndex() == 2:
+            self._run_kinematic()
+        elif self._window.feature_type.currentIndex() == 3:
+            self._run_stats()
+        else:
+            self._run_temporal()
+
+    def _run_ip(self):
+        pass
+
+    def _run_kinematic(self):
+        """
+            Here, we run the Kinematic features that the user selected
+            and then send the answers back.
+
+            Returns
+            -------
+                PTRAILDataFrame
+        """
+        selected_function = self._window.listWidget.selectedItems()[0].text()
+        print(selected_function)
+
+        # Based on the function selected by the user and whether it contains any
+        # user given parameters, we will go ahead and run those features and update
+        # the GUI with the results.
+
+        if selected_function == 'All Kinematic Features':
+            self._data = KinematicFeatures.generate_kinematic_features(self._data)
+
+        elif selected_function == 'Distance':
+            self._data = KinematicFeatures.create_distance_column(self._data)
+
+        elif selected_function == 'Distance from Start':
+            self._data = KinematicFeatures.create_distance_from_start_column(self._data)
+
+        elif selected_function == 'Point within Range':
+            params = inspect.getfullargspec(KinematicFeatures.create_point_within_range_column).args
+            params.remove('dataframe')
+            input_dialog = InputDialog(parent=self._window,
+                                       labels=params,
+                                       title='Enter parameters: ')
+            if input_dialog.exec_():
+                args = input_dialog.getInputs()
+
+                # Use Regex to get all the digits from the coords input and convert
+                # it to required tuple to feed into the method.
+                temp = re.findall(r'\d+', args[0])
+                coords = tuple(map(int, temp))
+
+                dist_range = float(args[1])
+                self._data = KinematicFeatures.create_point_within_range_column(self._data,
+                                                                                coordinates=coords,
+                                                                                dist_range=dist_range)
+        elif selected_function == 'Distance from Co-ordinates':
+            params = inspect.getfullargspec(KinematicFeatures.create_distance_from_point_column).args
+            params.remove('dataframe')
+            input_dialog = InputDialog(parent=self._window,
+                                       labels=params,
+                                       title='Enter parameters: ')
+            if input_dialog.exec_():
+                args = input_dialog.getInputs()
+
+                # Use Regex to get all the digits from the coords input and convert
+                # it to required tuple to feed into the method.
+                temp = re.findall(r'\d+', args[0])
+                coords = tuple(map(int, temp))
+
+                self._data = KinematicFeatures.create_distance_from_point_column(dataframe=self._data,
+                                                                                 coordinates=coords,)
+
+        elif selected_function == 'Speed':
+            self._data = KinematicFeatures.create_speed_column(self._data)
+
+        elif selected_function == 'Acceleration':
+            self._data = KinematicFeatures.create_acceleration_column(self._data)
+
+        elif selected_function == 'Jerk':
+            self._data = KinematicFeatures.create_jerk_column(self._data)
+
+        elif selected_function == 'Bearing':
+            self._data = KinematicFeatures.create_bearing_column(self._data)
+
+        elif selected_function == 'Bearing Rate':
+            self._data = KinematicFeatures.create_bearing_rate_column(self._data)
+
+        elif selected_function == 'Rate of Bearing Rate':
+            self._data = KinematicFeatures.create_rate_of_br_column(self._data)
+
+        # Finally, update the GUI with the updated DF received from the
+        # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._model = TableModel(self._data.reset_index(inplace=False))
+        self._table.setModel(self._model)
+
+    def _run_temporal(self):
+        pass
+
+    def _run_filters(self):
+        pass
+
+    def _run_stats(self):
+        pass

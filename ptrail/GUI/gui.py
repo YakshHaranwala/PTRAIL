@@ -155,7 +155,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # ---------------------------------------------------------------------------------- #
         # Declare the list containing the features and then individual lists of all features.
         feature_types = [
-            'Kinematic Features', 'Temporal Features', 'Semantic Features', 'Interpolation', 'Statistics'
+            'Kinematic Features', 'Temporal Features', 'Filtering', 'Interpolation', 'Statistics'
         ]
 
         # ------------------- Feature Selection List ---------------------- #
@@ -167,13 +167,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # ------------------- Multi Selection Widget ----------------------#
         self.listWidget = QtWidgets.QListWidget()
-        self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        # self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.listWidget.setSizePolicy(QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored))
-        ip_features = [
-            'Linear Interpolation', 'Cubic Interpolation', 'Kinematic Interpolation',
-            'Random-Walk Interpolation'
+        filt_features = [
+            'Hampel Filter', 'Remove Duplicates', 'By Trajectory ID', 'By Bounding Box', 'By Date',
+            'By DateTime', 'By Maximum Speed', 'By Minimum Speed', 'By Minimum Consecutive Distance',
+            'By Maximum Consecutive Distance', 'By Maximum Distance and Speed', 'By Minimum Distance and Speed',
+            'Remove Outliers by Consecutive Distance', 'Remove Outliers by Consecutive Speed',
+            'Remove Trajectories with Less Points',
         ]
-        self.listWidget.addItems(ip_features)
+
+        self.listWidget.addItems(filt_features)
         self.listWidget.setFont(QtGui.QFont('Tahoma', 12))
         self.listWidget.setUniformItemSizes(True)
         self.CommandPalette.addWidget(self.listWidget)
@@ -182,6 +186,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.run_stats_btn = QtWidgets.QPushButton("Run")
         self.run_stats_btn.toggle()
         self.run_stats_btn.setFont(QtGui.QFont('Tahoma', 12))
+        self.run_stats_btn.setEnabled(False)
+        self.run_stats_btn.clicked.connect(lambda: self.handler.run_command())
         self.CommandPalette.addWidget(self.run_stats_btn)
 
         self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 4, 1)
@@ -193,16 +199,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ]
 
         kinematic_features = [
-            'All Kinematic Features', 'Bounding Box', 'Start Location', 'End Location',
-            'Distance', 'Distance from Start', 'Distance travelled by date and trajectory Id',
-            'Point within Range', 'Distance from Co-ordinates',
-            'Speed', 'Acceleration', 'Jerk', 'Bearing', 'Bearing Rate',
-            'Rate of Bearing Rate', 'Distance Travelled by traj Id', 'Number of Unique locations',
+            'All Kinematic Features', 'Distance', 'Distance from Start', 'Point within Range',
+            'Distance from Co-ordinates', 'Speed', 'Acceleration', 'Jerk', 'Bearing', 'Bearing Rate',
+            'Rate of Bearing Rate',
         ]
 
-        semantic_features = [
-            'Visited Location', 'Visited POI', 'Trajectories Inside Polygon',
-            'Trajectories Intersect Inside Polygon', 'Nearest POI'
+        filt_features = [
+            'Hampel Filter', 'Remove Duplicates', 'By Trajectory ID', 'By Bounding Box', 'By Date',
+            'By DateTime', 'By Maximum Speed', 'By Minimum Speed', 'By Minimum Consecutive Distance',
+            'By Maximum Consecutive Distance', 'By Maximum Distance and Speed', 'By Minimum Distance and Speed',
+            'Remove Outliers by Consecutive Distance', 'Remove Outliers by Consecutive Speed',
+            'Remove Trajectories with Less Points',
         ]
 
         stat_features = [
@@ -211,9 +218,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         ]
 
         temporal_features = [
-            'All Temporal Features', 'Date', 'Time', 'Day of the Week',
-            'Weekend Indicator', 'Time of Day', 'Trajectory Duration', 'Start Time(s)',
-            'End Time(s)'
+            'All Temporal Features', 'Date', 'Time',
+            'Day of the Week', 'Weekend Indicator', 'Time of Day',
         ]
 
         self.listWidget.clear()
@@ -221,11 +227,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Change the options of the list as per the current
         # feature selection.
         if self.feature_type.currentIndex() == 0:
-            self.listWidget.addItems(ip_features)
+            self.listWidget.addItems(filt_features)
         elif self.feature_type.currentIndex() == 1:
-            self.listWidget.addItems(kinematic_features)
+            self.listWidget.addItems(ip_features)
         elif self.feature_type.currentIndex() == 2:
-            self.listWidget.addItems(semantic_features)
+            self.listWidget.addItems(kinematic_features)
         elif self.feature_type.currentIndex() == 3:
             self.listWidget.addItems(stat_features)
         else:
