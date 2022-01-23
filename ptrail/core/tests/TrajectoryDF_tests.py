@@ -10,7 +10,7 @@ from typing import Text
 
 
 class TestPTRAILDF(unittest.TestCase):
-    _pdf_data = pd.read_csv('examples/data/gulls.csv')
+    _pdf_data = pd.read_csv('examples/data/seagulls.csv')
 
     _list_data = [
         [39.984094, 116.319236, '2008-10-23 05:53:05', 1],

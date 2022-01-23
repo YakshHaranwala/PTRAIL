@@ -1,7 +1,6 @@
 import unittest
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.preprocessing.filters import Filters
-from ptrail.utilities.conversions import Conversions as con
 from ptrail.features.temporal_features import TemporalFeatures
 from ptrail.features.kinematic_features import KinematicFeatures
 from ptrail.utilities.exceptions import *
@@ -9,14 +8,8 @@ from ptrail.preprocessing.helpers import Helpers
 import pandas as pd
 
 
-def _convert_to_datetime(row):
-    this_date = '{}-{}-{}'.format(str(row['Date'])[0:4], str(row['Date'])[4:6], str(row['Date'])[6:])
-    this_time = '{:02d}:{:02d}:00'.format(int(row['Time'] / 100), int(str(row['Time'])[-2:]))
-    return '{} {}'.format(this_date, this_time)
-
-
 class FiltersTest(unittest.TestCase):
-    _pdf_data = pd.read_csv('examples/data/gulls.csv')
+    _pdf_data = pd.read_csv('examples/data/seagulls.csv')
     _gulls = PTRAILDataFrame(data_set=_pdf_data,
                              latitude='location-lat',
                              longitude='location-long',
@@ -25,14 +18,11 @@ class FiltersTest(unittest.TestCase):
                              rest_of_columns=[])
 
     _atlantic = pd.read_csv('examples/data/atlantic_hurricanes.csv')
-    _atlantic = con.convert_directions_to_degree_lat_lon(_atlantic, 'Latitude', "Longitude")
-
-    _atlantic['DateTime'] = _atlantic.apply(_convert_to_datetime, axis=1)
     _atlantic = PTRAILDataFrame(_atlantic,
-                                latitude='Latitude',
-                                longitude='Longitude',
+                                latitude='lat',
+                                longitude='lon',
                                 datetime='DateTime',
-                                traj_id='ID',
+                                traj_id='traj_id',
                                 rest_of_columns=[])
 
     def test_remove_duplicates(self):
