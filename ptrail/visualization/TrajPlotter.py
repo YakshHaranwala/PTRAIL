@@ -59,7 +59,7 @@ class TrajectoryPlotter:
             to_select = dataset.loc[dataset.Species == 2, 'traj_id'].unique()
 
         # Create the multi select widget and return it.
-        ids_ = widgets.SelectMultiple(options=to_select, value=(to_select[0] if len(to_select) > 0 else tuple(to_select)),
+        ids_ = widgets.SelectMultiple(options=to_select, value=(to_select[0], ),
                                       description="Trajectory ID: ", disabled=False)
         return ids_
 
