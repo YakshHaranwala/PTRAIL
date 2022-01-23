@@ -24,7 +24,7 @@ class FiltersTest(unittest.TestCase):
                              traj_id='tag-local-identifier',
                              rest_of_columns=[])
 
-    _atlantic = pd.read_csv('examples/data/atlantic.csv')
+    _atlantic = pd.read_csv('examples/data/atlantic_hurricanes.csv')
     _atlantic = con.convert_directions_to_degree_lat_lon(_atlantic, 'Latitude', "Longitude")
 
     _atlantic['DateTime'] = _atlantic.apply(_convert_to_datetime, axis=1)

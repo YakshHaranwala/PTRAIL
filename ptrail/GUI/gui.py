@@ -9,7 +9,7 @@
 from PyQt5 import QtCore, QtWidgets, QtGui, QtWebEngineWidgets
 import sys
 
-from PyQt5.QtWidgets import QListView, QSizePolicy
+from PyQt5.QtWidgets import QSizePolicy
 
 from ptrail.GUI.handler import GuiHandler
 
@@ -161,7 +161,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # ------------------- Feature Selection List ---------------------- #
         self.feature_type = QtWidgets.QComboBox()
         self.feature_type.addItems(sorted(feature_types))
-        self.feature_type.setFont(QtGui.QFont('Times font', 12))
+        self.feature_type.setFont(QtGui.QFont('Tahoma', 12))
         self.feature_type.currentIndexChanged.connect(self.add_tree_options)
         self.CommandPalette.addWidget(self.feature_type)
 
@@ -174,14 +174,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'Random-Walk Interpolation'
         ]
         self.listWidget.addItems(ip_features)
-        self.listWidget.setFont(QtGui.QFont("Times Font", 11))
+        self.listWidget.setFont(QtGui.QFont('Tahoma', 12))
         self.listWidget.setUniformItemSizes(True)
         self.CommandPalette.addWidget(self.listWidget)
 
         # ------------- Add the run commands button. --------------------- #
         self.run_stats_btn = QtWidgets.QPushButton("Run")
         self.run_stats_btn.toggle()
-        self.run_stats_btn.setFont(QtGui.QFont('Times font', 12))
+        self.run_stats_btn.setFont(QtGui.QFont('Tahoma', 12))
         self.CommandPalette.addWidget(self.run_stats_btn)
 
         self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 4, 1)
@@ -231,7 +231,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         else:
             self.listWidget.addItems(temporal_features)
 
-        self.listWidget.setFont(QtGui.QFont('Times font', 12))
+        self.listWidget.setFont(QtGui.QFont('Tahoma', 12))
         self.listWidget.setUniformItemSizes(True)
 
     def setup_menubar(self):
