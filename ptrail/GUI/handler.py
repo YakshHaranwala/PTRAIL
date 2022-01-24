@@ -268,7 +268,37 @@ class GuiHandler:
         self._table.setModel(self._model)
 
     def _run_temporal(self):
-        pass
+        """
+            Execution of Temporal features according to user selection
+            and updating the GUI with the latest dataframe.
+
+            Returns
+            -------
+                PTRAILDataFrame
+        """
+        selected_function = self._window.listWidget.selectedItems()[0].text()
+        print(selected_function)
+
+        if selected_function == "All Temporal Features":
+            self._data = TemporalFeatures.generate_temporal_features(self._data)
+
+        elif selected_function == "Date":
+            self._data = TemporalFeatures.create_date_column(self._data)
+
+        elif selected_function == "Time":
+            self._data = TemporalFeatures.create_time_column(self._data)
+
+        elif selected_function == "Day of the Week":
+            self._data = TemporalFeatures.create_day_of_week_column(self._data)
+
+        elif selected_function == "Weekend Indicator":
+            self._data = TemporalFeatures.create_weekend_indicator_column(self._data)
+
+        elif selected_function == "Time of Day":
+            self._data = TemporalFeatures.create_time_of_day_column(self._data)
+
+        self._model = TableModel(self._data.reset_index(inplace=False))
+        self._table.setModel(self._model)
 
     def _run_filters(self):
         pass
