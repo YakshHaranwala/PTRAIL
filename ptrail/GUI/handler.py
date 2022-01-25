@@ -3,7 +3,7 @@
     backend. All the GUI's functionalities are handled in this
     class.
 
-    | Authors: Yaksh J Haranwala
+    | Authors: Yaksh J Haranwala, Salman Haidri
 """
 import random
 import re
@@ -21,9 +21,9 @@ from ptrail.core.TrajectoryDF import PTRAILDataFrame
 
 from ptrail.features.kinematic_features import KinematicFeatures
 from ptrail.features.temporal_features import TemporalFeatures
-from ptrail.features.semantic_features import SemanticFeatures
 from ptrail.preprocessing.statistics import Statistics
 from ptrail.preprocessing.filters import Filters
+from ptrail.preprocessing.interpolation import Interpolation
 
 
 class GuiHandler:
@@ -61,31 +61,24 @@ class GuiHandler:
                 # remove the item from layout
                 self._window.DFPane.removeItem(item)
 
-            # Create the input dialog item.
-            input_dialog = InputDialog(parent=self._window,
-                                       labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
-                                       title='Enter the column names: ')
+            col_names = self._get_input_parms(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
+                                              title="Enter Column Names")
 
-            # Get the input before displaying the dataframe.
-            if input_dialog.exec():
-                # Get the column names.
-                col_names = input_dialog.getInputs()
+            # Read the data into a PTRAIL dataframe.
+            self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
+                                         traj_id=col_names[0].strip(),
+                                         datetime=col_names[1].strip(),
+                                         latitude=col_names[2].strip(),
+                                         longitude=col_names[3].strip())
+            # Set the table model and display the dataframe.
+            self._table = QtWidgets.QTableView()
 
-                # Read the data into a PTRAIL dataframe.
-                self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
-                                             traj_id=col_names[0].strip(),
-                                             datetime=col_names[1].strip(),
-                                             latitude=col_names[2].strip(),
-                                             longitude=col_names[3].strip())
-                # Set the table model and display the dataframe.
-                self._table = QtWidgets.QTableView()
-
-                # NOTE: whenever we update DFs, make sure to send the data after resetting
-                #       index and setting inplace as False.
-                self._model = TableModel(self._data.reset_index(inplace=False))
-                self._table.setModel(self._model)
-                self._window.DFPane.addWidget(self._table)
-                self._window.run_stats_btn.setEnabled(True)
+            # NOTE: whenever we update DFs, make sure to send the data after resetting
+            #       index and setting inplace as False.
+            self._model = TableModel(self._data.reset_index(inplace=False))
+            self._table.setModel(self._model)
+            self._window.DFPane.addWidget(self._table)
+            self._window.run_stats_btn.setEnabled(True)
 
         except AttributeError:
             msg = QtWidgets.QMessageBox()
@@ -126,11 +119,10 @@ class GuiHandler:
             small_df = self._data.reset_index().loc[self._data.reset_index()[const.TRAJECTORY_ID] == ids_[i],
                                                     [const.LAT, const.LONG]]
 
-            # # Then, create (lat, lon) pairs for the data points.
+            # Then, create (lat, lon) pairs for the data points.
             locations = []
             for j in range(len(small_df)):
                 locations.append((small_df['lat'].iloc[j], small_df['lon'].iloc[j]))
-
 
             # Create text frame.
             iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {ids_[i]} ' + '<br>' +
@@ -194,7 +186,6 @@ class GuiHandler:
                 PTRAILDataFrame
         """
         selected_function = self._window.listWidget.selectedItems()[0].text()
-        print(selected_function)
 
         # Based on the function selected by the user and whether it contains any
         # user given parameters, we will go ahead and run those features and update
@@ -212,37 +203,29 @@ class GuiHandler:
         elif selected_function == 'Point within Range':
             params = inspect.getfullargspec(KinematicFeatures.create_point_within_range_column).args
             params.remove('dataframe')
-            input_dialog = InputDialog(parent=self._window,
-                                       labels=params,
-                                       title='Enter parameters: ')
-            if input_dialog.exec_():
-                args = input_dialog.getInputs()
+            args = self._get_input_parms(params, title="Enter Parameters")
 
-                # Use Regex to get all the digits from the coords input and convert
-                # it to required tuple to feed into the method.
-                temp = re.findall(r'\d+', args[0])
-                coords = tuple(map(int, temp))
+            # Use Regex to get all the digits from the coords input and convert
+            # it to required tuple to feed into the method.
+            temp = re.findall(r'\d+', args[0])
+            coords = tuple(map(int, temp))
 
-                dist_range = float(args[1])
-                self._data = KinematicFeatures.create_point_within_range_column(self._data,
-                                                                                coordinates=coords,
-                                                                                dist_range=dist_range)
+            dist_range = float(args[1])
+            self._data = KinematicFeatures.create_point_within_range_column(self._data,
+                                                                            coordinates=coords,
+                                                                            dist_range=dist_range)
         elif selected_function == 'Distance from Co-ordinates':
             params = inspect.getfullargspec(KinematicFeatures.create_distance_from_point_column).args
             params.remove('dataframe')
-            input_dialog = InputDialog(parent=self._window,
-                                       labels=params,
-                                       title='Enter parameters: ')
-            if input_dialog.exec_():
-                args = input_dialog.getInputs()
 
-                # Use Regex to get all the digits from the coords input and convert
-                # it to required tuple to feed into the method.
-                temp = re.findall(r'\d+', args[0])
-                coords = tuple(map(int, temp))
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # Use Regex to get all the digits from the coords input and convert
+            # it to required tuple to feed into the method.
+            temp = re.findall(r'\d+', args[0])
+            coords = tuple(map(int, temp))
 
-                self._data = KinematicFeatures.create_distance_from_point_column(dataframe=self._data,
-                                                                                 coordinates=coords,)
+            self._data = KinematicFeatures.create_distance_from_point_column(dataframe=self._data,
+                                                                             coordinates=coords,)
 
         elif selected_function == 'Speed':
             self._data = KinematicFeatures.create_speed_column(self._data)
@@ -277,7 +260,6 @@ class GuiHandler:
                 PTRAILDataFrame
         """
         selected_function = self._window.listWidget.selectedItems()[0].text()
-        print(selected_function)
 
         if selected_function == "All Temporal Features":
             self._data = TemporalFeatures.generate_temporal_features(self._data)
@@ -305,3 +287,12 @@ class GuiHandler:
 
     def _run_stats(self):
         pass
+
+    def _get_input_parms(self, labels, title):
+        input_dialog = InputDialog(parent=self._window,
+                                   labels=labels,
+                                   title=title)
+        if input_dialog.exec_():
+            args = input_dialog.getInputs()
+
+            return args
