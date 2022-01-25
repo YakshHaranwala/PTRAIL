@@ -45,9 +45,11 @@ class GuiHandler:
                 filename: str
                     The name of the file. This is obtained from the GUI.
 
-            Returns
-            -------
-                None
+            Raises
+            ------
+                AttributeError:
+                    If the user gives incorrect column names, then we ask
+                    the user to enter them again.
         """
         try:
             # First, we clear out the DF pane area.
@@ -63,24 +65,25 @@ class GuiHandler:
 
             col_names = self._get_input_parms(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
                                               title="Enter Column Names")
+            if col_names:
+                # Read the data into a PTRAIL dataframe.
+                self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
+                                             traj_id=col_names[0].strip(),
+                                             datetime=col_names[1].strip(),
+                                             latitude=col_names[2].strip(),
+                                             longitude=col_names[3].strip())
+                # Set the table model and display the dataframe.
+                self._table = QtWidgets.QTableView()
 
-            # Read the data into a PTRAIL dataframe.
-            self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
-                                         traj_id=col_names[0].strip(),
-                                         datetime=col_names[1].strip(),
-                                         latitude=col_names[2].strip(),
-                                         longitude=col_names[3].strip())
-            # Set the table model and display the dataframe.
-            self._table = QtWidgets.QTableView()
-
-            # NOTE: whenever we update DFs, make sure to send the data after resetting
-            #       index and setting inplace as False.
-            self._model = TableModel(self._data.reset_index(inplace=False))
-            self._table.setModel(self._model)
-            self._window.DFPane.addWidget(self._table)
-            self._window.run_stats_btn.setEnabled(True)
-
-        except AttributeError:
+                # NOTE: whenever we update DFs, make sure to send the data after resetting
+                #       index and setting inplace as False.
+                self._model = TableModel(self._data.reset_index(inplace=False))
+                self._table.setModel(self._model)
+                self._window.DFPane.addWidget(self._table)
+                self._window.run_stats_btn.setEnabled(True)
+            else:
+                self._window.open_file()
+        except AttributeError or ValueError or TypeError:
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Critical)
             msg.setWindowTitle("Incorrect Column names")
@@ -205,27 +208,38 @@ class GuiHandler:
             params.remove('dataframe')
             args = self._get_input_parms(params, title="Enter Parameters")
 
-            # Use Regex to get all the digits from the coords input and convert
-            # it to required tuple to feed into the method.
-            temp = re.findall(r'\d+', args[0])
-            coords = tuple(map(int, temp))
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                # Use Regex to get all the digits from the coords input and convert
+                # it to required tuple to feed into the method.
+                temp = re.findall(r'\d+', args[0])
+                coords = tuple(map(int, temp))
 
-            dist_range = float(args[1])
-            self._data = KinematicFeatures.create_point_within_range_column(self._data,
-                                                                            coordinates=coords,
-                                                                            dist_range=dist_range)
+                dist_range = float(args[1])
+                self._data = KinematicFeatures.create_point_within_range_column(self._data,
+                                                                                coordinates=coords,
+                                                                                dist_range=dist_range)
+            else:
+                self._run_kinematic()
+
         elif selected_function == 'Distance from Co-ordinates':
             params = inspect.getfullargspec(KinematicFeatures.create_distance_from_point_column).args
             params.remove('dataframe')
 
             args = self._get_input_parms(params, title="Enter Parameters")
-            # Use Regex to get all the digits from the coords input and convert
-            # it to required tuple to feed into the method.
-            temp = re.findall(r'\d+', args[0])
-            coords = tuple(map(int, temp))
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                # Use Regex to get all the digits from the coords input and convert
+                # it to required tuple to feed into the method.
+                temp = re.findall(r'\d+', args[0])
+                coords = tuple(map(int, temp))
 
-            self._data = KinematicFeatures.create_distance_from_point_column(dataframe=self._data,
-                                                                             coordinates=coords,)
+                self._data = KinematicFeatures.create_distance_from_point_column(dataframe=self._data,
+                                                                                 coordinates=coords, )
+            else:
+                self._run_kinematic()
 
         elif selected_function == 'Speed':
             self._data = KinematicFeatures.create_speed_column(self._data)
@@ -283,7 +297,196 @@ class GuiHandler:
         self._table.setModel(self._model)
 
     def _run_filters(self):
-        pass
+        selected_function = self._window.listWidget.selectedItems()[0].text()
+
+        if selected_function == 'Hampel Filter':
+            params = inspect.getfullargspec(Filters.hampel_outlier_detection).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.hampel_outlier_detection(dataframe=self._data,
+                                                              column_name=args[0])
+            else:
+                self._run_filters()
+
+        elif selected_function == 'Remove Duplicates':
+            self._data = Filters.remove_duplicates(self._data)
+
+        elif selected_function == 'By Trajectory ID':
+            params = inspect.getfullargspec(Filters.filter_by_traj_id).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.filter_by_traj_id(dataframe=self._data,
+                                                       traj_id=args[0])
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Bounding Box':
+            params = inspect.getfullargspec(Filters.filter_by_bounding_box).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                temp = re.findall("\d+\.\d+", args[0])
+                coords = tuple(map(float, temp))
+                self._data = Filters.filter_by_bounding_box(dataframe=self._data,
+                                                            bounding_box=coords,
+                                                            inside=bool(args[1]))
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Date':
+            params = inspect.getfullargspec(Filters.filter_by_date).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                if args[0] == '':
+                    self._data = Filters.filter_by_date(dataframe=self._data,
+                                                        end_date=args[1])
+                elif args[1] == '':
+                    self._data = Filters.filter_by_date(dataframe=self._data,
+                                                        start_date=args[0])
+                else:
+                    self._data = Filters.filter_by_date(dataframe=self._data,
+                                                        start_date=args[0],
+                                                        end_date=args[1])
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By DateTime':
+            params = inspect.getfullargspec(Filters.filter_by_datetime).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                if args[0] == '':
+                    self._data = Filters.filter_by_datetime(dataframe=self._data,
+                                                            end_dateTime=args[1])
+                elif args[1] == '':
+                    self._data = Filters.filter_by_datetime(dataframe=self._data,
+                                                            start_dateTime=args[0])
+                else:
+                    self._data = Filters.filter_by_datetime(dataframe=self._data,
+                                                            start_dateTime=args[0],
+                                                            end_dateTime=args[1])
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Maximum Speed':
+            params = inspect.getfullargspec(Filters.filter_by_max_speed).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.filter_by_max_speed(dataframe=self._data,
+                                                         max_speed=float(args[0]))
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Minimum Speed':
+            params = inspect.getfullargspec(Filters.filter_by_min_speed).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.filter_by_min_speed(dataframe=self._data,
+                                                         min_speed=float(args[0]))
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Minimum Consecutive Distance':
+            params = inspect.getfullargspec(Filters.filter_by_min_consecutive_distance).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.filter_by_min_consecutive_distance(dataframe=self._data,
+                                                                        min_distance=float(args[0]))
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Maximum Consecutive Distance':
+            params = inspect.getfullargspec(Filters.filter_by_max_consecutive_distance).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.filter_by_max_consecutive_distance(dataframe=self._data,
+                                                                        max_distance=float(args[0]))
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Maximum Distance and Speed':
+            params = inspect.getfullargspec(Filters.filter_by_max_distance_and_speed).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.filter_by_max_distance_and_speed(dataframe=self._data,
+                                                                      max_distance=float(args[0]),
+                                                                      max_speed=float(args[1]))
+            else:
+                self._run_filters()
+
+        elif selected_function == 'By Minimum Distance and Speed':
+            params = inspect.getfullargspec(Filters.filter_by_min_distance_and_speed).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.filter_by_min_distance_and_speed(dataframe=self._data,
+                                                                      min_distance=float(args[0]),
+                                                                      min_speed=float(args[1]))
+            else:
+                self._run_filters()
+
+        elif selected_function == 'Remove Outliers by Consecutive Distance':
+            self._data = Filters.filter_outliers_by_consecutive_distance(dataframe=self._data)
+
+        elif selected_function == 'Remove Outliers by Consecutive Speed':
+            self._data = Filters.filter_outliers_by_consecutive_speed(dataframe=self._data)
+
+        elif selected_function == 'Remove Trajectories with Less Points':
+            params = inspect.getfullargspec(Filters.remove_trajectories_with_less_points).args
+            params.remove('dataframe')
+
+            args = self._get_input_parms(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Filters.remove_trajectories_with_less_points(dataframe=self._data,
+                                                                          num_min_points=int(args[1]))
+            else:
+                self._run_filters()
+
+        self._model = TableModel(self._data.reset_index(inplace=False, drop=True))
+        self._table.setModel(self._model)
 
     def _run_stats(self):
         pass

@@ -1,9 +1,7 @@
-from ptrail.features.kinematic_features import KinematicFeatures
+from ptrail.preprocessing.filters import Filters
 import inspect
 
-a = inspect.getfullargspec(KinematicFeatures.generate_kinematic_features)
+a = inspect.getfullargspec(Filters.filter_by_date)
 
-print(a)
-
-print(type(a.args.remove('dataframe')))
 print(a.args)
+
