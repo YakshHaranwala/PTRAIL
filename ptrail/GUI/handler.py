@@ -5,6 +5,7 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
 """
+import distutils
 import random
 import re
 
@@ -369,6 +370,8 @@ class GuiHandler:
         elif selected_function == "Time of Day":
             self._data = TemporalFeatures.create_time_of_day_column(self._data)
 
+        # Finally, update the GUI with the updated DF received from the
+        # function results. DO NOT FORGET THE reset_index(inplace=False).
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
@@ -424,7 +427,7 @@ class GuiHandler:
                 coords = tuple(map(float, temp))
                 self._data = Filters.filter_by_bounding_box(dataframe=self._data,
                                                             bounding_box=coords,
-                                                            inside=bool(args[1]))
+                                                            inside=(bool(distutils.util.strtobool(args[1]))))
             else:
                 self._run_filters()
 
@@ -569,6 +572,8 @@ class GuiHandler:
             else:
                 self._run_filters()
 
+        # Finally, update the GUI with the updated DF received from the
+        # function results. DO NOT FORGET THE reset_index(inplace=False).
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
@@ -606,7 +611,7 @@ class GuiHandler:
             if args:
                 self._data = Statistics.generate_kinematic_stats(dataframe=self._data,
                                                                  target_col_name=args[0],
-                                                                 segmented=bool(args[1].capitalize()))
+                                                                 segmented=bool(distutils.util.strtobool(args[1])))
             else:
                 self._run_stats()
 
@@ -620,9 +625,14 @@ class GuiHandler:
             if args:
                 self._data = Statistics.pivot_stats_df(dataframe=self._data,
                                                        target_col_name=args[0],
-                                                       segmented=bool(args[1].capitalize()))
+                                                       segmented=bool(distutils.util.strtobool(args[1])))
             else:
                 self._run_stats()
+
+        # Finally, update the GUI with the updated DF received from the
+        # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._model = TableModel(self._data.reset_index(inplace=False))
+        self._table.setModel(self._model)
 
     def _get_input_params(self, labels, title):
         """
