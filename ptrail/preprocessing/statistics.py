@@ -27,7 +27,7 @@ NUM_CPU = ceil((num * 2) / 3)
 
 class Statistics:
     @staticmethod
-    def segment_traj_by_days(df: PTRAILDataFrame, num_days):
+    def segment_traj_by_days(dataframe: PTRAILDataFrame, num_days):
         """
             Given a dataframe containing trajectory data, segment all
             the trajectories by each week.
@@ -46,7 +46,7 @@ class Statistics:
                     with a new column added called segment_id
         """
         # splitting the dataframe according to trajectory ids
-        df_chunks = helpers._df_split_helper(dataframe=df.reset_index())
+        df_chunks = helpers._df_split_helper(dataframe=dataframe.reset_index())
 
         # Here, create 2/3rds number of processes as there are in the system. Some CPUs are
         # kept free at all times in order to not block up the system.

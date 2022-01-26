@@ -63,7 +63,7 @@ class GuiHandler:
                 # remove the item from layout
                 self._window.DFPane.removeItem(item)
 
-            col_names = self._get_input_parms(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
+            col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
                                               title="Enter Column Names")
             if col_names:
                 # Read the data into a PTRAIL dataframe.
@@ -165,6 +165,14 @@ class GuiHandler:
         self._window.map.setHtml(map_.get_root().render())
 
     def run_command(self):
+        """
+            When the user pushes the Run button, run the user's
+            selected function on the dataset.
+
+            Returns
+            -------
+                None
+        """
         if self._window.feature_type.currentIndex() == 0:
             self._run_filters()
         elif self._window.feature_type.currentIndex() == 1:
@@ -177,16 +185,84 @@ class GuiHandler:
             self._run_temporal()
 
     def _run_ip(self):
-        pass
-
-    def _run_kinematic(self):
         """
-            Here, we run the Kinematic features that the user selected
-            and then send the answers back.
+            Helper function for running the Interpolation commands
+            from the GUI.
 
             Returns
             -------
-                PTRAILDataFrame
+                None
+        """
+        selected_function = self._window.listWidget.selectedItems()[0].text()
+
+        if selected_function == 'Linear Interpolation':
+            params = inspect.getfullargspec(Interpolation.interpolate_position).args
+            params.remove('dataframe')
+            params.remove('ip_type')
+            args = self._get_input_params(params, title="Enter Parameters")
+
+            if args:
+                self._data = Interpolation.interpolate_position(dataframe=self._data,
+                                                                ip_type='linear',
+                                                                time_jump=float(args[0]))
+            else:
+                self._run_ip()
+
+        elif selected_function == 'Cubic Interpolation':
+            params = inspect.getfullargspec(Interpolation.interpolate_position).args
+            params.remove('dataframe')
+            params.remove('ip_type')
+            args = self._get_input_params(params, title="Enter Parameters")
+
+            if args:
+                self._data = Interpolation.interpolate_position(dataframe=self._data,
+                                                                ip_type='cubic',
+                                                                time_jump=float(args[0]))
+            else:
+                self._run_ip()
+
+        elif selected_function == 'Kinematic Interpolation':
+            params = inspect.getfullargspec(Interpolation.interpolate_position).args
+            params.remove('dataframe')
+            params.remove('ip_type')
+            args = self._get_input_params(params, title="Enter Parameters")
+
+            if args:
+                self._data = Interpolation.interpolate_position(dataframe=self._data,
+                                                                ip_type='kinematic',
+                                                                time_jump=float(args[0]))
+            else:
+                self._run_ip()
+
+        elif selected_function == 'Random-Walk Interpolation':
+            params = inspect.getfullargspec(Interpolation.interpolate_position).args
+            params.remove('dataframe')
+            params.remove('ip_type')
+            args = self._get_input_params(params, title="Enter Parameters")
+
+            if args:
+                self._data = Interpolation.interpolate_position(dataframe=self._data,
+                                                                ip_type='random_walk',
+                                                                time_jump=float(args[0]))
+            else:
+                self._run_ip()
+
+        # Finally, update the GUI with the updated DF received from the
+        # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._model = TableModel(self._data.reset_index(inplace=False))
+        self._table.setModel(self._model)
+
+        # Also, update the map.
+        self.add_map()
+
+    def _run_kinematic(self):
+        """
+            Helper function for running the Kinematic commands
+            from the GUI.
+
+            Returns
+            -------
+                None
         """
         selected_function = self._window.listWidget.selectedItems()[0].text()
 
@@ -206,7 +282,7 @@ class GuiHandler:
         elif selected_function == 'Point within Range':
             params = inspect.getfullargspec(KinematicFeatures.create_point_within_range_column).args
             params.remove('dataframe')
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
 
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
@@ -227,7 +303,7 @@ class GuiHandler:
             params = inspect.getfullargspec(KinematicFeatures.create_distance_from_point_column).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -266,12 +342,12 @@ class GuiHandler:
 
     def _run_temporal(self):
         """
-            Execution of Temporal features according to user selection
-            and updating the GUI with the latest dataframe.
+            Helper function for running the Temporal commands
+            from the GUI.
 
             Returns
             -------
-                PTRAILDataFrame
+                None
         """
         selected_function = self._window.listWidget.selectedItems()[0].text()
 
@@ -297,13 +373,21 @@ class GuiHandler:
         self._table.setModel(self._model)
 
     def _run_filters(self):
+        """
+            Helper function for running the Filter commands
+            from the GUI.
+
+            Returns
+            -------
+                None
+        """
         selected_function = self._window.listWidget.selectedItems()[0].text()
 
         if selected_function == 'Hampel Filter':
             params = inspect.getfullargspec(Filters.hampel_outlier_detection).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -319,7 +403,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_traj_id).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -332,7 +416,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_bounding_box).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -348,7 +432,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_date).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -369,7 +453,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_datetime).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -390,7 +474,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_max_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -403,7 +487,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_min_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -416,7 +500,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_min_consecutive_distance).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -429,7 +513,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_max_consecutive_distance).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -442,7 +526,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_max_distance_and_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -456,7 +540,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_min_distance_and_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -476,7 +560,7 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.remove_trajectories_with_less_points).args
             params.remove('dataframe')
 
-            args = self._get_input_parms(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters")
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -485,13 +569,78 @@ class GuiHandler:
             else:
                 self._run_filters()
 
-        self._model = TableModel(self._data.reset_index(inplace=False, drop=True))
+        self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
     def _run_stats(self):
-        pass
+        """
+            Helper function for running the Statistical commands
+            from the GUI.
 
-    def _get_input_parms(self, labels, title):
+            Returns
+            -------
+                None
+        """
+        selected_function = self._window.listWidget.selectedItems()[0].text()
+
+        if selected_function == 'Segment Trajectories':
+            params = inspect.getfullargspec(Statistics.segment_traj_by_days).args
+            params.remove('dataframe')
+
+            args = self._get_input_params(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Statistics.segment_traj_by_days(dataframe=self._data,
+                                                             num_days=int(args[0]))
+            else:
+                self._run_stats()
+
+        elif selected_function == 'Generate Kinematic Statistics':
+            params = inspect.getfullargspec(Statistics.generate_kinematic_stats).args
+            params.remove('dataframe')
+
+            args = self._get_input_params(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Statistics.generate_kinematic_stats(dataframe=self._data,
+                                                                 target_col_name=args[0],
+                                                                 segmented=bool(args[1].capitalize()))
+            else:
+                self._run_stats()
+
+        elif selected_function == 'Pivot Statistics DF':
+            params = inspect.getfullargspec(Statistics.pivot_stats_df).args
+            params.remove('dataframe')
+
+            args = self._get_input_params(params, title="Enter Parameters")
+            # If the user provided the input params, then run the function, else
+            # wait for the user to play their part.
+            if args:
+                self._data = Statistics.pivot_stats_df(dataframe=self._data,
+                                                       target_col_name=args[0],
+                                                       segmented=bool(args[1].capitalize()))
+            else:
+                self._run_stats()
+
+    def _get_input_params(self, labels, title):
+        """
+            Take the input parameters for the function in question from
+            the user.
+
+            Parameters
+            ----------
+                labels: list
+                    The name of the parameters.
+                title: str
+                    The title of the input dialog box.
+
+            Returns
+            -------
+                list:
+                    A list containing the user input.
+        """
         input_dialog = InputDialog(parent=self._window,
                                    labels=labels,
                                    title=title)
