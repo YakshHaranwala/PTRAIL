@@ -44,6 +44,7 @@ class Filters:
         -------
             PTRAILDataFrame
                 The dataframe with dropped duplicates.
+
         """
         return dataframe.reset_index().drop_duplicates(
             subset=[const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG],
@@ -486,7 +487,7 @@ class Filters:
 
             Returns
             -------
-                PTRAILDataFrame:
+                pandas.DataFrame:
                     The filtered dataframe.
 
 
