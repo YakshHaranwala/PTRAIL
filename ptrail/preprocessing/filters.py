@@ -19,6 +19,8 @@ import pandas as pd
 import ptrail.utilities.constants as const
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.preprocessing.helpers import Helpers as helper
+from ptrail.features.temporal_features import TemporalFeatures as temporal
+from ptrail.features.kinematic_features import KinematicFeatures as kinematic
 from ptrail.utilities.exceptions import *
 
 num = os.cpu_count()
@@ -184,8 +186,6 @@ class Filters:
 
             Raises
             ------
-                KeyError:
-                    When the Date column is not present in the data.
                 ValueError:
                     When the start date is later than the end date.
         """
@@ -227,9 +227,12 @@ class Filters:
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
         except KeyError:
-            # Ask the user first to create a date.
-            raise MissingColumnsException(f"The Date column is missing in the dataset. Please run the "
-                                          f"create_date_column() function first before running this filter.")
+            # # Ask the user first to create a date.
+            # raise MissingColumnsException(f"The Date column is missing in the dataset. Please run the "
+            #                               f"create_date_column() function first before running this filter.")
+
+            dataframe = temporal.create_date_column(dataframe)
+            return Filters.filter_by_date(dataframe, start_date, end_date)
 
     @staticmethod
     def filter_by_datetime(dataframe: PTRAILDataFrame, start_dateTime: Optional[Text] = None,
@@ -326,10 +329,6 @@ class Filters:
                 PTRAILDataFrame:
                     PTRAILDataFrame Dataframe containing the resultant dataframe.
 
-            Raises
-            ------
-                KeyError:
-                    The column 'Speed' is not present in the dataframe.
         """
         try:
             dataframe = dataframe.reset_index()
@@ -342,9 +341,12 @@ class Filters:
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Speed is not present in the dataset. "
-                                          f"Please run the function create_speed_from_prev_column() before"
-                                          f" running this filter.")
+            # raise MissingColumnsException(f"The column 'Speed is not present in the dataset. "
+            #                               f"Please run the function create_speed_from_prev_column() before"
+            #                               f" running this filter.")
+
+            dataframe = kinematic.create_speed_column(dataframe)
+            return Filters.filter_by_max_speed(dataframe, max_speed)
 
     @staticmethod
     def filter_by_min_speed(dataframe, min_speed: float):
@@ -367,10 +369,6 @@ class Filters:
                 PTRAILDataFrame:
                     PTRAILDataFrame Dataframe containing the resultant dataframe.
 
-            Raises
-            ------
-                KeyError:
-                    The column 'Speed' is not present in the dataframe.
         """
         try:
             dataframe = dataframe.reset_index()
@@ -383,9 +381,8 @@ class Filters:
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Speed is not present in the dataset. "
-                                          f"Please run the function create_speed_from_prev_column() before"
-                                          f" running this filter.")
+            dataframe = kinematic.create_speed_column(dataframe)
+            return Filters.filter_by_min_speed(dataframe, min_speed)
 
     @staticmethod
     def filter_by_min_consecutive_distance(dataframe, min_distance: float):
@@ -410,11 +407,6 @@ class Filters:
                 PTRAILDataFrame:
                     The filtered dataframe.
 
-            Raises
-            ------
-                KeyError:
-                    The column 'Distance' is not present in the dataframe.
-
         """
         try:
             dataframe = dataframe.reset_index()
@@ -427,9 +419,8 @@ class Filters:
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Distance is not present in the dataset. "
-                                          f"Please run the function create_distance_between_consecutive_column() before"
-                                          f" running this filter.")
+            dataframe = kinematic.create_distance_column(dataframe)
+            return Filters.filter_by_min_consecutive_distance(dataframe, min_distance)
 
     @staticmethod
     def filter_by_max_consecutive_distance(dataframe, max_distance: float):
@@ -454,10 +445,6 @@ class Filters:
                 PTRAILDataFrame:
                     The filtered dataframe.
 
-            Raises
-            ------
-                KeyError:
-                    The column 'Distance' is not present in the dataframe.
             """
         try:
             dataframe = dataframe.reset_index()
@@ -470,9 +457,8 @@ class Filters:
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
-            raise MissingColumnsException(f"The column 'Distance is not present in the dataset. "
-                                          f"Please run the function create_distance_between_consecutive_column() before"
-                                          f" running this filter.")
+            dataframe = kinematic.create_distance_column(dataframe)
+            return Filters.filter_by_max_consecutive_distance(dataframe, max_distance)
 
     @staticmethod
     def filter_by_max_distance_and_speed(dataframe, max_distance: float, max_speed: float):
@@ -503,10 +489,7 @@ class Filters:
                 PTRAILDataFrame:
                     The filtered dataframe.
 
-            Raises
-            ------
-                MissingColumnsException:
-                    The column 'Distance' or 'Speed' is not present in the dataframe.
+
         """
         try:
             # filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)
@@ -519,12 +502,8 @@ class Filters:
 
             return filtered_df  # Return the df filtered on the basis of 2 constraints.
         except KeyError:
-            # The system asks the user to only run create_speed_from_prev_column() function because
-            # running create_speed_from_prev_column() function create the 'Distance'
-            # function automatically if the column is already not present.
-            raise MissingColumnsException(f"Either of the columns 'Distance' or 'Speed'"
-                                          f"are missing in the dataset. Please run the function "
-                                          f"create_speed_column() first before running the function.")
+            dataframe = kinematic.create_speed_column(dataframe)
+            return Filters.filter_by_max_distance_and_speed(dataframe, max_distance, max_speed)
 
     @staticmethod
     def filter_by_min_distance_and_speed(dataframe, min_distance: float, min_speed: float):
@@ -555,10 +534,6 @@ class Filters:
                 PTRAILDataFrame:
                     The filtered dataframe.
 
-            Raises
-            ------
-                MissingColumnsException:
-                    Either of Distance or Speed column are missing from the dataset.
         """
         try:
             # filt = Filters.filter_by_max_consecutive_distance(dataframe, max_distance)
@@ -572,12 +547,8 @@ class Filters:
             # Return the df filtered on the basis of 2 constraints.
             return filtered_df
         except KeyError:
-            # The system asks the user to only run create_speed_from_prev_column() function because
-            # running create_speed_from_prev_column() function create the 'Distance'
-            # function automatically if the column is already not present.
-            raise MissingColumnsException(f"Either of the columns 'Distance' or 'Speed'"
-                                          f"are missing in the dataset. Please run the function "
-                                          f"create_speed_column() first before running the function.")
+            dataframe = kinematic.create_speed_column(dataframe)
+            return Filters.filter_by_min_distance_and_speed(dataframe, min_distance, min_speed)
 
     @staticmethod
     def filter_outliers_by_consecutive_distance(dataframe: PTRAILDataFrame):
@@ -601,10 +572,6 @@ class Filters:
                 PTRAILDataFrame:
                     The dataframe which has been filtered.
 
-            Raises
-            ------
-                KeyError:
-                    The column 'Distance' is not present in the dataset.
         """
         try:
             # Find the lower and higher quantile first along with the inter-quantile range.
@@ -626,9 +593,8 @@ class Filters:
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
         except KeyError:
-            raise MissingColumnsException(f"The column 'Distance' is missing in the dataset. "
-                                          f"Please run the function create_distance_between_consecutive_column() "
-                                          f"before running this filter.")
+            dataframe = kinematic.create_distance_column(dataframe)
+            return Filters.filter_outliers_by_consecutive_distance(dataframe)
 
     @staticmethod
     def filter_outliers_by_consecutive_speed(dataframe):
@@ -652,10 +618,6 @@ class Filters:
                 PTRAILDataFrame:
                     The dataframe which has been filtered.
 
-            Raises
-            ------
-                KeyError:
-                The column 'Distance' is not present in the dataset.
         """
         try:
             q_low = dataframe['Speed'].quantile(0.25)
@@ -671,9 +633,8 @@ class Filters:
             return dataframe.loc[df_filt]
 
         except KeyError:
-            raise MissingColumnsException(f"The column 'Speed' is missing in the dataset. "
-                                          f"Please run the function create_speed_from_prev_column() "
-                                          f"before running this filter.")
+            dataframe = kinematic.create_speed_column(dataframe)
+            return Filters.filter_outliers_by_consecutive_speed(dataframe)
 
     @staticmethod
     def remove_trajectories_with_less_points(dataframe, num_min_points: Optional[int] = 3):
