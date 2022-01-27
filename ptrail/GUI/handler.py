@@ -84,6 +84,7 @@ class GuiHandler:
                 self._window.run_stats_btn.setEnabled(True)
             else:
                 self._window.open_file()
+
         except AttributeError or ValueError or TypeError:
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -206,8 +207,6 @@ class GuiHandler:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='linear',
                                                                 time_jump=float(args[0]))
-            else:
-                self._run_ip()
 
         elif selected_function == 'Cubic Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
@@ -219,8 +218,6 @@ class GuiHandler:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='cubic',
                                                                 time_jump=float(args[0]))
-            else:
-                self._run_ip()
 
         elif selected_function == 'Kinematic Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
@@ -232,8 +229,6 @@ class GuiHandler:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='kinematic',
                                                                 time_jump=float(args[0]))
-            else:
-                self._run_ip()
 
         elif selected_function == 'Random-Walk Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
@@ -245,8 +240,6 @@ class GuiHandler:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='random_walk',
                                                                 time_jump=float(args[0]))
-            else:
-                self._run_ip()
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
@@ -297,8 +290,6 @@ class GuiHandler:
                 self._data = KinematicFeatures.create_point_within_range_column(self._data,
                                                                                 coordinates=coords,
                                                                                 dist_range=dist_range)
-            else:
-                self._run_kinematic()
 
         elif selected_function == 'Distance from Co-ordinates':
             params = inspect.getfullargspec(KinematicFeatures.create_distance_from_point_column).args
@@ -315,8 +306,6 @@ class GuiHandler:
 
                 self._data = KinematicFeatures.create_distance_from_point_column(dataframe=self._data,
                                                                                  coordinates=coords, )
-            else:
-                self._run_kinematic()
 
         elif selected_function == 'Speed':
             self._data = KinematicFeatures.create_speed_column(self._data)
@@ -396,8 +385,6 @@ class GuiHandler:
             if args:
                 self._data = Filters.hampel_outlier_detection(dataframe=self._data,
                                                               column_name=args[0])
-            else:
-                self._run_filters()
 
         elif selected_function == 'Remove Duplicates':
             self._data = Filters.remove_duplicates(self._data)
@@ -412,8 +399,6 @@ class GuiHandler:
             if args:
                 self._data = Filters.filter_by_traj_id(dataframe=self._data,
                                                        traj_id=args[0])
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Bounding Box':
             params = inspect.getfullargspec(Filters.filter_by_bounding_box).args
@@ -428,8 +413,6 @@ class GuiHandler:
                 self._data = Filters.filter_by_bounding_box(dataframe=self._data,
                                                             bounding_box=coords,
                                                             inside=(bool(distutils.util.strtobool(args[1]))))
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Date':
             params = inspect.getfullargspec(Filters.filter_by_date).args
@@ -449,8 +432,6 @@ class GuiHandler:
                     self._data = Filters.filter_by_date(dataframe=self._data,
                                                         start_date=args[0],
                                                         end_date=args[1])
-            else:
-                self._run_filters()
 
         elif selected_function == 'By DateTime':
             params = inspect.getfullargspec(Filters.filter_by_datetime).args
@@ -470,8 +451,6 @@ class GuiHandler:
                     self._data = Filters.filter_by_datetime(dataframe=self._data,
                                                             start_dateTime=args[0],
                                                             end_dateTime=args[1])
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Maximum Speed':
             params = inspect.getfullargspec(Filters.filter_by_max_speed).args
@@ -483,8 +462,6 @@ class GuiHandler:
             if args:
                 self._data = Filters.filter_by_max_speed(dataframe=self._data,
                                                          max_speed=float(args[0]))
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Minimum Speed':
             params = inspect.getfullargspec(Filters.filter_by_min_speed).args
@@ -496,8 +473,6 @@ class GuiHandler:
             if args:
                 self._data = Filters.filter_by_min_speed(dataframe=self._data,
                                                          min_speed=float(args[0]))
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Minimum Consecutive Distance':
             params = inspect.getfullargspec(Filters.filter_by_min_consecutive_distance).args
@@ -509,8 +484,6 @@ class GuiHandler:
             if args:
                 self._data = Filters.filter_by_min_consecutive_distance(dataframe=self._data,
                                                                         min_distance=float(args[0]))
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Maximum Consecutive Distance':
             params = inspect.getfullargspec(Filters.filter_by_max_consecutive_distance).args
@@ -522,8 +495,6 @@ class GuiHandler:
             if args:
                 self._data = Filters.filter_by_max_consecutive_distance(dataframe=self._data,
                                                                         max_distance=float(args[0]))
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Maximum Distance and Speed':
             params = inspect.getfullargspec(Filters.filter_by_max_distance_and_speed).args
@@ -536,8 +507,6 @@ class GuiHandler:
                 self._data = Filters.filter_by_max_distance_and_speed(dataframe=self._data,
                                                                       max_distance=float(args[0]),
                                                                       max_speed=float(args[1]))
-            else:
-                self._run_filters()
 
         elif selected_function == 'By Minimum Distance and Speed':
             params = inspect.getfullargspec(Filters.filter_by_min_distance_and_speed).args
@@ -550,8 +519,6 @@ class GuiHandler:
                 self._data = Filters.filter_by_min_distance_and_speed(dataframe=self._data,
                                                                       min_distance=float(args[0]),
                                                                       min_speed=float(args[1]))
-            else:
-                self._run_filters()
 
         elif selected_function == 'Remove Outliers by Consecutive Distance':
             self._data = Filters.filter_outliers_by_consecutive_distance(dataframe=self._data)
@@ -569,8 +536,6 @@ class GuiHandler:
             if args:
                 self._data = Filters.remove_trajectories_with_less_points(dataframe=self._data,
                                                                           num_min_points=int(args[1]))
-            else:
-                self._run_filters()
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
@@ -598,8 +563,6 @@ class GuiHandler:
             if args:
                 self._data = Statistics.segment_traj_by_days(dataframe=self._data,
                                                              num_days=int(args[0]))
-            else:
-                self._run_stats()
 
         elif selected_function == 'Generate Kinematic Statistics':
             params = inspect.getfullargspec(Statistics.generate_kinematic_stats).args
@@ -612,8 +575,6 @@ class GuiHandler:
                 self._data = Statistics.generate_kinematic_stats(dataframe=self._data,
                                                                  target_col_name=args[0],
                                                                  segmented=bool(distutils.util.strtobool(args[1])))
-            else:
-                self._run_stats()
 
         elif selected_function == 'Pivot Statistics DF':
             params = inspect.getfullargspec(Statistics.pivot_stats_df).args
@@ -626,8 +587,6 @@ class GuiHandler:
                 self._data = Statistics.pivot_stats_df(dataframe=self._data,
                                                        target_col_name=args[0],
                                                        segmented=bool(distutils.util.strtobool(args[1])))
-            else:
-                self._run_stats()
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).

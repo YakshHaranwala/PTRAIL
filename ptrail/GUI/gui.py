@@ -258,8 +258,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         # Create the save button of the File Menu.
         self.SaveButton = QtWidgets.QAction(self.OuterWindow)
+        self.SaveButton.triggered.connect(self.save_file)
         self.SaveButton.setObjectName("SaveButton")
-        self.SaveButton.setShortcut("Ctrl+S")
+        self.SaveButton.setShortcut("Ctrl+S" if sys.platform != 'darwin' else "cmd+S")
         self.FileMenu.addAction(self.SaveButton)
 
         # Create the open button of the File Menu.
@@ -304,12 +305,44 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         options = QtWidgets.QFileDialog.Options()
 
         # Limit the user to select only CSV files to load.
-        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()", "",
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Load Dataset", "",
                                                             ";csv Files (*.csv)", options=options)
 
         # If the user selects a file, load it into a pandas dataframe and print its statistics.
         if fileName:
             self.handler = GuiHandler(fileName, self)
+
+    def save_file(self):
+        """
+            Save the dataframe to a .csv file.
+
+            Returns
+            -------
+                None
+        """
+        # Create the file selection dialog box.
+        options = QtWidgets.QFileDialog.Options()
+
+        # Limit the user to select only CSV files to load.
+        file, check = QtWidgets.QFileDialog.getSaveFileName(None, "Save File", "",
+                                                            "Csv Files (*.csv)", options=options)
+
+        # If the user has decided to save the file, save the dataframe to the
+        # specified location and display the success message.
+        if file and self.handler._data is not None:
+            try:
+                self.handler._data.to_csv(file + '.csv')
+                msg = QtWidgets.QMessageBox()
+                msg.setIcon(QtWidgets.QMessageBox.Information)
+                msg.setWindowTitle("Success")
+                msg.setText("File Saved Successfully!")
+                msg.exec()
+            except PermissionError:
+                msg = QtWidgets.QMessageBox()
+                msg.setIcon(QtWidgets.QMessageBox.Critical)
+                msg.setWindowTitle("Error")
+                msg.setText("File could not be saved. Please try again!")
+                msg.exec()
 
     def version_button_clicked(self):
         """
