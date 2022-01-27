@@ -132,9 +132,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.MapPane.setContentsMargins(0, 0, 0, 0)
         self.MapPane.setObjectName("MapPane")
 
-        self.map = QtWebEngineWidgets.QWebEngineView()
-        self.MapPane.addWidget(self.map)
-
         self.vlayout.addWidget(self.maplayoutmanager, 0, 1, 3, 2)
 
     def setup_command_palette(self):

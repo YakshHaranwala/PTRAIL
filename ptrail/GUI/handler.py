@@ -15,7 +15,7 @@ import inspect
 import pandas as pd
 import ptrail.utilities.constants as const
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtWebEngineWidgets
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
@@ -29,6 +29,8 @@ from ptrail.preprocessing.interpolation import Interpolation
 
 class GuiHandler:
     def __init__(self, filename, window):
+        self.traj_id_list = None
+        self.map = None
         self._window = window
         self._data = None
         self._model = None
@@ -65,7 +67,7 @@ class GuiHandler:
                 self._window.DFPane.removeItem(item)
 
             col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
-                                              title="Enter Column Names")
+                                               title="Enter Column Names")
             if col_names:
                 # Read the data into a PTRAIL dataframe.
                 self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
@@ -94,7 +96,7 @@ class GuiHandler:
             msg.exec()
             self.__init__(filename, self._window)
 
-    def add_map(self, weight: float = 3, opacity: float = 0.8):
+    def add_map(self):
         """
             Use folium to plot the trajectory on a map.
             Parameters
@@ -108,63 +110,77 @@ class GuiHandler:
                 folium.folium.Map
                     The map with plotted trajectory.
         """
-        sw = self._data[['lat', 'lon']].min().values.tolist()
-        ne = self._data[['lat', 'lon']].max().values.tolist()
-
-        # Create a map with the initial point.
-        map_ = folium.Map(location=(self._data.latitude[0], self._data.longitude[0]),
-                          zoom_start=13)
-
+        # Create the dropdown menu to select the trajectory to plot.
         ids_ = list(self._data.traj_id.value_counts().keys())
+        self.traj_id_list = QtWidgets.QComboBox()
+        self.traj_id_list.addItems(ids_)
+        self.traj_id_list.currentIndexChanged.connect(self.redraw_map)
+        self._window.MapPane.addWidget(self.traj_id_list)
+
+        # The area for plotting the map.
+        self.map = QtWebEngineWidgets.QWebEngineView()
+        self._window.MapPane.addWidget(self.map)
+
+        # Actually draw the map.
+        to_plot = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+        self.draw_map(to_plot, ids_)
+
+    def draw_map(self, to_plot, ids_):
+        self.map.setHtml('')
         colors = ["#" + ''.join([random.choice('123456789BCDEF') for j in range(6)])
                   for i in range(len(ids_))]
 
-        for i in range(len(ids_)):
-            # First, filter out the smaller dataframe.
-            small_df = self._data.reset_index().loc[self._data.reset_index()[const.TRAJECTORY_ID] == ids_[i],
-                                                    [const.LAT, const.LONG]]
+        sw = to_plot[['lat', 'lon']].min().values.tolist()
+        ne = to_plot[['lat', 'lon']].max().values.tolist()
 
-            # Then, create (lat, lon) pairs for the data points.
-            locations = []
-            for j in range(len(small_df)):
-                locations.append((small_df['lat'].iloc[j], small_df['lon'].iloc[j]))
+        # Create a map with the initial point.
+        map_ = folium.Map(location=(to_plot[const.LAT].iloc[0], to_plot[const.LONG].iloc[0]),
+                          zoom_start=13)
 
-            # Create text frame.
-            iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {ids_[i]} ' + '<br>' +
-                                   f'Latitude: {locations[0][0]}' + '<br>' +
-                                   f'Longitude: {locations[0][1]} </font>')
+        # Then, create (lat, lon) pairs for the data points.
+        locations = []
+        for j in range(len(to_plot)):
+            locations.append((to_plot['lat'].iloc[j], to_plot['lon'].iloc[j]))
 
-            # Create start and end markers for the trajectory.
-            popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
+        # Create text frame.
+        iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {self.traj_id_list.currentText()} ' + '<br>' +
+                               f'Latitude: {locations[0][0]}' + '<br>' +
+                               f'Longitude: {locations[0][1]} </font>')
 
-            folium.Marker([small_df['lat'].iloc[0], small_df['lon'].iloc[0]],
-                          color='green',
-                          popup=popup,
-                          marker_color='green',
-                          icon=folium.Icon(icon_color='green', icon='circle', prefix='fa')).add_to(map_)
+        # Create start and end markers for the trajectory.
+        popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
 
-            # Create text frame.
-            iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {ids_[i]} ' + '<br>' +
-                                   f'Latitude: {locations[0][0]}' + '<br>' +
-                                   f'Longitude: {locations[0][1]} </font>')
+        folium.Marker([to_plot['lat'].iloc[0], to_plot['lon'].iloc[0]],
+                      color='green',
+                      popup=popup,
+                      marker_color='green',
+                      icon=folium.Icon(icon_color='green', icon='circle', prefix='fa')).add_to(map_)
 
-            # Create start and end markers for the trajectory.
-            popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
+        # Create text frame.
+        iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {self.traj_id_list.currentText()} ' + '<br>' +
+                               f'Latitude: {locations[0][0]}' + '<br>' +
+                               f'Longitude: {locations[0][1]} </font>')
 
-            folium.Marker([small_df['lat'].iloc[-1], small_df['lon'].iloc[-1]],
-                          color='green',
-                          popup=popup,
-                          marker_color='red',
-                          icon=folium.Icon(icon_color='red', icon='circle', prefix='fa')).add_to(map_)
+        # Create start and end markers for the trajectory.
+        popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
 
-            # Add trajectory to map.
-            # folium.PolyLine(locations,
-            #                 color=colors[i],
-            #                 weight=weight,
-            #                 opacity=opacity,).add_to(map_)
+        folium.Marker([to_plot['lat'].iloc[-1], to_plot['lon'].iloc[-1]],
+                      color='green',
+                      popup=popup,
+                      marker_color='red',
+                      icon=folium.Icon(icon_color='red', icon='circle', prefix='fa')).add_to(map_)
+
+        # Add trajectory to map.
+        folium.PolyLine(locations,
+                        color=colors[random.randint(0, len(ids_)-1)],
+                        ).add_to(map_)
 
         map_.fit_bounds([sw, ne])
-        self._window.map.setHtml(map_.get_root().render())
+        self.map.setHtml(map_.get_root().render())
+
+    def redraw_map(self):
+        to_plot = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+        self.draw_map(to_plot, list(self._data.traj_id.value_counts().keys()))
 
     def run_command(self):
         """
@@ -247,7 +263,7 @@ class GuiHandler:
         self._table.setModel(self._model)
 
         # Also, update the map.
-        self.add_map()
+        self.redraw_map()
 
     def _run_kinematic(self):
         """
