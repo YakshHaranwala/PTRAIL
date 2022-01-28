@@ -8,18 +8,18 @@
 import distutils
 import random
 import re
-
 import folium
-
 import inspect
 import pandas as pd
-import ptrail.utilities.constants as const
 
+# GUI Imports.
 from PyQt5 import QtWidgets, QtWebEngineWidgets
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 
+# Backend.
+import ptrail.utilities.constants as const
 from ptrail.features.kinematic_features import KinematicFeatures
 from ptrail.features.temporal_features import TemporalFeatures
 from ptrail.preprocessing.statistics import Statistics
@@ -30,6 +30,7 @@ from ptrail.preprocessing.interpolation import Interpolation
 class GuiHandler:
     def __init__(self, filename, window):
         self.traj_id_list = None
+
         self.map = None
         self._window = window
         self._data = None
@@ -68,7 +69,7 @@ class GuiHandler:
 
             col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
                                                title="Enter Column Names")
-            if col_names:
+            if col_names is not None and col_names[0] != '' and len(col_names) == 4:
                 # Read the data into a PTRAIL dataframe.
                 self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
                                              traj_id=col_names[0].strip(),
@@ -99,43 +100,44 @@ class GuiHandler:
     def add_map(self):
         """
             Use folium to plot the trajectory on a map.
-            Parameters
-            ----------
-                weight: float
-                    The weight of the trajectory line on the map.
-                opacity: float
-                    The opacity of the trajectory line on the map.
+
             Returns
             -------
                 folium.folium.Map
                     The map with plotted trajectory.
         """
-        # Create the dropdown menu to select the trajectory to plot.
-        ids_ = list(self._data.traj_id.value_counts().keys())
-        self.traj_id_list = QtWidgets.QComboBox()
-        self.traj_id_list.addItems(ids_)
-        self.traj_id_list.currentIndexChanged.connect(self.redraw_map)
-        self._window.MapPane.addWidget(self.traj_id_list)
+        # Get all the unique trajectory ids.
+        ids_ = list(self._data.reset_index()['traj_id'].value_counts().keys())
 
-        # The area for plotting the map.
+        # Initiate the map placeholder.
         self.map = QtWebEngineWidgets.QWebEngineView()
+
+        # Create the drop-down list for ID selection.
+        self.traj_id_list = QtWidgets.QComboBox()
+        self.traj_id_list.currentIndexChanged.connect(self.redraw_map)
+        self.traj_id_list.addItems(ids_)
+
+        # Add the drop-down and the map pane to the area.
+        self._window.MapPane.addWidget(self.traj_id_list)
         self._window.MapPane.addWidget(self.map)
 
         # Actually draw the map.
         to_plot = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
-        self.draw_map(to_plot, ids_)
+        self._draw_map(to_plot)
 
-    def draw_map(self, to_plot, ids_):
+    def _draw_map(self, to_plot):
         self.map.setHtml('')
-        colors = ["#" + ''.join([random.choice('123456789BCDEF') for j in range(6)])
-                  for i in range(len(ids_))]
+
+        # This is the colorblind palette taken from seaborn.
+        colors = ['#0173b2', '#de8f05', '#029e73', '#d55e00', '#cc78bc',
+                  '#ca9161', '#fbafe4', '#949494', '#ece133', '#56b4e9']
 
         sw = to_plot[['lat', 'lon']].min().values.tolist()
         ne = to_plot[['lat', 'lon']].max().values.tolist()
 
         # Create a map with the initial point.
         map_ = folium.Map(location=(to_plot[const.LAT].iloc[0], to_plot[const.LONG].iloc[0]),
-                          zoom_start=13)
+                          zoom_start=13, tiles='CartoDB positron')
 
         # Then, create (lat, lon) pairs for the data points.
         locations = []
@@ -154,7 +156,7 @@ class GuiHandler:
                       color='green',
                       popup=popup,
                       marker_color='green',
-                      icon=folium.Icon(icon_color='green', icon='circle', prefix='fa')).add_to(map_)
+                      icon=folium.Icon(icon_color='green', icon='play', prefix='fa')).add_to(map_)
 
         # Create text frame.
         iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {self.traj_id_list.currentText()} ' + '<br>' +
@@ -165,14 +167,14 @@ class GuiHandler:
         popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
 
         folium.Marker([to_plot['lat'].iloc[-1], to_plot['lon'].iloc[-1]],
-                      color='green',
+                      color='red',
                       popup=popup,
                       marker_color='red',
-                      icon=folium.Icon(icon_color='red', icon='circle', prefix='fa')).add_to(map_)
+                      icon=folium.Icon(icon_color='red', icon='stop', prefix='fa')).add_to(map_)
 
         # Add trajectory to map.
         folium.PolyLine(locations,
-                        color=colors[random.randint(0, len(ids_)-1)],
+                        color=colors[random.randint(0, len(colors)-1)],
                         ).add_to(map_)
 
         map_.fit_bounds([sw, ne])
@@ -180,7 +182,7 @@ class GuiHandler:
 
     def redraw_map(self):
         to_plot = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
-        self.draw_map(to_plot, list(self._data.traj_id.value_counts().keys()))
+        self._draw_map(to_plot)
 
     def run_command(self):
         """

@@ -306,8 +306,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                             ";csv Files (*.csv)", options=options)
 
         # If the user selects a file, load it into a pandas dataframe and print its statistics.
-        if fileName:
+        if fileName is not None and fileName != '':
             self.handler = GuiHandler(fileName, self)
+        else:
+            pass
 
     def save_file(self):
         """
@@ -340,6 +342,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                 msg.setWindowTitle("Error")
                 msg.setText("File could not be saved. Please try again!")
                 msg.exec()
+        else:
+            pass
 
     def version_button_clicked(self):
         """
