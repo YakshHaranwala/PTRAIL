@@ -8,6 +8,9 @@
 import distutils
 import random
 import re
+import sys
+import time
+
 import folium
 import inspect
 import pandas as pd
@@ -33,6 +36,7 @@ class GuiHandler:
 
         self.map = None
         self._window = window
+        self._map_data = None
         self._data = None
         self._model = None
         self._table = None
@@ -55,7 +59,9 @@ class GuiHandler:
                     If the user gives incorrect column names, then we ask
                     the user to enter them again.
         """
+        # self._window.statusBar.showMessage("Loading Dataset")
         try:
+            self._window.statusBar.showMessage("Loading the Dataset...")
             # First, we clear out the DF pane area.
             # This is done in order to make sure that 2 dataframes
             # are not loaded simultaneously making the view cluttered.
@@ -76,6 +82,7 @@ class GuiHandler:
                                              datetime=col_names[1].strip(),
                                              latitude=col_names[2].strip(),
                                              longitude=col_names[3].strip())
+                self._map_data = self._data
                 # Set the table model and display the dataframe.
                 self._table = QtWidgets.QTableView()
 
@@ -85,6 +92,7 @@ class GuiHandler:
                 self._table.setModel(self._model)
                 self._window.DFPane.addWidget(self._table)
                 self._window.run_stats_btn.setEnabled(True)
+                self._window.statusBar.showMessage("Dataset Loaded Successfully.")
             else:
                 self._window.open_file()
 
@@ -122,7 +130,8 @@ class GuiHandler:
         self._window.MapPane.addWidget(self.map)
 
         # Actually draw the map.
-        to_plot = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+        to_plot = self._map_data.reset_index().loc[self._map_data.reset_index()['traj_id']
+                                                   == self.traj_id_list.currentText()]
         self._draw_map(to_plot)
 
     def _draw_map(self, to_plot):
@@ -181,7 +190,8 @@ class GuiHandler:
         self.map.setHtml(map_.get_root().render())
 
     def redraw_map(self):
-        to_plot = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+        to_plot = self._map_data.reset_index().loc[
+            self._map_data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
         self._draw_map(to_plot)
 
     def run_command(self):
@@ -194,14 +204,19 @@ class GuiHandler:
                 None
         """
         if self._window.feature_type.currentIndex() == 0:
+            self._window.statusBar.showMessage("Running Filters ...")
             self._run_filters()
         elif self._window.feature_type.currentIndex() == 1:
+            self._window.statusBar.showMessage("Running Interpolation ...")
             self._run_ip()
         elif self._window.feature_type.currentIndex() == 2:
+            self._window.statusBar.showMessage("Running Kinematic Features ...")
             self._run_kinematic()
         elif self._window.feature_type.currentIndex() == 3:
+            self._window.statusBar.showMessage("Running Statistics ...")
             self._run_stats()
         else:
+            self._window.statusBar.showMessage("Running Temporal Features ...")
             self._run_temporal()
 
     def _run_ip(self):
@@ -259,6 +274,7 @@ class GuiHandler:
                                                                 ip_type='random_walk',
                                                                 time_jump=float(args[0]))
 
+        self._window.statusBar.showMessage("Task Done ...")
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
         self._model = TableModel(self._data.reset_index(inplace=False))
@@ -284,6 +300,7 @@ class GuiHandler:
 
         if selected_function == 'All Kinematic Features':
             self._data = KinematicFeatures.generate_kinematic_features(self._data)
+            self._window.statusBar.showMessage("Done ...")
 
         elif selected_function == 'Distance':
             self._data = KinematicFeatures.create_distance_column(self._data)
@@ -345,6 +362,7 @@ class GuiHandler:
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
@@ -379,6 +397,7 @@ class GuiHandler:
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
@@ -553,10 +572,11 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.remove_trajectories_with_less_points(dataframe=self._data,
-                                                                          num_min_points=int(args[1]))
+                                                                          num_min_points=int(args[0]))
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
@@ -608,6 +628,7 @@ class GuiHandler:
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 

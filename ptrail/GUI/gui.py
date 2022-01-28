@@ -74,6 +74,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.setup_stats_palette()
         self.setup_map_pane()
         self.setup_df_pane()
+        self.setup_statusbar()
         self.retranslateUi(OuterWindow)
 
         OuterWindow.setCentralWidget(self.centralwidget)
@@ -370,3 +371,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.SaveButton.setText(_translate("OuterWindow", "Save"))
         self.QuitButton.setText(_translate("OuterWindow", "Quit"))
         self.VersionInfoButton.setText(_translate("OuterWindow", "Version Info"))
+
+    def setup_statusbar(self):
+        self.statusBar = QtWidgets.QStatusBar()
+        self.statusBar.setStyleSheet("border :1px solid grey;")
+        self.statusBar.setFont(QtGui.QFont('Tahoma', 12))
+        self.OuterWindow.setStatusBar(self.statusBar)
+
+    def startAnimation(self):
+        self.movie.start()
+
+    # Stop Animation(According to need)
+    def stopAnimation(self):
+        self.movie.stop()
