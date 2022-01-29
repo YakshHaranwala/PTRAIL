@@ -218,7 +218,7 @@ class KinematicFeatures:
             multi_pool.join()
 
             # merge the smaller pieces and then return the dataframe converted to PTRAILDataFrame.
-            return PTRAILDataFrame(pd.concat(result), const.LAT, const.LONG,
+            return PTRAILDataFrame(pd.concat(result).drop(columns=['index']), const.LAT, const.LONG,
                                    const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
@@ -269,7 +269,7 @@ class KinematicFeatures:
             multi_pool.join()
 
             # merge the smaller pieces and then return the dataframe converted to PTRAILDataFrame.
-            return PTRAILDataFrame(pd.concat(result), const.LAT, const.LONG,
+            return PTRAILDataFrame(pd.concat(result).drop(columns=['index']), const.LAT, const.LONG,
                                    const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
@@ -367,7 +367,8 @@ class KinematicFeatures:
 
         # Now lets join all the smaller partitions and return the resultant dataframe
         result = pd.concat(result)
-        return PTRAILDataFrame(result.reset_index(), const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+        return PTRAILDataFrame(result.reset_index().drop(columns=['index']),
+                               const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
     def create_distance_from_point_column(dataframe: PTRAILDataFrame, coordinates: tuple):
@@ -644,7 +645,7 @@ class KinematicFeatures:
             multi_pool.join()
 
             # merge the smaller pieces and then return the dataframe converted to PTRAILDataFrame.
-            dataframe = pd.concat(result)
+            dataframe = pd.concat(result).drop(columns=['index'])
             dataframe = dataframe.replace([np.inf, -np.inf], np.nan)
             return PTRAILDataFrame(dataframe, const.LAT, const.LONG,
                                    const.DateTime, const.TRAJECTORY_ID)

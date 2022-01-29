@@ -75,7 +75,6 @@ class GuiHandler:
 
             col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
                                                title="Enter Column Names")
-            print(col_names)
             if col_names is not None and col_names[0] != '' and len(col_names) == 4:
                 # Read the data into a PTRAIL dataframe.
                 self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
@@ -289,7 +288,6 @@ class GuiHandler:
                 None
         """
         # TODO: Fix level_0 and index issue
-        print(self._data)
         selected_function = self._window.listWidget.selectedItems()[0].text()
 
         # Based on the function selected by the user and whether it contains any
