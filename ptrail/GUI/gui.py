@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QSizePolicy
 
 from ptrail.GUI.handler import GuiHandler
 
+
 # TODO: The application crashes when we cancel file upload and try to upload a different file.
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, OuterWindow):

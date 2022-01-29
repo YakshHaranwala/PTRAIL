@@ -8,8 +8,6 @@
 import distutils
 import random
 import re
-import sys
-import time
 
 import folium
 import inspect
@@ -36,13 +34,12 @@ class GuiHandler:
 
         self.map = None
         self._window = window
-        self._map_data = None
         self._data = None
+        self._map_data = None
         self._model = None
         self._table = None
 
         self.display_df(filename=filename)
-        # self.add_map()
 
     def display_df(self, filename):
         """
@@ -59,7 +56,6 @@ class GuiHandler:
                     If the user gives incorrect column names, then we ask
                     the user to enter them again.
         """
-        # self._window.statusBar.showMessage("Loading Dataset")
         try:
             self._window.statusBar.showMessage("Loading the Dataset...")
             # First, we clear out the DF pane area.
@@ -82,8 +78,8 @@ class GuiHandler:
                                              datetime=col_names[1].strip(),
                                              latitude=col_names[2].strip(),
                                              longitude=col_names[3].strip())
-
                 self._map_data = self._data
+
                 # Set the table model and display the dataframe.
                 self._table = QtWidgets.QTableView()
 
@@ -95,8 +91,6 @@ class GuiHandler:
                 self._window.run_stats_btn.setEnabled(True)
                 self._window.statusBar.showMessage("Dataset Loaded Successfully.")
 
-                # TODO: Fix the map and keep it updated with the dataframe
-                # TODO: Also update the traj_id dropdown as the dataframe updates
                 # Get all the unique trajectory ids.
                 ids_ = list(self._data.reset_index()['traj_id'].value_counts().keys())
 
@@ -178,16 +172,21 @@ class GuiHandler:
 
         # Add trajectory to map.
         folium.PolyLine(locations,
-                        color=colors[random.randint(0, len(colors)-1)],
+                        color=colors[random.randint(0, len(colors) - 1)],
                         ).add_to(map_)
 
         map_.fit_bounds([sw, ne])
         self.map.setHtml(map_.get_root().render())
 
     def redraw_map(self):
-        to_plot = self._map_data.reset_index().loc[
-            self._map_data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
-        self._draw_map(to_plot)
+        # Check whether the QComboBox is empty or not. If so, don't redraw.
+        # NOTE: This is done specifically to handle the case of filtering where
+        #       some trajectories might be filtered out, and we have to update the
+        #       id selection list.
+        if self.traj_id_list.currentText() and self.traj_id_list.currentText() != '' and len(self._data) > 0:
+            to_plot = self._map_data.reset_index().loc[
+                self._map_data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+            self._draw_map(to_plot)
 
     def run_command(self):
         """
@@ -270,12 +269,14 @@ class GuiHandler:
                                                                 time_jump=float(args[0]))
 
         self._window.statusBar.showMessage("Task Done ...")
+
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
         # Also, update the map.
+        self._map_data = self._data
         self.redraw_map()
 
     def _run_kinematic(self):
@@ -287,7 +288,6 @@ class GuiHandler:
             -------
                 None
         """
-        # TODO: Fix level_0 and index issue
         selected_function = self._window.listWidget.selectedItems()[0].text()
 
         # Based on the function selected by the user and whether it contains any
@@ -358,6 +358,7 @@ class GuiHandler:
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._map_data = self._data
         self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
@@ -393,6 +394,7 @@ class GuiHandler:
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self._map_data = self._data
         self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
@@ -570,6 +572,12 @@ class GuiHandler:
                 self._data = Filters.remove_trajectories_with_less_points(dataframe=self._data,
                                                                           num_min_points=int(args[0]))
 
+        # Update the traj_id list in case if some trajectories have been completely
+        # removed.
+        self._map_data = self._data
+        self.traj_id_list.clear()
+        self.traj_id_list.addItems(list(self._data.reset_index()['traj_id'].value_counts().keys()))
+
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
         self._window.statusBar.showMessage("Task Done ...")
@@ -597,6 +605,7 @@ class GuiHandler:
             if args:
                 self._data = Statistics.segment_traj_by_days(dataframe=self._data,
                                                              num_days=int(args[0]))
+                self._map_data = self._data
 
         elif selected_function == 'Generate Kinematic Statistics':
             params = inspect.getfullargspec(Statistics.generate_kinematic_stats).args
