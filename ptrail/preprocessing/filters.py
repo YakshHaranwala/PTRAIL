@@ -420,6 +420,7 @@ class Filters:
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
             return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
         except KeyError:
+
             dataframe = kinematic.create_distance_column(dataframe)
             return Filters.filter_by_min_consecutive_distance(dataframe, min_distance)
 

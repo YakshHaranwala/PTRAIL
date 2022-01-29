@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QSizePolicy
 
 from ptrail.GUI.handler import GuiHandler
 
-
+# TODO: The application crashes when we cancel file upload and try to upload a different file.
 class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, OuterWindow):
         super(Ui_MainWindow, self).__init__()
@@ -378,9 +378,3 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.statusBar.setFont(QtGui.QFont('Tahoma', 12))
         self.OuterWindow.setStatusBar(self.statusBar)
 
-    def startAnimation(self):
-        self.movie.start()
-
-    # Stop Animation(According to need)
-    def stopAnimation(self):
-        self.movie.stop()

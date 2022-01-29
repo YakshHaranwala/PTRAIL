@@ -600,8 +600,7 @@ class Helpers:
         # Now split the dataframes based on set of Trajectory ids.
         # As of now, each smaller chunk is supposed to have data of 100
         # trajectory IDs max
-        # TODO: KeyError: 'Requested level (traj_id) does not match index name (None)' on line 604
-        df_chunks = [dataframe.loc[dataframe.index.get_level_values(const.TRAJECTORY_ID).isin(ids_[i])]
+        df_chunks = [dataframe.reset_index().loc[dataframe.reset_index()[const.TRAJECTORY_ID].isin(ids_[i])]
                      for i in range(len(ids_))]
         return df_chunks
 
