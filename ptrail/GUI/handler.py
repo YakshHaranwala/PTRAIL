@@ -42,7 +42,7 @@ class GuiHandler:
         self._table = None
 
         self.display_df(filename=filename)
-        self.add_map()
+        # self.add_map()
 
     def display_df(self, filename):
         """
@@ -75,6 +75,7 @@ class GuiHandler:
 
             col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
                                                title="Enter Column Names")
+            print(col_names)
             if col_names is not None and col_names[0] != '' and len(col_names) == 4:
                 # Read the data into a PTRAIL dataframe.
                 self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
@@ -82,6 +83,7 @@ class GuiHandler:
                                              datetime=col_names[1].strip(),
                                              latitude=col_names[2].strip(),
                                              longitude=col_names[3].strip())
+
                 self._map_data = self._data
                 # Set the table model and display the dataframe.
                 self._table = QtWidgets.QTableView()
@@ -93,6 +95,29 @@ class GuiHandler:
                 self._window.DFPane.addWidget(self._table)
                 self._window.run_stats_btn.setEnabled(True)
                 self._window.statusBar.showMessage("Dataset Loaded Successfully.")
+
+                # TODO: Fix the map and keep it updated with the dataframe
+                # TODO: Also update the traj_id dropdown as the dataframe updates
+                # Get all the unique trajectory ids.
+                ids_ = list(self._data.reset_index()['traj_id'].value_counts().keys())
+
+                # Initiate the map placeholder.
+                self.map = QtWebEngineWidgets.QWebEngineView()
+
+                # Create the drop-down list for ID selection.
+                self.traj_id_list = QtWidgets.QComboBox()
+                self.traj_id_list.currentIndexChanged.connect(lambda: self.redraw_map())
+                self.traj_id_list.addItems(ids_)
+
+                # Add the drop-down and the map pane to the area.
+                self._window.MapPane.addWidget(self.traj_id_list)
+                self._window.MapPane.addWidget(self.map)
+
+                # Actually draw the map.
+                to_plot = self._map_data.reset_index().loc[self._map_data.reset_index()['traj_id']
+                                                           == self.traj_id_list.currentText()]
+                self._draw_map(to_plot)
+
             else:
                 self._window.open_file()
 
@@ -104,35 +129,6 @@ class GuiHandler:
                         "Please Enter the names again.")
             msg.exec()
             self.__init__(filename, self._window)
-
-    def add_map(self):
-        """
-            Use folium to plot the trajectory on a map.
-
-            Returns
-            -------
-                folium.folium.Map
-                    The map with plotted trajectory.
-        """
-        # Get all the unique trajectory ids.
-        ids_ = list(self._data.reset_index()['traj_id'].value_counts().keys())
-
-        # Initiate the map placeholder.
-        self.map = QtWebEngineWidgets.QWebEngineView()
-
-        # Create the drop-down list for ID selection.
-        self.traj_id_list = QtWidgets.QComboBox()
-        self.traj_id_list.currentIndexChanged.connect(self.redraw_map)
-        self.traj_id_list.addItems(ids_)
-
-        # Add the drop-down and the map pane to the area.
-        self._window.MapPane.addWidget(self.traj_id_list)
-        self._window.MapPane.addWidget(self.map)
-
-        # Actually draw the map.
-        to_plot = self._map_data.reset_index().loc[self._map_data.reset_index()['traj_id']
-                                                   == self.traj_id_list.currentText()]
-        self._draw_map(to_plot)
 
     def _draw_map(self, to_plot):
         self.map.setHtml('')
@@ -292,6 +288,8 @@ class GuiHandler:
             -------
                 None
         """
+        # TODO: Fix level_0 and index issue
+        print(self._data)
         selected_function = self._window.listWidget.selectedItems()[0].text()
 
         # Based on the function selected by the user and whether it contains any
