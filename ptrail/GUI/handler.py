@@ -58,6 +58,7 @@ class GuiHandler:
         """
         try:
             self._window.statusBar.showMessage("Loading the Dataset...")
+
             # First, we clear out the DF pane area.
             # This is done in order to make sure that 2 dataframes
             # are not loaded simultaneously making the view cluttered.
@@ -109,6 +110,7 @@ class GuiHandler:
                 # Actually draw the map.
                 to_plot = self._map_data.reset_index().loc[self._map_data.reset_index()['traj_id']
                                                            == self.traj_id_list.currentText()]
+                self._window.open_btn.deleteLater()
                 self._draw_map(to_plot)
 
             else:

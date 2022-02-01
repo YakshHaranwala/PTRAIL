@@ -35,6 +35,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.maplayoutmanager = None
         self.MapPane = None
         self.map = None
+        self.open_btn = None
 
         # CommandPalette variables
         self.cmdlayoutmanager = None
@@ -133,6 +134,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.MapPane = QtWidgets.QGridLayout(self.maplayoutmanager)
         self.MapPane.setContentsMargins(0, 0, 0, 0)
         self.MapPane.setObjectName("MapPane")
+
+        self.open_btn = QtWidgets.QPushButton("Open File")
+        self.open_btn.clicked.connect(self.open_file)
+        self.MapPane.addWidget(self.open_btn)
 
         self.vlayout.addWidget(self.maplayoutmanager, 0, 1, 3, 2)
 
@@ -255,19 +260,19 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.FileMenu = QtWidgets.QMenu(self.MenuBar)
         self.FileMenu.setObjectName("FileMenu")
 
-        # Create the save button of the File Menu.
-        self.SaveButton = QtWidgets.QAction(self.OuterWindow)
-        self.SaveButton.triggered.connect(self.save_file)
-        self.SaveButton.setObjectName("SaveButton")
-        self.SaveButton.setShortcut("Ctrl+S" if sys.platform != 'darwin' else "cmd+S")
-        self.FileMenu.addAction(self.SaveButton)
-
         # Create the open button of the File Menu.
         self.OpenButton = QtWidgets.QAction(self.OuterWindow)
         self.OpenButton.triggered.connect(self.open_file)
         self.OpenButton.setObjectName("OpenButton")
         self.OpenButton.setShortcut("Ctrl+O" if sys.platform != 'darwin' else "cmd+O")
         self.FileMenu.addAction(self.OpenButton)
+
+        # Create the save button of the File Menu.
+        self.SaveButton = QtWidgets.QAction(self.OuterWindow)
+        self.SaveButton.triggered.connect(self.save_file)
+        self.SaveButton.setObjectName("SaveButton")
+        self.SaveButton.setShortcut("Ctrl+S" if sys.platform != 'darwin' else "cmd+S")
+        self.FileMenu.addAction(self.SaveButton)
 
         self.FileMenu.addSeparator()
         # Create the quit button of the File Menu and add action listener.
@@ -369,7 +374,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.FileMenu.setTitle(_translate("OuterWindow", "File"))
         self.menuAbout.setTitle(_translate("OuterWindow", "About"))
         self.OpenButton.setText(_translate("OuterWindow", "Open"))
-        self.SaveButton.setText(_translate("OuterWindow", "Save"))
+        self.SaveButton.setText(_translate("OuterWindow", "Export"))
         self.QuitButton.setText(_translate("OuterWindow", "Quit"))
         self.VersionInfoButton.setText(_translate("OuterWindow", "Version Info"))
 
