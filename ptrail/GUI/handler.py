@@ -14,7 +14,7 @@ import inspect
 import pandas as pd
 
 # GUI Imports.
-from PyQt5 import QtWidgets, QtWebEngineWidgets
+from PyQt5 import QtWidgets, QtWebEngineWidgets, QtGui
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
@@ -88,8 +88,8 @@ class GuiHandler:
                 #       index and setting inplace as False.
                 self._model = TableModel(self._data.reset_index(inplace=False))
                 self._table.setModel(self._model)
+                self._window.add_df_controller()
                 self._window.DFPane.addWidget(self._table)
-                self._window.run_stats_btn.setEnabled(True)
                 self._window.statusBar.showMessage("Dataset Loaded Successfully.")
 
                 # Get all the unique trajectory ids.
@@ -101,6 +101,7 @@ class GuiHandler:
                 # Create the drop-down list for ID selection.
                 self.traj_id_list = QtWidgets.QComboBox()
                 self.traj_id_list.currentIndexChanged.connect(lambda: self.redraw_map())
+                self.traj_id_list.setFont(QtGui.QFont('Tahoma', 12))
                 self.traj_id_list.addItems(ids_)
 
                 # Add the drop-down and the map pane to the area.
@@ -112,7 +113,7 @@ class GuiHandler:
                                                            == self.traj_id_list.currentText()]
                 self._window.open_btn.deleteLater()
                 self._draw_map(to_plot)
-
+                self._window.run_stats_btn.setEnabled(True)
             else:
                 self._window.open_file()
 
@@ -160,8 +161,8 @@ class GuiHandler:
 
         # Create text frame.
         iframe = folium.IFrame(f'<font size="1px">Trajectory ID: {self.traj_id_list.currentText()} ' + '<br>' +
-                               f'Latitude: {locations[0][0]}' + '<br>' +
-                               f'Longitude: {locations[0][1]} </font>')
+                               f'Latitude: {locations[-1][0]}' + '<br>' +
+                               f'Longitude: {locations[-1][1]} </font>')
 
         # Create start and end markers for the trajectory.
         popup = folium.Popup(iframe, min_width=180, max_width=200, max_height=75)
@@ -199,6 +200,7 @@ class GuiHandler:
             -------
                 None
         """
+        # self._window.run_stats_btn.setEnabled(True)
         if self._window.feature_type.currentIndex() == 0:
             self._window.statusBar.showMessage("Running Filters ...")
             self._run_filters()

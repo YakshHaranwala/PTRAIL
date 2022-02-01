@@ -19,6 +19,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def __init__(self, OuterWindow):
         super(Ui_MainWindow, self).__init__()
         # Main Window variables.
+        self.statusBar = None
         self.vlayout = None
         self.centralwidget = None
 
@@ -52,7 +53,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.dflayoutmanager = None
         self.DFPane = None
         self.OuterWindow = OuterWindow
+        self.export_btn = None
+        self.df_controller = None
+        self.df_view = None
 
+        # The GUI conductor.
         self.handler = None
         self.setupUi(OuterWindow)
 
@@ -137,6 +142,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
         self.open_btn = QtWidgets.QPushButton("Open File")
         self.open_btn.clicked.connect(self.open_file)
+        self.open_btn.resize(150, 50)
         self.MapPane.addWidget(self.open_btn)
 
         self.vlayout.addWidget(self.maplayoutmanager, 0, 1, 3, 2)
@@ -184,6 +190,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.listWidget.addItems(filt_features)
         self.listWidget.setFont(QtGui.QFont('Tahoma', 12))
         self.listWidget.setUniformItemSizes(True)
+        self.listWidget.item(0).setSelected(True)
         self.CommandPalette.addWidget(self.listWidget)
 
         # ------------- Add the run commands button. --------------------- #
@@ -225,7 +232,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'All Temporal Features', 'Date', 'Time',
             'Day of the Week', 'Weekend Indicator', 'Time of Day',
         ]
-
         self.listWidget.clear()
 
         # Change the options of the list as per the current
@@ -242,6 +248,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             self.listWidget.addItems(temporal_features)
 
         self.listWidget.setFont(QtGui.QFont('Tahoma', 12))
+        self.listWidget.item(0).setSelected(True)
         self.listWidget.setUniformItemSizes(True)
 
     def setup_menubar(self):
@@ -296,6 +303,40 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.MenuBar.addAction(self.FileMenu.menuAction())
         self.MenuBar.addAction(self.menuAbout.menuAction())
         self.OuterWindow.setMenuBar(self.MenuBar)
+
+    def retranslateUi(self, OuterWindow):
+        """ Auto Generated method by PyQt Designer."""
+        _translate = QtCore.QCoreApplication.translate
+        OuterWindow.setWindowTitle(_translate("OuterWindow", "PTRAIL - A Trajectory Preprocessing Tool"))
+        self.FileMenu.setTitle(_translate("OuterWindow", "File"))
+        self.menuAbout.setTitle(_translate("OuterWindow", "About"))
+        self.OpenButton.setText(_translate("OuterWindow", "Open"))
+        self.SaveButton.setText(_translate("OuterWindow", "Export"))
+        self.QuitButton.setText(_translate("OuterWindow", "Quit"))
+        self.VersionInfoButton.setText(_translate("OuterWindow", "Version Info"))
+
+    def add_df_controller(self):
+        # Create a smaller box layout.
+        self.df_controller = QtWidgets.QHBoxLayout()
+
+        # Create a trajectory View selector.
+        self.df_view = QtWidgets.QComboBox()
+        self.df_view.addItems(['Point-Based View', 'Segment-Based View'])
+        self.df_controller.addWidget(self.df_view)
+
+        # Create an export button for the dataset.
+        self.export_btn = QtWidgets.QPushButton("Export Dataframe")
+        self.export_btn.clicked.connect(self.save_file)
+        self.df_controller.addWidget(self.export_btn)
+
+        # Add this mini panel to the main DF panel.
+        self.DFPane.addLayout(self.df_controller)
+
+    def setup_statusbar(self):
+        self.statusBar = QtWidgets.QStatusBar()
+        self.statusBar.setStyleSheet("border :1px solid grey;")
+        self.statusBar.setFont(QtGui.QFont('Tahoma', 12))
+        self.OuterWindow.setStatusBar(self.statusBar)
 
     def open_file(self):
         """
@@ -366,21 +407,3 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         msg.setText("Version: 0.6.3 Beta \n"
                     "Authors: Yaksh J Haranwala, Salman Haidri")
         msg.exec()
-
-    def retranslateUi(self, OuterWindow):
-        """ Auto Generated method by PyQt Designer."""
-        _translate = QtCore.QCoreApplication.translate
-        OuterWindow.setWindowTitle(_translate("OuterWindow", "PTRAIL - A Trajectory Preprocessing Tool"))
-        self.FileMenu.setTitle(_translate("OuterWindow", "File"))
-        self.menuAbout.setTitle(_translate("OuterWindow", "About"))
-        self.OpenButton.setText(_translate("OuterWindow", "Open"))
-        self.SaveButton.setText(_translate("OuterWindow", "Export"))
-        self.QuitButton.setText(_translate("OuterWindow", "Quit"))
-        self.VersionInfoButton.setText(_translate("OuterWindow", "Version Info"))
-
-    def setup_statusbar(self):
-        self.statusBar = QtWidgets.QStatusBar()
-        self.statusBar.setStyleSheet("border :1px solid grey;")
-        self.statusBar.setFont(QtGui.QFont('Tahoma', 12))
-        self.OuterWindow.setStatusBar(self.statusBar)
-
