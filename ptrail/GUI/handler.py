@@ -203,6 +203,7 @@ class GuiHandler:
 
         # Create the list widget and add the options.
         self._window.dropColumnWidget = QtWidgets.QListWidget()
+        self._window.dropColumnWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self._window.dropColumnWidget.setFont(QtGui.QFont("Tahoma", 12))
         self._window.dropColumnWidget.setSizePolicy(
             QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored))
@@ -213,8 +214,9 @@ class GuiHandler:
         small_layout.addWidget(self._window.dropColumnWidget)
 
         # Add the button to drop the column.
-        self._window.dropColumnBtn = QtWidgets.QPushButton("Drop Column")
+        self._window.dropColumnBtn = QtWidgets.QPushButton("Drop Column(s)")
         self._window.dropColumnBtn.setFont(QtGui.QFont("Tahoma", 12))
+        self._window.dropColumnBtn.clicked.connect(lambda: self.drop_col())
         small_layout.addWidget(self._window.dropColumnBtn)
 
         # Add the VBoxLayout to the Command Palette.
@@ -718,3 +720,22 @@ class GuiHandler:
         toAdd.remove('lat')
         toAdd.remove('lon')
         self._window.dropColumnWidget.addItems(toAdd)
+
+    def drop_col(self):
+        """
+            Drop the columns based on the user selection.
+        """
+        # Get the selected items and then create a list
+        # of the column names to drop.
+        items = self._window.dropColumnWidget.selectedItems()
+        to_drop = list()
+        for it in items:
+            to_drop.append(it.text())
+
+        # Drop the column(s) selected by the user.
+        self._data.drop(columns=to_drop, inplace=True)
+
+        # Update the options in the drop-column selection list and display the table again.
+        self.update_dropCol_options()
+        self._model = TableModel(self._data.reset_index(inplace=False))
+        self._table.setModel(self._model)

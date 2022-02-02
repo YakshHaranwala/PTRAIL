@@ -1,16 +1,16 @@
-import distutils
+import pandas as pd
 
 from ptrail.preprocessing.filters import Filters
-import inspect
+from ptrail.core.TrajectoryDF import PTRAILDataFrame
 
-a = inspect.getfullargspec(Filters.filter_by_date)
+df = PTRAILDataFrame(data_set=pd.read_csv('/home/yjharanwala/Desktop/PTRAIL/examples/data/seagulls.csv'),
+                     datetime='DateTime',
+                     traj_id='traj_id',
+                     latitude='lat',
+                     longitude='lon')
 
-print(a.args)
+print(df.columns)
 
-print()
+df.drop(columns=['event-id'])
 
-import seaborn as sns
-
-a = sns.color_palette('colorblind').as_hex()
-
-print(a)
+print(type(df))
