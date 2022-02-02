@@ -14,7 +14,7 @@ import inspect
 import pandas as pd
 
 # GUI Imports.
-from PyQt5 import QtWidgets, QtWebEngineWidgets, QtGui
+from PyQt5 import QtWidgets, QtWebEngineWidgets, QtGui, QtCore
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
@@ -113,7 +113,8 @@ class GuiHandler:
                                                            == self.traj_id_list.currentText()]
                 self._window.open_btn.deleteLater()
                 self._draw_map(to_plot)
-                self._window.run_stats_btn.setEnabled(True)
+                self.add_column_drop_widget()
+                self._window.runStatsBtn.setEnabled(True)
             else:
                 self._window.open_file()
 
@@ -181,7 +182,48 @@ class GuiHandler:
         map_.fit_bounds([sw, ne])
         self.map.setHtml(map_.get_root().render())
 
+    def add_column_drop_widget(self):
+        """
+            Add a List Widget to drop columns from the dataset. This
+            widget is added to the CommandPalette.
+
+            Note
+            ----
+                It is to be noted that the following columns are mandatory for
+                PTrailDataFrame:
+                    | 1. traj_id
+                    | 2. DateTime
+                    | 3. lat
+                    | 4. lon
+
+                Hence, these columns are not presented as options for deletion.
+        """
+        # A layout for containing the drop column setup.
+        small_layout = QtWidgets.QVBoxLayout()
+
+        # Create the list widget and add the options.
+        self._window.dropColumnWidget = QtWidgets.QListWidget()
+        self._window.dropColumnWidget.setFont(QtGui.QFont("Tahoma", 12))
+        self._window.dropColumnWidget.setSizePolicy(
+            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored))
+        to_add = list(self._data.columns)
+        to_add.remove('lat')
+        to_add.remove('lon')
+        self._window.dropColumnWidget.addItems(to_add)
+        small_layout.addWidget(self._window.dropColumnWidget)
+
+        # Add the button to drop the column.
+        self._window.dropColumnBtn = QtWidgets.QPushButton("Drop Column")
+        self._window.dropColumnBtn.setFont(QtGui.QFont("Tahoma", 12))
+        small_layout.addWidget(self._window.dropColumnBtn)
+
+        # Add the VBoxLayout to the Command Palette.
+        self._window.CommandPalette.addLayout(small_layout)
+
     def redraw_map(self):
+        """
+            Redraw the map when the traj_id is changed from the DropDown list.
+        """
         # Check whether the QComboBox is empty or not. If so, don't redraw.
         # NOTE: This is done specifically to handle the case of filtering where
         #       some trajectories might be filtered out, and we have to update the
@@ -200,22 +242,23 @@ class GuiHandler:
             -------
                 None
         """
-        # self._window.run_stats_btn.setEnabled(True)
-        if self._window.feature_type.currentIndex() == 0:
+        if self._window.featureType.currentIndex() == 0:
             self._window.statusBar.showMessage("Running Filters ...")
             self._run_filters()
-        elif self._window.feature_type.currentIndex() == 1:
+        elif self._window.featureType.currentIndex() == 1:
             self._window.statusBar.showMessage("Running Interpolation ...")
             self._run_ip()
-        elif self._window.feature_type.currentIndex() == 2:
+        elif self._window.featureType.currentIndex() == 2:
             self._window.statusBar.showMessage("Running Kinematic Features ...")
             self._run_kinematic()
-        elif self._window.feature_type.currentIndex() == 3:
+        elif self._window.featureType.currentIndex() == 3:
             self._window.statusBar.showMessage("Running Statistics ...")
             self._run_stats()
         else:
             self._window.statusBar.showMessage("Running Temporal Features ...")
             self._run_temporal()
+
+        self.update_dropCol_options()
 
     def _run_ip(self):
         """
@@ -226,7 +269,7 @@ class GuiHandler:
             -------
                 None
         """
-        selected_function = self._window.listWidget.selectedItems()[0].text()
+        selected_function = self._window.featureListWidget.selectedItems()[0].text()
 
         if selected_function == 'Linear Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
@@ -292,7 +335,7 @@ class GuiHandler:
             -------
                 None
         """
-        selected_function = self._window.listWidget.selectedItems()[0].text()
+        selected_function = self._window.featureListWidget.selectedItems()[0].text()
 
         # Based on the function selected by the user and whether it contains any
         # user given parameters, we will go ahead and run those features and update
@@ -376,7 +419,7 @@ class GuiHandler:
             -------
                 None
         """
-        selected_function = self._window.listWidget.selectedItems()[0].text()
+        selected_function = self._window.featureListWidget.selectedItems()[0].text()
 
         if selected_function == "All Temporal Features":
             self._data = TemporalFeatures.generate_temporal_features(self._data)
@@ -412,7 +455,7 @@ class GuiHandler:
             -------
                 None
         """
-        selected_function = self._window.listWidget.selectedItems()[0].text()
+        selected_function = self._window.featureListWidget.selectedItems()[0].text()
 
         if selected_function == 'Hampel Filter':
             params = inspect.getfullargspec(Filters.hampel_outlier_detection).args
@@ -597,7 +640,7 @@ class GuiHandler:
             -------
                 None
         """
-        selected_function = self._window.listWidget.selectedItems()[0].text()
+        selected_function = self._window.featureListWidget.selectedItems()[0].text()
 
         if selected_function == 'Segment Trajectories':
             params = inspect.getfullargspec(Statistics.segment_traj_by_days).args
@@ -665,3 +708,13 @@ class GuiHandler:
             args = input_dialog.getInputs()
 
             return args
+
+    def update_dropCol_options(self):
+        """
+            Update the options in the QListWidget for dropping the columns.
+        """
+        self._window.dropColumnWidget.clear()
+        toAdd = list(self._data.columns)
+        toAdd.remove('lat')
+        toAdd.remove('lon')
+        self._window.dropColumnWidget.addItems(toAdd)

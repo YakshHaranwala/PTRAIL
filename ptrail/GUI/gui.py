@@ -8,7 +8,6 @@
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtWebEngineWidgets
 import sys
-
 from PyQt5.QtWidgets import QSizePolicy
 
 from ptrail.GUI.handler import GuiHandler
@@ -41,9 +40,11 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # CommandPalette variables
         self.cmdlayoutmanager = None
         self.CommandPalette = None
-        self.feature_type = None
-        self.listWidget = None
-        self.run_stats_btn = None
+        self.featureType = None
+        self.featureListWidget = None
+        self.dropColumnWidget = None
+        self.runStatsBtn = None
+        self.dropColumnBtn = None
 
         # StatsPane variables.
         self.statslayoutmanager = None
@@ -53,9 +54,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.dflayoutmanager = None
         self.DFPane = None
         self.OuterWindow = OuterWindow
-        self.export_btn = None
-        self.df_controller = None
-        self.df_view = None
+        self.exportBtn = None
+        self.dfController = None
+        self.dfView = None
 
         # The GUI conductor.
         self.handler = None
@@ -158,7 +159,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Create the layout manager and set the size of the pane.
         self.cmdlayoutmanager = QtWidgets.QWidget(self.centralwidget)
         self.cmdlayoutmanager.setObjectName("verticalLayoutWidget_2")
-        self.CommandPalette = QtWidgets.QGridLayout(self.cmdlayoutmanager)
+        self.CommandPalette = QtWidgets.QVBoxLayout(self.cmdlayoutmanager)
         self.CommandPalette.setContentsMargins(0, 0, 0, 0)
         self.CommandPalette.setObjectName("CommandPalette")
 
@@ -168,17 +169,17 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'Kinematic Features', 'Temporal Features', 'Filtering', 'Interpolation', 'Statistics'
         ]
 
+        newVLayout = QtWidgets.QVBoxLayout()
         # ------------------- Feature Selection List ---------------------- #
-        self.feature_type = QtWidgets.QComboBox()
-        self.feature_type.addItems(sorted(feature_types))
-        self.feature_type.setFont(QtGui.QFont('Tahoma', 12))
-        self.feature_type.currentIndexChanged.connect(self.add_tree_options)
-        self.CommandPalette.addWidget(self.feature_type)
+        self.featureType = QtWidgets.QComboBox()
+        self.featureType.addItems(sorted(feature_types))
+        self.featureType.setFont(QtGui.QFont('Tahoma', 12))
+        self.featureType.currentIndexChanged.connect(self.add_tree_options)
+        newVLayout.addWidget(self.featureType)
 
         # ------------------- Multi Selection Widget ----------------------#
-        self.listWidget = QtWidgets.QListWidget()
-        # self.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.listWidget.setSizePolicy(QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored))
+        self.featureListWidget = QtWidgets.QListWidget()
+        self.featureListWidget.setSizePolicy(QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored))
         filt_features = [
             'Hampel Filter', 'Remove Duplicates', 'By Trajectory ID', 'By Bounding Box', 'By Date',
             'By DateTime', 'By Maximum Speed', 'By Minimum Speed', 'By Minimum Consecutive Distance',
@@ -187,19 +188,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'Remove Trajectories with Less Points',
         ]
 
-        self.listWidget.addItems(filt_features)
-        self.listWidget.setFont(QtGui.QFont('Tahoma', 12))
-        self.listWidget.setUniformItemSizes(True)
-        self.listWidget.item(0).setSelected(True)
-        self.CommandPalette.addWidget(self.listWidget)
+        self.featureListWidget.addItems(filt_features)
+        self.featureListWidget.setFont(QtGui.QFont('Tahoma', 12))
+        self.featureListWidget.setUniformItemSizes(True)
+        self.featureListWidget.item(0).setSelected(True)
+        newVLayout.addWidget(self.featureListWidget)
 
         # ------------- Add the run commands button. --------------------- #
-        self.run_stats_btn = QtWidgets.QPushButton("Run")
-        self.run_stats_btn.toggle()
-        self.run_stats_btn.setFont(QtGui.QFont('Tahoma', 12))
-        self.run_stats_btn.setEnabled(False)
-        self.run_stats_btn.clicked.connect(lambda: self.handler.run_command())
-        self.CommandPalette.addWidget(self.run_stats_btn)
+        self.runStatsBtn = QtWidgets.QPushButton("Run")
+        self.runStatsBtn.toggle()
+        self.runStatsBtn.setFont(QtGui.QFont('Tahoma', 12))
+        self.runStatsBtn.setEnabled(False)
+        self.runStatsBtn.clicked.connect(lambda: self.handler.run_command())
+        newVLayout.addWidget(self.runStatsBtn)
+        self.CommandPalette.addLayout(newVLayout)
 
         self.vlayout.addWidget(self.cmdlayoutmanager, 0, 0, 4, 1)
 
@@ -232,24 +234,24 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
             'All Temporal Features', 'Date', 'Time',
             'Day of the Week', 'Weekend Indicator', 'Time of Day',
         ]
-        self.listWidget.clear()
+        self.featureListWidget.clear()
 
         # Change the options of the list as per the current
         # feature selection.
-        if self.feature_type.currentIndex() == 0:
-            self.listWidget.addItems(filt_features)
-        elif self.feature_type.currentIndex() == 1:
-            self.listWidget.addItems(ip_features)
-        elif self.feature_type.currentIndex() == 2:
-            self.listWidget.addItems(kinematic_features)
-        elif self.feature_type.currentIndex() == 3:
-            self.listWidget.addItems(stat_features)
+        if self.featureType.currentIndex() == 0:
+            self.featureListWidget.addItems(filt_features)
+        elif self.featureType.currentIndex() == 1:
+            self.featureListWidget.addItems(ip_features)
+        elif self.featureType.currentIndex() == 2:
+            self.featureListWidget.addItems(kinematic_features)
+        elif self.featureType.currentIndex() == 3:
+            self.featureListWidget.addItems(stat_features)
         else:
-            self.listWidget.addItems(temporal_features)
+            self.featureListWidget.addItems(temporal_features)
 
-        self.listWidget.setFont(QtGui.QFont('Tahoma', 12))
-        self.listWidget.item(0).setSelected(True)
-        self.listWidget.setUniformItemSizes(True)
+        self.featureListWidget.setFont(QtGui.QFont('Tahoma', 12))
+        self.featureListWidget.item(0).setSelected(True)
+        self.featureListWidget.setUniformItemSizes(True)
 
     def setup_menubar(self):
         """
@@ -317,20 +319,20 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def add_df_controller(self):
         # Create a smaller box layout.
-        self.df_controller = QtWidgets.QHBoxLayout()
+        self.dfController = QtWidgets.QHBoxLayout()
 
         # Create a trajectory View selector.
-        self.df_view = QtWidgets.QComboBox()
-        self.df_view.addItems(['Point-Based View', 'Segment-Based View'])
-        self.df_controller.addWidget(self.df_view)
+        self.dfView = QtWidgets.QComboBox()
+        self.dfView.addItems(['Point-Based View', 'Segment-Based View'])
+        self.dfController.addWidget(self.dfView)
 
         # Create an export button for the dataset.
-        self.export_btn = QtWidgets.QPushButton("Export Dataframe")
-        self.export_btn.clicked.connect(self.save_file)
-        self.df_controller.addWidget(self.export_btn)
+        self.exportBtn = QtWidgets.QPushButton("Export Dataframe")
+        self.exportBtn.clicked.connect(self.save_file)
+        self.dfController.addWidget(self.exportBtn)
 
         # Add this mini panel to the main DF panel.
-        self.DFPane.addLayout(self.df_controller)
+        self.DFPane.addLayout(self.dfController)
 
     def setup_statusbar(self):
         self.statusBar = QtWidgets.QStatusBar()
