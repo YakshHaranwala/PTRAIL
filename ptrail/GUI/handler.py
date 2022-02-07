@@ -27,9 +27,18 @@ from ptrail.preprocessing.statistics import Statistics
 from ptrail.preprocessing.filters import Filters
 from ptrail.preprocessing.interpolation import Interpolation
 
+# Statistics imports.
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
 
 class GuiHandler:
     def __init__(self, filename, window):
+        self.statCanvas = None
+        self.statFigure = None
+        self.ax = None
         self.traj_id_list = None
 
         self.map = None
@@ -100,7 +109,6 @@ class GuiHandler:
 
                 # Create the drop-down list for ID selection.
                 self.traj_id_list = QtWidgets.QComboBox()
-                self.traj_id_list.currentIndexChanged.connect(lambda: self.redraw_map())
                 self.traj_id_list.setFont(QtGui.QFont('Tahoma', 12))
                 self.traj_id_list.addItems(ids_)
 
@@ -113,6 +121,7 @@ class GuiHandler:
                                                            == self.traj_id_list.currentText()]
                 self._window.open_btn.deleteLater()
                 self._draw_map(to_plot)
+                self.draw_stats()
                 self.add_column_drop_widget()
                 self._window.runStatsBtn.setEnabled(True)
             else:
@@ -180,7 +189,76 @@ class GuiHandler:
                         ).add_to(map_)
 
         map_.fit_bounds([sw, ne])
+        self.traj_id_list.currentIndexChanged.connect(lambda: self.redraw_map())
         self.map.setHtml(map_.get_root().render())
+
+    def redraw_map(self):
+        """
+            Redraw the map when the traj_id is changed from the DropDown list.
+        """
+        # Check whether the QComboBox is empty or not. If so, don't redraw.
+        # NOTE: This is done specifically to handle the case of filtering where
+        #       some trajectories might be filtered out, and we have to update the
+        #       id selection list.
+        if self.traj_id_list.currentText() and self.traj_id_list.currentText() != '' and len(self._data) > 0:
+            to_plot = self._map_data.reset_index().loc[
+                self._map_data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+            self._draw_map(to_plot)
+            self.redraw_stat()
+
+    def draw_stats(self):
+        # Create the Stat Selection Drop down button.
+        self._window.selectStatDropdown = QtWidgets.QComboBox()
+        self._window.selectStatDropdown.currentIndexChanged.connect(lambda: self.redraw_stat())
+        self._window.selectStatDropdown.setFont(QtGui.QFont("Tahoma", 12))
+
+        # Create the matplotlib figure and axis.
+        self.statFigure = plt.figure()
+        self.statCanvas = FigureCanvas(self.statFigure)
+        self.statCanvas.setSizePolicy(
+            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
+        )
+
+        # Add the figure and canvas to a new layout and finally add the layout to the StatsPane.
+        featureFig = plt.figure()
+        featureCanvas = FigureCanvas(featureFig)
+        featureCanvas.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored))
+        new_draw_layout = QtWidgets.QVBoxLayout()
+        new_draw_layout.addWidget(self._window.selectStatDropdown)
+        new_draw_layout.addWidget(self.statCanvas)
+        new_draw_layout.addWidget(featureCanvas)
+        self._window.StatsPane.addLayout(new_draw_layout)
+
+    def redraw_stat(self):
+        selected_stat = self._window.selectStatDropdown.currentText()
+        stat_data = self._data.describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9])
+        colors = sns.color_palette('tab10')
+
+        # Get the necessary stats out.
+        percent_10 = stat_data[selected_stat]['10%']
+        percent_25 = stat_data[selected_stat]['25%']
+        percent_50 = stat_data[selected_stat]['50%']
+        percent_75 = stat_data[selected_stat]['75%']
+        percent_90 = stat_data[selected_stat]['90%']
+        avg = stat_data[selected_stat]['mean']
+
+        self.statFigure.clear()
+        ax = self.statFigure.add_subplot(111)
+
+        # Attributes for the plot.
+        text = ['10%', '25%', 'Median', '75%', '90%', 'Mean']
+        horizontal_lines = [percent_10, percent_25, percent_50, percent_75, percent_90, avg]
+
+        # Plot the lineplot and the stat lines.
+        one_animal = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+        sns.lineplot(data=one_animal.reset_index(), x='DateTime', y=selected_stat, ax=ax, color='skyblue')
+        for i in range(len(horizontal_lines)):
+            ax.axhline(horizontal_lines[i], c=colors[i], linestyle='--', label=text[i])
+
+        ax.legend()
+        plt.xticks(rotation=90)
+        self.statFigure.tight_layout()
+        self.statCanvas.draw()
 
     def add_column_drop_widget(self):
         """
@@ -221,19 +299,6 @@ class GuiHandler:
 
         # Add the VBoxLayout to the Command Palette.
         self._window.CommandPalette.addLayout(small_layout)
-
-    def redraw_map(self):
-        """
-            Redraw the map when the traj_id is changed from the DropDown list.
-        """
-        # Check whether the QComboBox is empty or not. If so, don't redraw.
-        # NOTE: This is done specifically to handle the case of filtering where
-        #       some trajectories might be filtered out, and we have to update the
-        #       id selection list.
-        if self.traj_id_list.currentText() and self.traj_id_list.currentText() != '' and len(self._data) > 0:
-            to_plot = self._map_data.reset_index().loc[
-                self._map_data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
-            self._draw_map(to_plot)
 
     def run_command(self):
         """
@@ -346,12 +411,21 @@ class GuiHandler:
         if selected_function == 'All Kinematic Features':
             self._data = KinematicFeatures.generate_kinematic_features(self._data)
             self._window.statusBar.showMessage("Done ...")
+            self._window.selectStatDropdown.blockSignals(True)
+            self._window.selectStatDropdown.clear()
+            self._window.selectStatDropdown.blockSignals(False)
+            self._window.selectStatDropdown.addItems([
+                'Distance', 'Distance_from_start', 'Speed', 'Acceleration',
+                'Jerk', 'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate',
+            ])
 
         elif selected_function == 'Distance':
             self._data = KinematicFeatures.create_distance_column(self._data)
+            self._window.selectStatDropdown.addItems(['Distance'])
 
         elif selected_function == 'Distance from Start':
             self._data = KinematicFeatures.create_distance_from_start_column(self._data)
+            self._window.selectStatDropdown.addItems(['Distance_from_start'])
 
         elif selected_function == 'Point within Range':
             params = inspect.getfullargspec(KinematicFeatures.create_point_within_range_column).args
@@ -389,24 +463,31 @@ class GuiHandler:
 
         elif selected_function == 'Speed':
             self._data = KinematicFeatures.create_speed_column(self._data)
+            self._window.selectStatDropdown.addItems(['Speed'])
 
         elif selected_function == 'Acceleration':
             self._data = KinematicFeatures.create_acceleration_column(self._data)
+            self._window.selectStatDropdown.addItems(['Acceleration'])
 
         elif selected_function == 'Jerk':
             self._data = KinematicFeatures.create_jerk_column(self._data)
+            self._window.selectStatDropdown.addItems(['Jerk'])
 
         elif selected_function == 'Bearing':
             self._data = KinematicFeatures.create_bearing_column(self._data)
+            self._window.selectStatDropdown.addItems(['Bearing'])
 
         elif selected_function == 'Bearing Rate':
             self._data = KinematicFeatures.create_bearing_rate_column(self._data)
+            self._window.selectStatDropdown.addItems(['Bearing_Rate'])
 
         elif selected_function == 'Rate of Bearing Rate':
             self._data = KinematicFeatures.create_rate_of_br_column(self._data)
+            self._window.selectStatDropdown.addItems(['Rate_of_bearing_rate'])
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
+        self.redraw_stat()
         self._map_data = self._data
         self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))

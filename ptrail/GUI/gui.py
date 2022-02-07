@@ -5,9 +5,9 @@
 
     | Author: Yaksh J Haranwala
 """
+import sys
 
 from PyQt5 import QtCore, QtWidgets, QtGui, QtWebEngineWidgets
-import sys
 from PyQt5.QtWidgets import QSizePolicy
 
 from ptrail.GUI.handler import GuiHandler
@@ -49,6 +49,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # StatsPane variables.
         self.statslayoutmanager = None
         self.StatsPane = None
+        self.selectStatDropdown = None
+        self.figure = None
+        self.canvas = None
 
         # DFPane variable.
         self.dflayoutmanager = None
@@ -115,14 +118,9 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Create the layout manager and set the size of the pane.
         self.statslayoutmanager = QtWidgets.QWidget(self.centralwidget)
         self.statslayoutmanager.setObjectName("gridLayoutWidget")
-        self.StatsPane = QtWidgets.QGridLayout(self.statslayoutmanager)
+        self.StatsPane = QtWidgets.QVBoxLayout(self.statslayoutmanager)
         self.StatsPane.setContentsMargins(0, 0, 0, 0)
         self.StatsPane.setObjectName("StatsPane")
-
-        # Add a sample label to the pane.
-        stat_label = QtWidgets.QLabel()
-        stat_label.setText("Statistics ")
-        self.StatsPane.addWidget(stat_label)
 
         self.vlayout.addWidget(self.statslayoutmanager, 0, 3, 4, 1)
 
