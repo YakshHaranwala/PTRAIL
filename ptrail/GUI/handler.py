@@ -36,6 +36,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 
 class GuiHandler:
     def __init__(self, filename, window):
+        self.generateStats = False
         self.statCanvas = None
         self.statFigure = None
         self.ax = None
@@ -204,7 +205,8 @@ class GuiHandler:
             to_plot = self._map_data.reset_index().loc[
                 self._map_data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
             self._draw_map(to_plot)
-            self.redraw_stat()
+            if self.generateStats:
+                self.redraw_stat()
 
     def draw_stats(self):
         # Create the Stat Selection Drop down button.
@@ -230,6 +232,10 @@ class GuiHandler:
         self._window.StatsPane.addLayout(new_draw_layout)
 
     def redraw_stat(self):
+        """
+            Redraw the statistics plot when the user changes the option from
+            the Dropdown menu.
+        """
         selected_stat = self._window.selectStatDropdown.currentText()
         stat_data = self._data.describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9])
         colors = sns.color_palette('tab10')
@@ -242,6 +248,7 @@ class GuiHandler:
         percent_90 = stat_data[selected_stat]['90%']
         avg = stat_data[selected_stat]['mean']
 
+        # Clear the figure and add an axes to it.
         self.statFigure.clear()
         ax = self.statFigure.add_subplot(111)
 
@@ -255,8 +262,9 @@ class GuiHandler:
         for i in range(len(horizontal_lines)):
             ax.axhline(horizontal_lines[i], c=colors[i], linestyle='--', label=text[i])
 
+        # Add the legend, rotate the ticks, set tight layout and draw it on the canvas.
         ax.legend()
-        plt.xticks(rotation=90)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
         self.statFigure.tight_layout()
         self.statCanvas.draw()
 
@@ -313,9 +321,11 @@ class GuiHandler:
             self._window.statusBar.showMessage("Running Filters ...")
             self._run_filters()
         elif self._window.featureType.currentIndex() == 1:
+            self.generateStats = False
             self._window.statusBar.showMessage("Running Interpolation ...")
             self._run_ip()
         elif self._window.featureType.currentIndex() == 2:
+            self.generateStats = True
             self._window.statusBar.showMessage("Running Kinematic Features ...")
             self._run_kinematic()
         elif self._window.featureType.currentIndex() == 3:
@@ -411,13 +421,15 @@ class GuiHandler:
         if selected_function == 'All Kinematic Features':
             self._data = KinematicFeatures.generate_kinematic_features(self._data)
             self._window.statusBar.showMessage("Done ...")
+
+            # Update the select-stats dropdown.
             self._window.selectStatDropdown.blockSignals(True)
             self._window.selectStatDropdown.clear()
-            self._window.selectStatDropdown.blockSignals(False)
             self._window.selectStatDropdown.addItems([
-                'Distance', 'Distance_from_start', 'Speed', 'Acceleration',
-                'Jerk', 'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate',
+                'Distance', 'Distance_from_start', 'Acceleration', 'Jerk',
+                'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate',
             ])
+            self._window.selectStatDropdown.blockSignals(False)
 
         elif selected_function == 'Distance':
             self._data = KinematicFeatures.create_distance_column(self._data)
@@ -485,9 +497,11 @@ class GuiHandler:
             self._data = KinematicFeatures.create_rate_of_br_column(self._data)
             self._window.selectStatDropdown.addItems(['Rate_of_bearing_rate'])
 
+        # Redraw the stats panel.
+        self.redraw_stat()
+
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
-        self.redraw_stat()
         self._map_data = self._data
         self._window.statusBar.showMessage("Task Done ...")
         self._model = TableModel(self._data.reset_index(inplace=False))
@@ -809,9 +823,26 @@ class GuiHandler:
         # Get the selected items and then create a list
         # of the column names to drop.
         items = self._window.dropColumnWidget.selectedItems()
+
         to_drop = list()
         for it in items:
             to_drop.append(it.text())
+
+        # Now, whenever we drop a column related to one of the stats,
+        # then we go ahead and remove that option from the stats selection
+        # panel as well.
+        all_stat_items = [self._window.selectStatDropdown.itemText(i)
+                          for i in range(self._window.selectStatDropdown.count())]
+        for val in to_drop:
+            if val in all_stat_items:
+                all_stat_items.remove(val)
+
+        # Make sure to block this signal before clearing and unblock
+        # after adding new options :).
+        self._window.selectStatDropdown.blockSignals(True)
+        self._window.selectStatDropdown.clear()
+        self._window.selectStatDropdown.addItems(all_stat_items)
+        self._window.selectStatDropdown.blockSignals(False)
 
         # Drop the column(s) selected by the user.
         self._data.drop(columns=to_drop, inplace=True)
