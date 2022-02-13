@@ -37,8 +37,13 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 class GuiHandler:
     def __init__(self, filename, window):
         self.generateStats = False
+        self.generateFeatureImportanceBtn = False
         self.statCanvas = None
         self.statFigure = None
+
+        self.featureCanvas = None
+        self.featureFigure = None
+
         self.ax = None
         self.traj_id_list = None
 
@@ -216,22 +221,41 @@ class GuiHandler:
         self._window.selectStatDropdown.currentIndexChanged.connect(lambda: self.redraw_stat())
         self._window.selectStatDropdown.setFont(QtGui.QFont("Tahoma", 12))
 
-        # Create the matplotlib figure and axis.
+        # Create the matplotlib figure and axis for stats.
         self.statFigure = plt.figure()
         self.statCanvas = FigureCanvas(self.statFigure)
         self.statCanvas.setSizePolicy(
             QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         )
 
+        # Create the matplotlib figure and axis for feature importance.
+        self.featureFigure = plt.figure()
+        self.featureCanvas = FigureCanvas(self.featureFigure)
+        self.featureCanvas.setSizePolicy(
+            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
+        )
+
         # Add the figure and canvas to a new layout and finally add the layout to the StatsPane.
-        featureFig = plt.figure()
-        featureCanvas = FigureCanvas(featureFig)
-        featureCanvas.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored))
+        self.generateFeatureImportanceBtn = QtWidgets.QPushButton("Generate Feature Importance")
+        self.generateFeatureImportanceBtn.clicked.connect(lambda: generate_features())
         new_draw_layout = QtWidgets.QVBoxLayout()
         new_draw_layout.addWidget(self._window.selectStatDropdown)
         new_draw_layout.addWidget(self.statCanvas)
-        new_draw_layout.addWidget(featureCanvas)
+        new_draw_layout.addWidget(self.featureCanvas)
+        new_draw_layout.addWidget(self.generateFeatureImportanceBtn)
         self._window.StatsPane.addLayout(new_draw_layout)
+
+    def generate_feature(self):
+        self.generateFeatureImportanceBtn.deleteLater()
+
+        Y = self._data['hello']
+        # df = df.select_dtypes(include=['float64', 'int'])
+        #
+        # importances = mutual_info_classif(df, Y)
+        #
+        # feat = pd.Series(importances, df.columns).sort_values()
+        # feat.plot(kind='barh', color='green')
+
 
     def redraw_stat(self):
         """
@@ -258,7 +282,7 @@ class GuiHandler:
         text = ['10%', '25%', 'Median', '75%', '90%', 'Mean']
         horizontal_lines = [percent_10, percent_25, percent_50, percent_75, percent_90, avg]
 
-        # Plot the lineplot and the stat lines.
+        # Plot the line-plot and the stat lines.
         one_animal = self._data.reset_index().loc[self._data.reset_index()['traj_id']
                                                   == self.traj_id_list.currentText()]
         sns.lineplot(data=one_animal.reset_index(), x='DateTime', y=selected_stat, ax=ax, color='skyblue')
@@ -422,6 +446,11 @@ class GuiHandler:
 
         # Also, update the map.
         self._map_data = self._data
+        self._window.selectStatDropdown.blockSignals(True)
+        self._window.selectStatDropdown.clear()
+        self.statFigure.clear()
+        self.statCanvas.draw()
+        self._window.selectStatDropdown.blockSignals(False)
         self.redraw_map()
 
     def _run_kinematic(self):
