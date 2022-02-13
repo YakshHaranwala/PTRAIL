@@ -357,7 +357,8 @@ class GuiHandler:
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='linear',
-                                                                time_jump=float(args[0]))
+                                                                time_jump=float(args[0]),
+                                                                class_label_col=args[1])
 
         elif selected_function == 'Cubic Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
@@ -368,7 +369,8 @@ class GuiHandler:
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='cubic',
-                                                                time_jump=float(args[0]))
+                                                                time_jump=float(args[0]),
+                                                                class_label_col=args[1])
 
         elif selected_function == 'Kinematic Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
@@ -379,7 +381,8 @@ class GuiHandler:
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='kinematic',
-                                                                time_jump=float(args[0]))
+                                                                time_jump=float(args[0]),
+                                                                class_label_col=args[1])
 
         elif selected_function == 'Random-Walk Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
@@ -390,7 +393,8 @@ class GuiHandler:
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='random_walk',
-                                                                time_jump=float(args[0]))
+                                                                time_jump=float(args[0]),
+                                                                class_label_col=args[1])
 
         self._window.statusBar.showMessage("Task Done ...")
 
