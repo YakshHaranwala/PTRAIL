@@ -28,7 +28,8 @@ NUM_CPU = ceil((num * 2) / 3)
 
 class Interpolation:
     @staticmethod
-    def interpolate_position(dataframe: NumTrajDF, time_jump: float, ip_type: Optional[Text] = 'linear'):
+    def interpolate_position(dataframe: NumTrajDF, time_jump: float,
+                             ip_type: Optional[Text] = 'linear', class_label_col: Optional[Text]=''):
         """
             Interpolate the position of an object and create new points using one of
             the interpolation methods provided by the Library. Currently, the library
@@ -68,6 +69,9 @@ class Interpolation:
                     The maximum time difference between 2 consecutive points.
                 ip_type: Optional[Text], default = linear
                     The type of interpolation that is to be used.
+                class_label_col: Optional[Text], default = ''
+                    The column header which contains the class label of the point.
+
 
             Returns
             -------
@@ -89,7 +93,7 @@ class Interpolation:
         if ip_type == 'linear':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._linear_ip,
-                                           args=(df_chunks[i], time_jump, return_list))
+                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -98,7 +102,7 @@ class Interpolation:
         elif ip_type == 'cubic':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._cubic_ip,
-                                           args=(df_chunks[i], time_jump, return_list))
+                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -106,7 +110,7 @@ class Interpolation:
         elif ip_type == 'kinematic':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._kinematic_ip,
-                                           args=(df_chunks[i], time_jump, return_list))
+                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -114,7 +118,7 @@ class Interpolation:
         elif ip_type == 'random-walk':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._random_walk_ip,
-                                           args=(df_chunks[i], time_jump, return_list))
+                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -127,7 +131,8 @@ class Interpolation:
                          const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def _linear_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump: float, return_list: list):
+    def _linear_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump: float,
+                   return_list: list, class_label_col):
         """
             Interpolate the position of points using the Linear Interpolation method. It makes
             the use of numpy's interpolation technique for the interpolation of the points.
@@ -146,6 +151,8 @@ class Interpolation:
                     be inserted between the given 2 points.
                 return_list: list
                     The list used by the Multiprocessing manager to get the return values
+                class_label_col: Optional[Text], default = ''
+                    The column header which contains the class label of the point.
 
             Returns
             -------
@@ -155,8 +162,12 @@ class Interpolation:
         # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
         # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
         # a list.
-        dataframe = dataframe.reset_index()[
-            [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+        if class_label_col == '':
+            dataframe = dataframe.reset_index()[
+                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+        else:
+            dataframe = dataframe.reset_index()[
+                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG, class_label_col]].set_index(const.DateTime)
 
         # Split the smaller dataframe further into smaller chunks containing only 1
         # Trajectory ID per index.
@@ -170,7 +181,7 @@ class Interpolation:
         # of the system.)
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.linear_help,
-                                   zip(df_chunks, ids_, itertools.repeat(time_jump)))
+                                   zip(df_chunks, ids_, itertools.repeat(time_jump), itertools.repeat(class_label_col)))
         small_pool.close()
         small_pool.join()
 
@@ -179,7 +190,8 @@ class Interpolation:
         return_list.append(pd.concat(final))
 
     @staticmethod
-    def _cubic_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump: float, return_list: list):
+    def _cubic_ip(dataframe: Union[pd.DataFrame, NumTrajDF],
+                  time_jump: float, return_list: list, class_label_col):
         try:
             """
                 Method for cubic interpolation of a dataframe based on the time jump provided.
@@ -198,7 +210,9 @@ class Interpolation:
                         The maximum time difference allowed to have between rows
                     return_list: list
                         The list used by the Multiprocessing manager to get the return values
-    
+                    class_label_col: Optional[Text], default = ''
+                        The column header which contains the class label of the point.
+
                 Returns
                 -------
                     pandas.core.dataframe.DataFrame:
@@ -208,8 +222,13 @@ class Interpolation:
             # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
             # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
             # a list.
-            dataframe = dataframe.reset_index()[
-                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+            if class_label_col == '':
+                dataframe = dataframe.reset_index()[
+                    [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+            else:
+                dataframe = dataframe.reset_index()[
+                    [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG, class_label_col]].set_index(
+                    const.DateTime)
 
             # Split the smaller dataframe further into smaller chunks containing only 1
             # Trajectory ID per index.
@@ -223,7 +242,8 @@ class Interpolation:
             # of the system.).
             small_pool = mlp.Pool(NUM_CPU)
             final = small_pool.starmap(helper.cubic_help,
-                                       zip(df_chunks, ids_, itertools.repeat(time_jump)))
+                                       zip(df_chunks, ids_,
+                                           itertools.repeat(time_jump), itertools.repeat(class_label_col)))
             small_pool.close()
             small_pool.join()
 
@@ -235,7 +255,8 @@ class Interpolation:
             raise ValueError
 
     @staticmethod
-    def _kinematic_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump, return_list):
+    def _kinematic_ip(dataframe: Union[pd.DataFrame, NumTrajDF],
+                      time_jump, return_list, class_label_col):
         """
              Method for Kinematic interpolation of a dataframe based on the time jump provided.
              It interpolates the coordinates based on the Datetime of the dataframe.
@@ -252,6 +273,8 @@ class Interpolation:
                      The maximum time difference allowed to have between rows
                  return_list: list
                      The list used by the Multiprocessing manager to get the return values
+                class_label_col: Optional[Text], default = ''
+                    The column header which contains the class label of the point.
 
              Returns
              -------
@@ -262,8 +285,12 @@ class Interpolation:
         # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
         # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
         # a list.
-        dataframe = dataframe.reset_index()[
-            [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+        if class_label_col == '':
+            dataframe = dataframe.reset_index()[
+                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+        else:
+            dataframe = dataframe.reset_index()[
+                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG, class_label_col]].set_index(const.DateTime)
 
         # Split the smaller dataframe further into smaller chunks containing only 1
         # Trajectory ID per index.
@@ -277,7 +304,7 @@ class Interpolation:
         # of the system.).
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.kinematic_help,
-                                   zip(df_chunks, ids_, itertools.repeat(time_jump)))
+                                   zip(df_chunks, ids_, itertools.repeat(time_jump), itertools.repeat(class_label_col)))
         small_pool.close()
         small_pool.join()
 
@@ -286,7 +313,8 @@ class Interpolation:
         return_list.append(pd.concat(final))
 
     @staticmethod
-    def _random_walk_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump, return_list):
+    def _random_walk_ip(dataframe: Union[pd.DataFrame, NumTrajDF],
+                        time_jump, return_list, class_label_col):
         """
              Method for Random walk interpolation of a dataframe based on the time jump provided.
              It interpolates the coordinates based on the Datetime of the dataframe.
@@ -304,6 +332,8 @@ class Interpolation:
                      The maximum time difference allowed to have between rows
                  return_list: list
                      The list used by the Multiprocessing manager to get the return values
+                class_label_col: Optional[Text], default = ''
+                    The column header which contains the class label of the point.
 
              Returns
              -------
@@ -314,8 +344,12 @@ class Interpolation:
         # First, reset the index, extract the Latitude, Longitude, DateTime and Trajectory ID columns
         # and set the DateTime column only as the index. Then, store all the unique Trajectory IDs in
         # a list.
-        dataframe = dataframe.reset_index()[
-            [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+        if class_label_col == '':
+            dataframe = dataframe.reset_index()[
+                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG]].set_index(const.DateTime)
+        else:
+            dataframe = dataframe.reset_index()[
+                [const.DateTime, const.TRAJECTORY_ID, const.LAT, const.LONG, class_label_col]].set_index(const.DateTime)
 
         # Split the smaller dataframe further into smaller chunks containing only 1
         # Trajectory ID per index.
@@ -325,11 +359,11 @@ class Interpolation:
         # Here, create as many processes at once as there are number of CPUs available in
         # the system - 1. One CPU is kept free at all times in order to not block up
         # the system. (Note: The blocking of system is mostly prevalent in Windows and does
-        # not happen very often in Linux. However, out of caution 1 CPU is kept free regardless
-        # of the system.).
+        # not happen very often in Linux. However, out of caution 1/3rds of CPU are kept free
+        # regardless of the system.).
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.random_walk_help,
-                                   zip(df_chunks, ids_, itertools.repeat(time_jump)))
+                                   zip(df_chunks, ids_, itertools.repeat(time_jump), itertools.repeat(class_label_col)))
         small_pool.close()
         small_pool.join()
 
@@ -337,6 +371,3 @@ class Interpolation:
         # can be finally merged into a larger dataframe.
         return_list.append(pd.concat(final))
 
-    @staticmethod
-    def interpolate_at_time(dataframe: Union[NumTrajDF, pandas.DataFrame], time: Text, ip_type: Text = 'linear'):
-        pass

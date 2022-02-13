@@ -41,7 +41,8 @@ from ptrail.utilities.exceptions import *
 class Helpers:
     # ------------------------------------ Interpolation Helpers --------------------------------------- #
     @staticmethod
-    def linear_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame], id_: Text, time_jump: float):
+    def linear_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame],
+                    id_: Text, time_jump: float, class_label_col):
         """
             This method takes a dataframe and uses linear interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -92,12 +93,17 @@ class Helpers:
         # insert a new point that is linearly interpolated between the 2 original points.
         for j in range(len(time_deltas)):
             if time_deltas[j] > time_jump:
-                dataframe.loc[new_times[j - 1]] = [id_, ip_lat[j - 1], ip_long[j - 1]]
+                if class_label_col == '':
+                    dataframe.loc[new_times[j - 1]] = [id_, ip_lat[j - 1], ip_long[j - 1]]
+                else:
+                    dataframe.loc[new_times[j - 1]] = [id_, ip_lat[j - 1], ip_long[j - 1],
+                                                       dataframe[class_label_col].iloc[0]]
 
         return dataframe
 
     @staticmethod
-    def cubic_help(df: Union[pd.DataFrame, PTRAILDataFrame], id_: Text, time_jump: float):
+    def cubic_help(df: Union[pd.DataFrame, PTRAILDataFrame], id_: Text,
+                   time_jump: float, class_label_col):
         """
             This method takes a dataframe and uses cubic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -128,18 +134,16 @@ class Helpers:
         #    new_time[i] = original_time[i] + time_jump.
         new_times = df.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
 
-        # Extract the Latitude, Longitude pairs for each point and store it in a
-        # numpy array.
-        coords = df.reset_index()[[const.LAT, const.LONG]].to_numpy()
-
         # Now, using Scipy's Cubic spline, create a spline object for interpolation of
         # points for the dataframes which have a length greater than 3 else CubicSpline
         # doesn't execute.
         if len(df) > 3:
-            cubic_spline = CubicSpline(x=df.reset_index()[const.DateTime].sort_values(),
-                                       y=coords,
-                                       extrapolate=True, bc_type='not-a-knot')
+            # Create the x and y values for the CubicSpline function.
+            # We make sure that there is a strictly increasing sequence of points.
+            x = df.reset_index()[const.DateTime].sort_values().drop_duplicates()
+            y = df.reset_index().iloc[x.index][[const.LAT, const.LONG]].to_numpy()
 
+            cubic_spline = CubicSpline(x=x, y=y, extrapolate=True, bc_type='not-a-knot')
             # Now, calculate the interpolated position of the points at all the new_times
             #    calculated above.
             ip_coords = cubic_spline(new_times)
@@ -155,12 +159,17 @@ class Helpers:
             # from the interpolation.
             if len(df) > 3:
                 if time_deltas[j] > time_jump:
-                    df.loc[new_times[j - 1]] = [id_, ip_coords[j - 1][0], ip_coords[j - 1][1]]
+                    if class_label_col == '':
+                        df.loc[new_times[j - 1]] = [id_, ip_coords[j - 1][0], ip_coords[j - 1][1]]
+                    else:
+                        df.loc[new_times[j - 1]] = [id_, ip_coords[j - 1][0], ip_coords[j - 1][1],
+                                                    df[class_label_col].iloc[0]]
 
         return df
 
     @staticmethod
-    def random_walk_help(dataframe: PTRAILDataFrame, id_: Text, time_jump: float):
+    def random_walk_help(dataframe: PTRAILDataFrame, id_: Text,
+                         time_jump: float, class_label_col):
         """
             This method takes a dataframe and uses random-walk interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -251,18 +260,22 @@ class Helpers:
         for i in range(len(time_deltas)):
             if len(df) > 3:
                 if time_deltas[i] > time_jump:
-                    new_lat = df[const.LAT].iloc[i - 1] + \
-                              (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
-                    new_lon = df[const.LONG].iloc[i - 1] + \
-                              (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(
-                        df[const.LAT].iloc[i - 1] * np.pi / 180)
-                    dataframe.loc[new_times[i - 1]] = [id_, new_lat[0], new_lon[0]]
+                    new_lat = df[const.LAT].iloc[i - 1] + (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
+                    new_lon = df[const.LONG].iloc[i - 1] +\
+                              (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(df[const.LAT].iloc[i - 1] * np.pi / 180)
+                    if class_label_col == '':
+                        dataframe.loc[new_times[i - 1]] = [id_, new_lat[0], new_lon[0]]
+                    else:
+                        dataframe.loc[new_times[i - 1]] = [id_, new_lat[0], new_lon[0],
+                                                           dataframe[class_label_col].iloc[0]]
+
 
         # Return the new dataframe
         return dataframe
 
     @staticmethod
-    def kinematic_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame], id_: Text, time_jump: float):
+    def kinematic_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame], id_: Text,
+                       time_jump: float, class_label_col):
         """
             This method takes a dataframe and uses kinematic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
@@ -324,13 +337,13 @@ class Helpers:
                 coef_y = np.linalg.solve(ay, by)
 
                 td = new_times[i - 1].timestamp() / 10e9
-                # x = lat[i-1] + lat_velocity[i-1] * td + \
-                #     (td**2)*coef_x[0]/2 + (td**3)*coef_x[1]/6
-                # y = lon[i-1] + lon_velocity[i-1] * td + \
-                #     (td ** 2) * coef_y[0] / 2 + (td ** 3) * coef_y[1] / 6
                 x = Helpers._pos(t=td, x1=lat[i - 1], v1=lat_velocity[i - 1], b=coef_x[0], c=coef_x[1])
                 y = Helpers._pos(t=td, x1=lon[i - 1], v1=lon_velocity[i - 1], b=coef_y[0], c=coef_y[1])
-                dataframe.loc[new_times[i - 1]] = [id_, x, y]
+
+                if class_label_col == '':
+                    dataframe.loc[new_times[i - 1]] = [id_, x, y]
+                else:
+                    dataframe.loc[new_times[i - 1]] = [id_, x, y, dataframe[class_label_col].iloc[0]]
 
         return dataframe
 
