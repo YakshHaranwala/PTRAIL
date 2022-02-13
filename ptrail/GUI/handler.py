@@ -259,7 +259,8 @@ class GuiHandler:
         horizontal_lines = [percent_10, percent_25, percent_50, percent_75, percent_90, avg]
 
         # Plot the lineplot and the stat lines.
-        one_animal = self._data.reset_index().loc[self._data.reset_index()['traj_id'] == self.traj_id_list.currentText()]
+        one_animal = self._data.reset_index().loc[self._data.reset_index()['traj_id']
+                                                  == self.traj_id_list.currentText()]
         sns.lineplot(data=one_animal.reset_index(), x='DateTime', y=selected_stat, ax=ax, color='skyblue')
         for i in range(len(horizontal_lines)):
             ax.axhline(horizontal_lines[i], c=colors[i], linestyle='--', label=text[i])
@@ -643,7 +644,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_datetime).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['YYYY-MM-DD hh:mm:ss', 'YYYY-MM-DD hh:mm:ss'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -662,7 +664,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_max_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Maximum speed between consecutive points (metres/second)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -673,7 +676,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_min_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Minimum speed between consecutive points (metres/second)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -684,7 +688,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_min_consecutive_distance).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Minimum Distance between 2 points (metres)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -695,7 +700,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_max_consecutive_distance).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Max Distance between 2 points (metres)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -706,7 +712,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_max_distance_and_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Max Distance (metres)', 'Max Speed (metres/second)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -718,7 +725,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_min_distance_and_speed).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Minimum Distance (metres)', 'Minimum Speed (metres/second)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -736,7 +744,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.remove_trajectories_with_less_points).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Number of Minimum points in the trajectory to avoid removal'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -770,7 +779,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Statistics.segment_traj_by_days).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Duration of each segment in days'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -782,7 +792,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Statistics.generate_kinematic_stats).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Class-label column name', 'Is the trajectory segmented?'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -795,7 +806,8 @@ class GuiHandler:
             params = inspect.getfullargspec(Statistics.pivot_stats_df).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Class-label column name', 'Is the trajectory segmented?'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
