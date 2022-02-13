@@ -28,7 +28,7 @@ NUM_CPU = ceil((num * 2) / 3)
 
 class Interpolation:
     @staticmethod
-    def interpolate_position(dataframe: NumTrajDF, time_jump: float,
+    def interpolate_position(dataframe: NumTrajDF, sampling_rate: float,
                              ip_type: Optional[Text] = 'linear', class_label_col: Optional[Text]=''):
         """
             Interpolate the position of an object and create new points using one of
@@ -65,7 +65,7 @@ class Interpolation:
             ----------
                 dataframe: PTRAILDataFrame
                     The dataframe containing the original dataset.
-                time_jump: float
+                sampling_rate: float
                     The maximum time difference between 2 consecutive points.
                 ip_type: Optional[Text], default = linear
                     The type of interpolation that is to be used.
@@ -93,7 +93,7 @@ class Interpolation:
         if ip_type == 'linear':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._linear_ip,
-                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
+                                           args=(df_chunks[i], sampling_rate, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -102,7 +102,7 @@ class Interpolation:
         elif ip_type == 'cubic':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._cubic_ip,
-                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
+                                           args=(df_chunks[i], sampling_rate, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -110,7 +110,7 @@ class Interpolation:
         elif ip_type == 'kinematic':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._kinematic_ip,
-                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
+                                           args=(df_chunks[i], sampling_rate, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -118,7 +118,7 @@ class Interpolation:
         elif ip_type == 'random-walk':
             for i in range(len(processes)):
                 processes[i] = mlp.Process(target=Interpolation._random_walk_ip,
-                                           args=(df_chunks[i], time_jump, return_list, class_label_col))
+                                           args=(df_chunks[i], sampling_rate, return_list, class_label_col))
                 processes[i].start()
 
             for j in range(len(processes)):
@@ -131,7 +131,7 @@ class Interpolation:
                          const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
 
     @staticmethod
-    def _linear_ip(dataframe: Union[pd.DataFrame, NumTrajDF], time_jump: float,
+    def _linear_ip(dataframe: Union[pd.DataFrame, NumTrajDF], sampling_rate: float,
                    return_list: list, class_label_col):
         """
             Interpolate the position of points using the Linear Interpolation method. It makes
@@ -145,7 +145,7 @@ class Interpolation:
             ----------
                 dataframe: PTRAILDataFrame
                     The dataframe containing the original data.
-                time_jump: float
+                sampling_rate: float
                     The maximum time difference between 2 points. If the time difference between
                     2 consecutive points is greater than the time jump, then another point will
                     be inserted between the given 2 points.
@@ -181,7 +181,8 @@ class Interpolation:
         # of the system.)
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.linear_help,
-                                   zip(df_chunks, ids_, itertools.repeat(time_jump), itertools.repeat(class_label_col)))
+                                   zip(df_chunks, ids_, itertools.repeat(sampling_rate),
+                                       itertools.repeat(class_label_col)))
         small_pool.close()
         small_pool.join()
 
@@ -191,7 +192,7 @@ class Interpolation:
 
     @staticmethod
     def _cubic_ip(dataframe: Union[pd.DataFrame, NumTrajDF],
-                  time_jump: float, return_list: list, class_label_col):
+                  sampling_rate: float, return_list: list, class_label_col):
         try:
             """
                 Method for cubic interpolation of a dataframe based on the time jump provided.
@@ -206,7 +207,7 @@ class Interpolation:
                 ----------
                     dataframe: Union[pd.DataFrame, NumTrajDF]
                         The dataframe on which interpolation is to be performed
-                    time_jump: float
+                    sampling_rate: float
                         The maximum time difference allowed to have between rows
                     return_list: list
                         The list used by the Multiprocessing manager to get the return values
@@ -243,7 +244,7 @@ class Interpolation:
             small_pool = mlp.Pool(NUM_CPU)
             final = small_pool.starmap(helper.cubic_help,
                                        zip(df_chunks, ids_,
-                                           itertools.repeat(time_jump), itertools.repeat(class_label_col)))
+                                           itertools.repeat(sampling_rate), itertools.repeat(class_label_col)))
             small_pool.close()
             small_pool.join()
 
@@ -256,7 +257,7 @@ class Interpolation:
 
     @staticmethod
     def _kinematic_ip(dataframe: Union[pd.DataFrame, NumTrajDF],
-                      time_jump, return_list, class_label_col):
+                      sampling_rate, return_list, class_label_col):
         """
              Method for Kinematic interpolation of a dataframe based on the time jump provided.
              It interpolates the coordinates based on the Datetime of the dataframe.
@@ -269,7 +270,7 @@ class Interpolation:
              ----------
                  dataframe: Union[pd.DataFrame, NumTrajDF]
                      The dataframe on which interpolation is to be performed
-                 time_jump: float
+                 sampling_rate: float
                      The maximum time difference allowed to have between rows
                  return_list: list
                      The list used by the Multiprocessing manager to get the return values
@@ -304,7 +305,8 @@ class Interpolation:
         # of the system.).
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.kinematic_help,
-                                   zip(df_chunks, ids_, itertools.repeat(time_jump), itertools.repeat(class_label_col)))
+                                   zip(df_chunks, ids_, itertools.repeat(sampling_rate),
+                                       itertools.repeat(class_label_col)))
         small_pool.close()
         small_pool.join()
 
@@ -314,7 +316,7 @@ class Interpolation:
 
     @staticmethod
     def _random_walk_ip(dataframe: Union[pd.DataFrame, NumTrajDF],
-                        time_jump, return_list, class_label_col):
+                        sampling_rate, return_list, class_label_col):
         """
              Method for Random walk interpolation of a dataframe based on the time jump provided.
              It interpolates the coordinates based on the Datetime of the dataframe.
@@ -328,7 +330,7 @@ class Interpolation:
              ----------
                  dataframe: Union[pd.DataFrame, NumTrajDF]
                      The dataframe on which interpolation is to be performed
-                 time_jump: float
+                 sampling_rate: float
                      The maximum time difference allowed to have between rows
                  return_list: list
                      The list used by the Multiprocessing manager to get the return values
@@ -363,7 +365,8 @@ class Interpolation:
         # regardless of the system.).
         small_pool = mlp.Pool(NUM_CPU)
         final = small_pool.starmap(helper.random_walk_help,
-                                   zip(df_chunks, ids_, itertools.repeat(time_jump), itertools.repeat(class_label_col)))
+                                   zip(df_chunks, ids_, itertools.repeat(sampling_rate),
+                                       itertools.repeat(class_label_col)))
         small_pool.close()
         small_pool.join()
 

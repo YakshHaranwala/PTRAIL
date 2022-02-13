@@ -9,18 +9,21 @@ from PyQt5 import QtWidgets
 
 
 class InputDialog(QtWidgets.QDialog):
-    def __init__(self, labels: List[str], title: str, parent=None):
+    def __init__(self, labels: List[str], title: str, placeHolders: List[str], parent=None,):
         super().__init__(parent)
         self.setWindowTitle(title)
+        self.setMinimumWidth(560)
 
         buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok |
                                                QtWidgets.QDialogButtonBox.Cancel, self)
         layout = QtWidgets.QFormLayout(self)
 
         self.inputs = []
-        for lab in labels:
-            self.inputs.append(QtWidgets.QLineEdit(self))
-            layout.addRow(lab, self.inputs[-1])
+        for i in range(len(labels)):
+            edit = QtWidgets.QLineEdit(self)
+            edit.setPlaceholderText(placeHolders[i])
+            self.inputs.append(edit)
+            layout.addRow(labels[i], self.inputs[-1])
 
         layout.addWidget(buttonBox)
 

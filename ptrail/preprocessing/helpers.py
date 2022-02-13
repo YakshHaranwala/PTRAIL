@@ -42,11 +42,11 @@ class Helpers:
     # ------------------------------------ Interpolation Helpers --------------------------------------- #
     @staticmethod
     def linear_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame],
-                    id_: Text, time_jump: float, class_label_col):
+                    id_: Text, sampling_rate: float, class_label_col):
         """
             This method takes a dataframe and uses linear interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
-            the user-specified time_jump and inserts the interpolated point those between 2 points.
+            the user-specified sampling_rate and inserts the interpolated point those between 2 points.
 
             Warning
             -------
@@ -59,7 +59,7 @@ class Helpers:
                      The dataframe containing the original trajectory data.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
-                time_jump: float
+                sampling_rate: float
                     The maximum time difference between 2 points greater than which
                     a point will be inserted between 2 points.
 
@@ -72,8 +72,8 @@ class Helpers:
         """
         # Now, for each unique ID in the dataframe, interpolate the points.
         # Create a Series containing new times which are calculated as follows:
-        #    new_time[i] = original_time[i] + time_jump.
-        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+        #    new_time[i] = original_time[i] + sampling_rate.
+        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(sampling_rate, unit='seconds')
 
         # Now, interpolate the latitudes using numpy based on the new times calculated above.
         ip_lat = np.interp(new_times,
@@ -89,10 +89,10 @@ class Helpers:
         time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
 
         # Now, for each point in the trajectory, check whether the time difference between
-        # 2 consecutive points is greater than the user-specified time_jump, and if so then
+        # 2 consecutive points is greater than the user-specified sampling_rate, and if so then
         # insert a new point that is linearly interpolated between the 2 original points.
         for j in range(len(time_deltas)):
-            if time_deltas[j] > time_jump:
+            if time_deltas[j] > sampling_rate:
                 if class_label_col == '':
                     dataframe.loc[new_times[j - 1]] = [id_, ip_lat[j - 1], ip_long[j - 1]]
                 else:
@@ -103,11 +103,11 @@ class Helpers:
 
     @staticmethod
     def cubic_help(df: Union[pd.DataFrame, PTRAILDataFrame], id_: Text,
-                   time_jump: float, class_label_col):
+                   sampling_rate: float, class_label_col):
         """
             This method takes a dataframe and uses cubic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
-            the user-specified time_jump and inserts the interpolated point those between 2 points.
+            the user-specified sampling_rate and inserts the interpolated point those between 2 points.
 
             Warning
             -------
@@ -120,7 +120,7 @@ class Helpers:
                      The dataframe containing the original trajectory data.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
-                time_jump: float
+                sampling_rate: float
                     The maximum time difference between 2 points greater than which
                     a point will be inserted between 2 points.
 
@@ -131,8 +131,8 @@ class Helpers:
                     points.
         """
         # Create a Series containing new times which are calculated as follows:
-        #    new_time[i] = original_time[i] + time_jump.
-        new_times = df.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+        #    new_time[i] = original_time[i] + sampling_rate.
+        new_times = df.reset_index()[const.DateTime] + pd.to_timedelta(sampling_rate, unit='seconds')
 
         # Now, using Scipy's Cubic spline, create a spline object for interpolation of
         # points for the dataframes which have a length greater than 3 else CubicSpline
@@ -152,13 +152,13 @@ class Helpers:
         time_deltas = df.reset_index()[const.DateTime].diff().dt.total_seconds()
 
         # Now, for each point in the trajectory, check whether the time difference between
-        # 2 consecutive points is greater than the user-specified time_jump, and if so then
+        # 2 consecutive points is greater than the user-specified sampling_rate, and if so then
         # insert a new point that is cubic-spline interpolated between the 2 original points.
         for j in range(len(time_deltas)):
             # If the trajectory has less than 3 points, then skip the trajectory
             # from the interpolation.
             if len(df) > 3:
-                if time_deltas[j] > time_jump:
+                if time_deltas[j] > sampling_rate:
                     if class_label_col == '':
                         df.loc[new_times[j - 1]] = [id_, ip_coords[j - 1][0], ip_coords[j - 1][1]]
                     else:
@@ -169,11 +169,11 @@ class Helpers:
 
     @staticmethod
     def random_walk_help(dataframe: PTRAILDataFrame, id_: Text,
-                         time_jump: float, class_label_col):
+                         sampling_rate: float, class_label_col):
         """
             This method takes a dataframe and uses random-walk interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
-            the user-specified time_jump and inserts the interpolated point those between 2 points.
+            the user-specified sampling_rate and inserts the interpolated point those between 2 points.
 
             Warning
             -------
@@ -186,7 +186,7 @@ class Helpers:
                      The dataframe containing the original trajectory data.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
-                time_jump: float
+                sampling_rate: float
                     The maximum time difference between 2 points greater than which
                     a point will be inserted between 2 points.
 
@@ -203,8 +203,8 @@ class Helpers:
                 Geoinformatica (2020)
         """
         # Create a Series containing new times which are calculated as follows:
-        #    new_time[i] = original_time[i] + time_jump.
-        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+        #    new_time[i] = original_time[i] + sampling_rate.
+        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(sampling_rate, unit='seconds')
 
         # First, create a distance between the consecutive points of the dataframe,
         # then, calculate the mean and standard deviation of all the distances between
@@ -254,12 +254,12 @@ class Helpers:
         # Here, store the time difference between all the consecutive points in an array.
         time_deltas = df.reset_index()[const.DateTime].diff().dt.total_seconds()
 
-        # Look for a time diff that exceeds the time_jump and if one is found, calculate the
+        # Look for a time diff that exceeds the sampling_rate and if one is found, calculate the
         # latitude and longitude and then append them to the dataframe at the location where
         # the threshold is crossed.
         for i in range(len(time_deltas)):
             if len(df) > 3:
-                if time_deltas[i] > time_jump:
+                if time_deltas[i] > sampling_rate:
                     new_lat = df[const.LAT].iloc[i - 1] + (dy / const.RADIUS_OF_EARTH) * (180 / np.pi)
                     new_lon = df[const.LONG].iloc[i - 1] +\
                               (dx / const.RADIUS_OF_EARTH) * (180 / np.pi) / np.cos(df[const.LAT].iloc[i - 1] * np.pi / 180)
@@ -275,11 +275,11 @@ class Helpers:
 
     @staticmethod
     def kinematic_help(dataframe: Union[pd.DataFrame, PTRAILDataFrame], id_: Text,
-                       time_jump: float, class_label_col):
+                       sampling_rate: float, class_label_col):
         """
             This method takes a dataframe and uses kinematic interpolation to determine coordinates
             of location on Datetime where the time difference between 2 consecutive points exceeds
-            the user-specified time_jump and inserts the interpolated point those between 2 points.
+            the user-specified sampling_rate and inserts the interpolated point those between 2 points.
 
             Warning
             -------
@@ -292,7 +292,7 @@ class Helpers:
                      The dataframe containing the original trajectory data.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
-                time_jump: float
+                sampling_rate: float
                     The maximum time difference between 2 points greater than which
                     a point will be inserted between 2 points.
 
@@ -308,8 +308,8 @@ class Helpers:
                 https://gist.github.com/talespaiva/128980e3608f9bc5083b.js
         """
         # Create a Series containing new times which are calculated as follows:
-        #    new_time[i] = original_time[i] + time_jump.
-        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(time_jump, unit='seconds')
+        #    new_time[i] = original_time[i] + sampling_rate.
+        new_times = dataframe.reset_index()[const.DateTime] + pd.to_timedelta(sampling_rate, unit='seconds')
 
         # Here, store the time difference between all the consecutive points in an array.
         time_deltas = dataframe.reset_index()[const.DateTime].diff().dt.total_seconds()
@@ -322,11 +322,11 @@ class Helpers:
         lat = list(dataframe.reset_index()[const.LAT].values)
         lon = list(dataframe.reset_index()[const.LONG].values)
 
-        # Look for a time diff that exceeds the time_jump and if one is found, calculate the
+        # Look for a time diff that exceeds the sampling_rate and if one is found, calculate the
         # latitude and longitude and then append them to the dataframe at the location where
         # the threshold is crossed.
         for i in range(len(time_deltas)):
-            if time_deltas[i] > time_jump and not np.isnan(lat_velocity[i - 1]):
+            if time_deltas[i] > sampling_rate and not np.isnan(lat_velocity[i - 1]):
                 ax = np.array([[(time_deltas[i] ** 2) / 2, (time_deltas[i] ** 3) / 6],
                                [float(time_deltas[i]), (time_deltas[i] ** 2) / 2]])
                 bx = [lat[i] - lat[i - 1] - lat_velocity[i - 1] * time_deltas[i], lat_velocity[i] - lat_velocity[i - 1]]

@@ -81,7 +81,9 @@ class GuiHandler:
                 self._window.DFPane.removeItem(item)
 
             col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
-                                               title="Enter Column Names")
+                                               title="Enter Column Names",
+                                               placeHolder=['Name of Identifier column', 'Name of Timestamp column',
+                                                            'Name of Latitude column', 'Name of Longitude column'])
             if col_names is not None and col_names[0] != '' and len(col_names) == 4:
                 # Read the data into a PTRAIL dataframe.
                 self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
@@ -352,49 +354,63 @@ class GuiHandler:
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
             params.remove('dataframe')
             params.remove('ip_type')
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Sampling rate (in seconds)',
+                                                       'Name of the column that contains class label (Leave empty if '
+                                                       'none)'])
 
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='linear',
-                                                                time_jump=float(args[0]),
-                                                                class_label_col=args[1])
+                                                                sampling_rate=float(args[0].strip()),
+                                                                class_label_col=args[1].strip())
 
         elif selected_function == 'Cubic Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
             params.remove('dataframe')
             params.remove('ip_type')
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Sampling rate (in seconds)',
+                                                       'Name of the column that contains class label (Leave empty if '
+                                                       'none)']
+                                          )
 
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='cubic',
-                                                                time_jump=float(args[0]),
-                                                                class_label_col=args[1])
+                                                                sampling_rate=float(args[0].strip()),
+                                                                class_label_col=args[1].strip())
 
         elif selected_function == 'Kinematic Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
             params.remove('dataframe')
             params.remove('ip_type')
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Sampling rate (in seconds)',
+                                                       'Name of the column that contains class label (Leave empty if '
+                                                       'none)'])
 
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='kinematic',
-                                                                time_jump=float(args[0]),
-                                                                class_label_col=args[1])
+                                                                sampling_rate=float(args[0].strip()),
+                                                                class_label_col=args[1].strip())
 
         elif selected_function == 'Random-Walk Interpolation':
             params = inspect.getfullargspec(Interpolation.interpolate_position).args
             params.remove('dataframe')
             params.remove('ip_type')
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Sampling rate (in seconds)',
+                                                       'Name of the column that contains class label (Leave empty if '
+                                                       'none)']
+                                          )
 
             if args:
                 self._data = Interpolation.interpolate_position(dataframe=self._data,
                                                                 ip_type='random_walk',
-                                                                time_jump=float(args[0]),
-                                                                class_label_col=args[1])
+                                                                sampling_rate=float(args[0].strip()),
+                                                                class_label_col=args[1].strip())
 
         self._window.statusBar.showMessage("Task Done ...")
 
@@ -446,17 +462,19 @@ class GuiHandler:
         elif selected_function == 'Point within Range':
             params = inspect.getfullargspec(KinematicFeatures.create_point_within_range_column).args
             params.remove('dataframe')
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Coordinates (lat1, lon1, lat2, lon2)',
+                                                       'Max distance from coordinates (metres)'])
 
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
                 # Use Regex to get all the digits from the coords input and convert
                 # it to required tuple to feed into the method.
-                temp = re.findall(r'\d+', args[0])
+                temp = re.findall(r'\d+', args[0].strip())
                 coords = tuple(map(int, temp))
 
-                dist_range = float(args[1])
+                dist_range = float(args[1].strip())
                 self._data = KinematicFeatures.create_point_within_range_column(self._data,
                                                                                 coordinates=coords,
                                                                                 dist_range=dist_range)
@@ -465,17 +483,18 @@ class GuiHandler:
             params = inspect.getfullargspec(KinematicFeatures.create_distance_from_point_column).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Coordinates (lat1, lon1, lat2, lon2)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
                 # Use Regex to get all the digits from the coords input and convert
                 # it to required tuple to feed into the method.
-                temp = re.findall(r'\d+', args[0])
+                temp = re.findall(r'\d+', args[0].strip())
                 coords = tuple(map(int, temp))
 
                 self._data = KinematicFeatures.create_distance_from_point_column(dataframe=self._data,
-                                                                                 coordinates=coords, )
+                                                                                 coordinates=coords)
 
         elif selected_function == 'Speed':
             self._data = KinematicFeatures.create_speed_column(self._data)
@@ -562,12 +581,13 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.hampel_outlier_detection).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Filter by Metric (Enter Column Name)'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
                 self._data = Filters.hampel_outlier_detection(dataframe=self._data,
-                                                              column_name=args[0])
+                                                              column_name=args[0].strip())
 
         elif selected_function == 'Remove Duplicates':
             self._data = Filters.remove_duplicates(self._data)
@@ -576,18 +596,20 @@ class GuiHandler:
             params = inspect.getfullargspec(Filters.filter_by_traj_id).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=['Trajectory ID'])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
                 self._data = Filters.filter_by_traj_id(dataframe=self._data,
-                                                       traj_id=args[0])
+                                                       traj_id=args[0].strip())
 
         elif selected_function == 'By Bounding Box':
             params = inspect.getfullargspec(Filters.filter_by_bounding_box).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=["Bounding Box (lat1, lon1, lat2, lon2)"])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -595,26 +617,27 @@ class GuiHandler:
                 coords = tuple(map(float, temp))
                 self._data = Filters.filter_by_bounding_box(dataframe=self._data,
                                                             bounding_box=coords,
-                                                            inside=(bool(distutils.util.strtobool(args[1]))))
+                                                            inside=(bool(distutils.util.strtobool(args[1].strip()))))
 
         elif selected_function == 'By Date':
             params = inspect.getfullargspec(Filters.filter_by_date).args
             params.remove('dataframe')
 
-            args = self._get_input_params(params, title="Enter Parameters")
+            args = self._get_input_params(params, title="Enter Parameters",
+                                          placeHolder=["YYYY-MM-DD", "YYYY-MM-DD"])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
                 if args[0] == '':
                     self._data = Filters.filter_by_date(dataframe=self._data,
-                                                        end_date=args[1])
+                                                        end_date=args[1].strip())
                 elif args[1] == '':
                     self._data = Filters.filter_by_date(dataframe=self._data,
-                                                        start_date=args[0])
+                                                        start_date=args[0].strip())
                 else:
                     self._data = Filters.filter_by_date(dataframe=self._data,
-                                                        start_date=args[0],
-                                                        end_date=args[1])
+                                                        start_date=args[0].strip(),
+                                                        end_date=args[1].strip())
 
         elif selected_function == 'By DateTime':
             params = inspect.getfullargspec(Filters.filter_by_datetime).args
@@ -626,14 +649,14 @@ class GuiHandler:
             if args:
                 if args[0] == '':
                     self._data = Filters.filter_by_datetime(dataframe=self._data,
-                                                            end_dateTime=args[1])
+                                                            end_dateTime=args[1].strip())
                 elif args[1] == '':
                     self._data = Filters.filter_by_datetime(dataframe=self._data,
-                                                            start_dateTime=args[0])
+                                                            start_dateTime=args[0].strip())
                 else:
                     self._data = Filters.filter_by_datetime(dataframe=self._data,
-                                                            start_dateTime=args[0],
-                                                            end_dateTime=args[1])
+                                                            start_dateTime=args[0].strip(),
+                                                            end_dateTime=args[1].strip())
 
         elif selected_function == 'By Maximum Speed':
             params = inspect.getfullargspec(Filters.filter_by_max_speed).args
@@ -644,7 +667,7 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.filter_by_max_speed(dataframe=self._data,
-                                                         max_speed=float(args[0]))
+                                                         max_speed=float(args[0].strip()))
 
         elif selected_function == 'By Minimum Speed':
             params = inspect.getfullargspec(Filters.filter_by_min_speed).args
@@ -655,7 +678,7 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.filter_by_min_speed(dataframe=self._data,
-                                                         min_speed=float(args[0]))
+                                                         min_speed=float(args[0].strip()))
 
         elif selected_function == 'By Minimum Consecutive Distance':
             params = inspect.getfullargspec(Filters.filter_by_min_consecutive_distance).args
@@ -666,7 +689,7 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.filter_by_min_consecutive_distance(dataframe=self._data,
-                                                                        min_distance=float(args[0]))
+                                                                        min_distance=float(args[0].strip()))
 
         elif selected_function == 'By Maximum Consecutive Distance':
             params = inspect.getfullargspec(Filters.filter_by_max_consecutive_distance).args
@@ -677,7 +700,7 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.filter_by_max_consecutive_distance(dataframe=self._data,
-                                                                        max_distance=float(args[0]))
+                                                                        max_distance=float(args[0].strip()))
 
         elif selected_function == 'By Maximum Distance and Speed':
             params = inspect.getfullargspec(Filters.filter_by_max_distance_and_speed).args
@@ -688,8 +711,8 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.filter_by_max_distance_and_speed(dataframe=self._data,
-                                                                      max_distance=float(args[0]),
-                                                                      max_speed=float(args[1]))
+                                                                      max_distance=float(args[0].strip()),
+                                                                      max_speed=float(args[1].strip()))
 
         elif selected_function == 'By Minimum Distance and Speed':
             params = inspect.getfullargspec(Filters.filter_by_min_distance_and_speed).args
@@ -700,8 +723,8 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.filter_by_min_distance_and_speed(dataframe=self._data,
-                                                                      min_distance=float(args[0]),
-                                                                      min_speed=float(args[1]))
+                                                                      min_distance=float(args[0].strip()),
+                                                                      min_speed=float(args[1].strip()))
 
         elif selected_function == 'Remove Outliers by Consecutive Distance':
             self._data = Filters.filter_outliers_by_consecutive_distance(dataframe=self._data)
@@ -718,7 +741,7 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Filters.remove_trajectories_with_less_points(dataframe=self._data,
-                                                                          num_min_points=int(args[0]))
+                                                                          num_min_points=int(args[0].strip()))
 
         # Update the traj_id list in case if some trajectories have been completely
         # removed.
@@ -752,7 +775,7 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Statistics.segment_traj_by_days(dataframe=self._data,
-                                                             num_days=int(args[0]))
+                                                             num_days=int(args[0].strip()))
                 self._map_data = self._data
 
         elif selected_function == 'Generate Kinematic Statistics':
@@ -764,8 +787,9 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Statistics.generate_kinematic_stats(dataframe=self._data,
-                                                                 target_col_name=args[0],
-                                                                 segmented=bool(distutils.util.strtobool(args[1])))
+                                                                 target_col_name=args[0].strip(),
+                                                                 segmented=bool(distutils.util.strtobool(args[1].strip()
+                                                                                                         )))
 
         elif selected_function == 'Pivot Statistics DF':
             params = inspect.getfullargspec(Statistics.pivot_stats_df).args
@@ -776,8 +800,8 @@ class GuiHandler:
             # wait for the user to play their part.
             if args:
                 self._data = Statistics.pivot_stats_df(dataframe=self._data,
-                                                       target_col_name=args[0],
-                                                       segmented=bool(distutils.util.strtobool(args[1])))
+                                                       target_col_name=args[0].strip(),
+                                                       segmented=bool(distutils.util.strtobool(args[1].strip())))
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
@@ -785,7 +809,7 @@ class GuiHandler:
         self._model = TableModel(self._data.reset_index(inplace=False))
         self._table.setModel(self._model)
 
-    def _get_input_params(self, labels, title):
+    def _get_input_params(self, labels, title, placeHolder):
         """
             Take the input parameters for the function in question from
             the user.
@@ -796,6 +820,8 @@ class GuiHandler:
                     The name of the parameters.
                 title: str
                     The title of the input dialog box.
+                placeHolder: list
+                    Default text for each QLineEdit.
 
             Returns
             -------
@@ -804,7 +830,8 @@ class GuiHandler:
         """
         input_dialog = InputDialog(parent=self._window,
                                    labels=labels,
-                                   title=title)
+                                   title=title,
+                                   placeHolders=placeHolder)
         if input_dialog.exec_():
             args = input_dialog.getInputs()
 

@@ -225,7 +225,8 @@ class Filters:
                     filtered_df = dataframe.loc[filt].reset_index()
 
             # Convert the smaller dataframe back to PTRAILDataFrame and return it.
-            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG, const.DateTime, const.TRAJECTORY_ID)
+            return PTRAILDataFrame(filtered_df, const.LAT, const.LONG,
+                                   const.DateTime, const.TRAJECTORY_ID).drop(columns=['level_0', 'index'])
 
         except KeyError:
             # # Ask the user first to create a date.
