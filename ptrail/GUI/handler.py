@@ -32,6 +32,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from sklearn.feature_selection import mutual_info_classif
 
 
 class GuiHandler:
@@ -237,7 +238,8 @@ class GuiHandler:
 
         # Add the figure and canvas to a new layout and finally add the layout to the StatsPane.
         self.generateFeatureImportanceBtn = QtWidgets.QPushButton("Generate Feature Importance")
-        self.generateFeatureImportanceBtn.clicked.connect(lambda: generate_features())
+        self.generateFeatureImportanceBtn.clicked.connect(lambda: self.generate_feature_imp_plot())
+        self.generateFeatureImportanceBtn.setFont(QtGui.QFont("Tahoma", 12))
         new_draw_layout = QtWidgets.QVBoxLayout()
         new_draw_layout.addWidget(self._window.selectStatDropdown)
         new_draw_layout.addWidget(self.statCanvas)
@@ -245,17 +247,33 @@ class GuiHandler:
         new_draw_layout.addWidget(self.generateFeatureImportanceBtn)
         self._window.StatsPane.addLayout(new_draw_layout)
 
-    def generate_feature(self):
-        self.generateFeatureImportanceBtn.deleteLater()
+    def generate_feature_imp_plot(self):
+        try:
+            args = self._get_input_params(['Class-Label Column'], title="Enter Classification Target column name",
+                                          placeHolder=['Classification target column name'])
+            if args:
+                df = self._data.select_dtypes(include=['float64', 'int']).dropna()
+                Y = df[args[0].strip()]
+                df = df.drop(columns=[args[0]])
 
-        Y = self._data['hello']
-        # df = df.select_dtypes(include=['float64', 'int'])
-        #
-        # importances = mutual_info_classif(df, Y)
-        #
-        # feat = pd.Series(importances, df.columns).sort_values()
-        # feat.plot(kind='barh', color='green')
+                importances = mutual_info_classif(df, Y)
+                feat = pd.Series(importances, df.columns).sort_values()
 
+                self.featureFigure.clear()
+                ax = self.featureFigure.add_subplot(111)
+
+                feat.plot(kind='barh', color='skyblue', ax=ax)
+                ax.set_title("Feature Importance for Classification")
+
+                self.featureFigure.tight_layout()
+                self.featureCanvas.draw()
+        except:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setWindowTitle("Not a classification problem")
+            msg.setText("Feature importance is only shown for datasets that have a "
+                        "target column.")
+            msg.exec()
 
     def redraw_stat(self):
         """
