@@ -240,6 +240,7 @@ class GuiHandler:
         self.generateFeatureImportanceBtn = QtWidgets.QPushButton("Generate Feature Importance")
         self.generateFeatureImportanceBtn.clicked.connect(lambda: self.generate_feature_imp_plot())
         self.generateFeatureImportanceBtn.setFont(QtGui.QFont("Tahoma", 12))
+        self.generateFeatureImportanceBtn.setEnabled(False)
         new_draw_layout = QtWidgets.QVBoxLayout()
         new_draw_layout.addWidget(self._window.selectStatDropdown)
         new_draw_layout.addWidget(self.statCanvas)
@@ -252,21 +253,27 @@ class GuiHandler:
             args = self._get_input_params(['Class-Label Column'], title="Enter Classification Target column name",
                                           placeHolder=['Classification target column name'])
             if args:
-                df = self._data.select_dtypes(include=['float64', 'int']).dropna()
+                df = KinematicFeatures.generate_kinematic_features(self._data).dropna()
+                df = df[[
+                    'lat', 'lon', 'Distance', 'Distance_from_start', 'Speed', 'Acceleration', 'Jerk',
+                    'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate', args[0]
+                ]]
                 Y = df[args[0].strip()]
                 df = df.drop(columns=[args[0]])
 
-                importances = mutual_info_classif(df, Y)
-                feat = pd.Series(importances, df.columns).sort_values()
+                importance = mutual_info_classif(df, Y)
+                feat = pd.Series(importance, df.columns).sort_values()
 
                 self.featureFigure.clear()
                 ax = self.featureFigure.add_subplot(111)
 
                 feat.plot(kind='barh', color='skyblue', ax=ax)
                 ax.set_title("Feature Importance for Classification")
+                ax.set_xlabel("Mutual Info")
 
                 self.featureFigure.tight_layout()
                 self.featureCanvas.draw()
+                self.generateFeatureImportanceBtn.setText("Refresh Importance")
         except:
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Critical)
@@ -497,6 +504,7 @@ class GuiHandler:
                 'Distance', 'Distance_from_start', 'Acceleration', 'Jerk',
                 'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate',
             ])
+            self.generateFeatureImportanceBtn.setEnabled(True)
             self._window.selectStatDropdown.blockSignals(False)
 
         elif selected_function == 'Distance':
