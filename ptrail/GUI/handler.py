@@ -659,7 +659,7 @@ class GuiHandler:
             if args:
                 self._data = Filters.filter_by_traj_id(dataframe=self._data,
                                                        traj_id=args[0].strip())
-
+        # TODO: This crashes on running
         elif selected_function == 'By Bounding Box':
             params = inspect.getfullargspec(Filters.filter_by_bounding_box).args
             params.remove('dataframe')
@@ -842,7 +842,7 @@ class GuiHandler:
                 self._data = Statistics.segment_traj_by_days(dataframe=self._data,
                                                              num_days=int(args[0].strip()))
                 self._map_data = self._data
-
+        # TODO: Crashes before execution
         elif selected_function == 'Generate Kinematic Statistics':
             params = inspect.getfullargspec(Statistics.generate_kinematic_stats).args
             params.remove('dataframe')
