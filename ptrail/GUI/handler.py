@@ -664,7 +664,8 @@ class GuiHandler:
             params.remove('dataframe')
 
             args = self._get_input_params(params, title="Enter Parameters",
-                                          placeHolder=["Bounding Box (lat1, lon1, lat2, lon2)"])
+                                          placeHolder=["lat1, lon1, lat2, lon2",
+                                                       "Points inside the bounding box? (True/False)"])
             # If the user provided the input params, then run the function, else
             # wait for the user to play their part.
             if args:
@@ -853,8 +854,7 @@ class GuiHandler:
             if args:
                 self._data = Statistics.generate_kinematic_stats(dataframe=self._data,
                                                                  target_col_name=args[0].strip(),
-                                                                 segmented=bool(util.strtobool(args[1].strip()
-                                                                                                         )))
+                                                                 segmented=bool(util.strtobool(args[1].strip())))
 
         elif selected_function == 'Pivot Statistics DF':
             params = inspect.getfullargspec(Statistics.pivot_stats_df).args
