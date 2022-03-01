@@ -5,7 +5,7 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
 """
-import distutils
+from distutils import util
 import random
 import re
 
@@ -315,7 +315,7 @@ class GuiHandler:
             ax.axhline(horizontal_lines[i], c=colors[i], linestyle='--', label=text[i])
 
         # Add the legend, rotate the ticks, set tight layout and draw it on the canvas.
-        ax.legend()
+        ax.legend(loc='upper right')
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
         self.statFigure.tight_layout()
         self.statCanvas.draw()
@@ -386,7 +386,6 @@ class GuiHandler:
         else:
             self._window.statusBar.showMessage("Running Temporal Features ...")
             self._run_temporal()
-
         self.update_dropCol_options()
 
     def _run_ip(self):
@@ -501,7 +500,7 @@ class GuiHandler:
             self._window.selectStatDropdown.blockSignals(True)
             self._window.selectStatDropdown.clear()
             self._window.selectStatDropdown.addItems([
-                'Distance', 'Distance_from_start', 'Acceleration', 'Jerk',
+                'Distance', 'Distance_from_start', 'Speed', 'Acceleration', 'Jerk',
                 'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate',
             ])
             self.generateFeatureImportanceBtn.setEnabled(True)
@@ -659,7 +658,7 @@ class GuiHandler:
             if args:
                 self._data = Filters.filter_by_traj_id(dataframe=self._data,
                                                        traj_id=args[0].strip())
-
+        # TODO: This crashes on running
         elif selected_function == 'By Bounding Box':
             params = inspect.getfullargspec(Filters.filter_by_bounding_box).args
             params.remove('dataframe')
@@ -673,7 +672,7 @@ class GuiHandler:
                 coords = tuple(map(float, temp))
                 self._data = Filters.filter_by_bounding_box(dataframe=self._data,
                                                             bounding_box=coords,
-                                                            inside=(bool(distutils.util.strtobool(args[1].strip()))))
+                                                            inside=(bool(util.strtobool(args[1].strip()))))
 
         elif selected_function == 'By Date':
             params = inspect.getfullargspec(Filters.filter_by_date).args
@@ -854,7 +853,7 @@ class GuiHandler:
             if args:
                 self._data = Statistics.generate_kinematic_stats(dataframe=self._data,
                                                                  target_col_name=args[0].strip(),
-                                                                 segmented=bool(distutils.util.strtobool(args[1].strip()
+                                                                 segmented=bool(util.strtobool(args[1].strip()
                                                                                                          )))
 
         elif selected_function == 'Pivot Statistics DF':
@@ -868,7 +867,7 @@ class GuiHandler:
             if args:
                 self._data = Statistics.pivot_stats_df(dataframe=self._data,
                                                        target_col_name=args[0].strip(),
-                                                       segmented=bool(distutils.util.strtobool(args[1].strip())))
+                                                       segmented=bool(util.strtobool(args[1].strip())))
 
         # Finally, update the GUI with the updated DF received from the
         # function results. DO NOT FORGET THE reset_index(inplace=False).
@@ -908,11 +907,16 @@ class GuiHandler:
         """
             Update the options in the QListWidget for dropping the columns.
         """
-        self._window.dropColumnWidget.clear()
-        toAdd = list(self._data.columns)
-        toAdd.remove('lat')
-        toAdd.remove('lon')
-        self._window.dropColumnWidget.addItems(toAdd)
+        try:
+            self._window.dropColumnWidget.clear()
+            toAdd = list(self._data.columns)
+            toAdd.remove('lat')
+            toAdd.remove('lon')
+            self._window.dropColumnWidget.addItems(toAdd)
+        except ValueError:
+            self._window.dropColumnWidget.clear()
+            toAdd = list(self._data.columns)
+            self._window.dropColumnWidget.addItems(toAdd)
 
     def drop_col(self):
         """
