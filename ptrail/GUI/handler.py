@@ -841,7 +841,7 @@ class GuiHandler:
                 self._data = Statistics.segment_traj_by_days(dataframe=self._data,
                                                              num_days=int(args[0].strip()))
                 self._map_data = self._data
-
+        # TODO: Crashes before execution
         elif selected_function == 'Generate Kinematic Statistics':
             params = inspect.getfullargspec(Statistics.generate_kinematic_stats).args
             params.remove('dataframe')
