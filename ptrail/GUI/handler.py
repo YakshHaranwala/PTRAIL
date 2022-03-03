@@ -217,6 +217,9 @@ class GuiHandler:
                 self.redraw_stat()
 
     def draw_stats(self):
+        """
+            Handle the objects of the statistics pane from here.
+        """
         # Create the Stat Selection Drop down button.
         self._window.selectStatDropdown = QtWidgets.QComboBox()
         self._window.selectStatDropdown.currentIndexChanged.connect(lambda: self.redraw_stat())
@@ -249,26 +252,51 @@ class GuiHandler:
         self._window.StatsPane.addLayout(new_draw_layout)
 
     def generate_feature_imp_plot(self):
+        """
+            Take the input from the user and draw the mutual info
+            plot.
+        """
         try:
-            args = self._get_input_params(['Class-Label Column'], title="Enter Classification Target column name",
-                                          placeHolder=['Classification target column name'])
+            args = self._get_input_params(['Class-Label Column', 'Number of Features', 'Segment Based'],
+                                          title="Enter Classification Target column name",
+                                          placeHolder=['Classification target column name', 'Number Features Wanted',
+                                                       'True/False'])
             if args:
-                df = KinematicFeatures.generate_kinematic_features(self._data).dropna()
-                df = df[[
-                    'lat', 'lon', 'Distance', 'Distance_from_start', 'Speed', 'Acceleration', 'Jerk',
-                    'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate', args[0]
-                ]]
-                Y = df[args[0].strip()]
-                df = df.drop(columns=[args[0]])
+                feat, importance = None, None
+                # If the user wants mutual info for point-based data, use the if-block.
+                # For segment-based data, the else block is used.
+                if not bool(util.strtobool(args[2].strip())):
+                    # Generate the features and drop duplicate cols.
+                    df = KinematicFeatures.generate_kinematic_features(self._data).dropna()
+                    df = df.loc[:, ~df.columns.duplicated()]
+                    df = df[[
+                        'lat', 'lon', 'Distance', 'Distance_from_start', 'Speed', 'Acceleration', 'Jerk',
+                        'Bearing', 'Bearing_Rate', 'Rate_of_bearing_rate', args[0]
+                    ]]
+                    Y = df[args[0].strip()]
+                    df = df.drop(columns=[args[0]])
+                else:
+                    df = Statistics.generate_kinematic_stats(self._data, args[0], False)
+                    df = Statistics.pivot_stats_df(df, args[0], False)
+                    df = df.loc[:, ~df.columns.duplicated()]
+                    Y = df[[args[0].strip()]]
+                    df = df.drop(columns=[args[0]])
 
+                # Check whether the number of features that the user asked is lesser
+                # than actual number of features.
+                num_features = int(args[1]) if len(df.columns) > int(args[1]) else len(df.columns)
+
+                # Predict the mutual info.
                 importance = mutual_info_classif(df, Y)
-                feat = pd.Series(importance, df.columns).sort_values()
+                feat = pd.Series(importance, df.columns).sort_values(ascending=False)
+                feat = feat[0: num_features]
 
+                # Plot the bar plots to the tool.
                 self.featureFigure.clear()
                 ax = self.featureFigure.add_subplot(111)
 
                 feat.plot(kind='barh', color='skyblue', ax=ax)
-                ax.set_title("Feature Importance for Classification")
+                ax.set_title("Classification Feature Importance")
                 ax.set_xlabel("Mutual Info")
 
                 self.featureFigure.tight_layout()
