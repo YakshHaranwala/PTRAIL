@@ -564,6 +564,7 @@ class Helpers:
             stats = stats[['traj_id', 'seg_id', 'mean', 'std', 'min', '10%',
                            '25%', '50%', '75%', '90%', 'max']]
             stats[target_col_name] = df[target_col_name].iloc[0]
+            stats = stats.loc[:, ~stats.columns.duplicated()]
 
             to_return = stats.reset_index().rename(
                 columns={'index': 'Columns'}).reset_index(drop=True).set_index(['traj_id', 'seg_id', 'Columns'])

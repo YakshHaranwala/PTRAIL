@@ -196,5 +196,7 @@ class Statistics:
         cols = const.ORDERED_COLS
         cols.append(target_col_name)
 
-        # Reorder the final DF and return it.
-        return to_return[cols]
+        # Reorder the final DF, drop duplicated columns and return it.
+        to_return = to_return[cols]
+        to_return = to_return.loc[:, ~to_return.columns.duplicated()]
+        return to_return
