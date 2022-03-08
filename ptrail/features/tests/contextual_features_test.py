@@ -6,7 +6,7 @@ import pandas as pd
 from shapely.geometry import Polygon
 
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
-from ptrail.features.semantic_features import SemanticFeatures
+from ptrail.features.contextual_features import ContextualFeatures
 
 
 class SemanticTests(unittest.TestCase):
@@ -31,39 +31,39 @@ class SemanticTests(unittest.TestCase):
                                   traj_id='traj_id')
 
     def test_visited_location_positive(self):
-        visited_location = SemanticFeatures.visited_location(df=self.starkey_traj,
-                                                             geo_layers=self.starkey_habitat,
-                                                             visited_location_name='BEAR',
-                                                             location_column_name='CowPast')
+        visited_location = ContextualFeatures.visited_location(df=self.starkey_traj,
+                                                               geo_layers=self.starkey_habitat,
+                                                               visited_location_name='BEAR',
+                                                               location_column_name='CowPast')
         self.assertIsNotNone(visited_location['Visited_BEAR'])
         self.assertIsInstance(visited_location['Visited_BEAR'][0], np.int64)
 
     def test_visited_location_negative(self):
         with self.assertRaises(KeyError):
-            visited_location = SemanticFeatures.visited_location(df=self.starkey_traj,
-                                                                 geo_layers=self.starkey_habitat,
-                                                                 visited_location_name='FAKE_NAME',
-                                                                 location_column_name='CowPast')
+            visited_location = ContextualFeatures.visited_location(df=self.starkey_traj,
+                                                                   geo_layers=self.starkey_habitat,
+                                                                   visited_location_name='FAKE_NAME',
+                                                                   location_column_name='CowPast')
 
     def test_visited_poi_positive(self):
-        water_visited = SemanticFeatures.visited_poi(df=self.single_traj,
-                                                     surrounding_data=self.mini_pasture,
-                                                     dist_column_label='DistEWat',
-                                                     nearby_threshold=10)
+        water_visited = ContextualFeatures.visited_poi(df=self.single_traj,
+                                                       surrounding_data=self.mini_pasture,
+                                                       dist_column_label='DistEWat',
+                                                       nearby_threshold=10)
         self.assertIsNotNone(water_visited['Nearby_POI'])
         self.assertIsInstance(water_visited['Nearby_POI'][0], np.bool_)
 
     def test_visited_poi_negative(self):
         with self.assertRaises(KeyError):
-            water_visited = SemanticFeatures.visited_poi(df=self.single_traj,
-                                                         surrounding_data=self.mini_pasture,
-                                                         dist_column_label='Fake_Name',
-                                                         nearby_threshold=10)
+            water_visited = ContextualFeatures.visited_poi(df=self.single_traj,
+                                                           surrounding_data=self.mini_pasture,
+                                                           dist_column_label='Fake_Name',
+                                                           nearby_threshold=10)
 
 
     def test_trajectories_inside_polygon(self):
-        traj_inside_poly = SemanticFeatures.trajectories_inside_polygon(df=self.starkey_traj,
-                                                                        polygon=self.poly)
+        traj_inside_poly = ContextualFeatures.trajectories_inside_polygon(df=self.starkey_traj,
+                                                                          polygon=self.poly)
         self.assertGreaterEqual(len(traj_inside_poly), 1)
         self.assertListEqual(list(traj_inside_poly.reset_index().columns),
                              list(self.starkey_traj.reset_index().columns))
@@ -83,20 +83,20 @@ class SemanticTests(unittest.TestCase):
                              datetime='DateTime',
                              traj_id='traj_id')
 
-        intersect = SemanticFeatures.traj_intersect_inside_polygon(t1, t2, self.poly)
+        intersect = ContextualFeatures.traj_intersect_inside_polygon(t1, t2, self.poly)
         self.assertGreaterEqual(len(intersect), 1)
         self.assertEqual(len(intersect.columns), 6)
 
     def test_nearest_poi_positive(self):
-        poi = SemanticFeatures.nearest_poi(coords=(47.5759762, -52.7031302),
-                                           tags={'amenity': ['bank', 'atm']},
-                                           dist_threshold=2500)
+        poi = ContextualFeatures.nearest_poi(coords=(47.5759762, -52.7031302),
+                                             tags={'amenity': ['bank', 'atm']},
+                                             dist_threshold=2500)
         self.assertGreaterEqual(len(poi), 1)
 
     def test_nearest_poi_negative(self):
-        poi = SemanticFeatures.nearest_poi(coords=(47.5759762, -52.7031302),
-                                           tags={'amenity': ['waterpark']},
-                                           dist_threshold=2500)
+        poi = ContextualFeatures.nearest_poi(coords=(47.5759762, -52.7031302),
+                                             tags={'amenity': ['waterpark']},
+                                             dist_threshold=2500)
         self.assertEqual(len(poi), 0)
 
 

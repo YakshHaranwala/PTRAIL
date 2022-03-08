@@ -10,7 +10,7 @@ from typing import Text
 
 
 class TestPTRAILDF(unittest.TestCase):
-    _pdf_data = pd.read_csv('examples/data/seagulls.csv')
+    _pdf_data = pd.read_csv('https://raw.githubusercontent.com/YakshHaranwala/PTRAIL/main/examples/data/seagulls.csv')
 
     _list_data = [
         [39.984094, 116.319236, '2008-10-23 05:53:05', 1],
@@ -48,12 +48,13 @@ class TestPTRAILDF(unittest.TestCase):
 
     def test_df_from_pdf_positive(self):
         from_pdf = PTRAILDataFrame(data_set=TestPTRAILDF._pdf_data,
-                                   latitude='location-lat',
-                                   longitude='location-long',
-                                   datetime='timestamp',
-                                   traj_id='tag-local-identifier',
+                                   latitude='lat',
+                                   longitude='lon',
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
                                    rest_of_columns=[])
         self.assertIsInstance(from_pdf, PTRAILDataFrame)
+        self.assertGreater(len(from_pdf), 1)
 
     def test_df_from_pdf_negative(self):
         """
@@ -66,14 +67,13 @@ class TestPTRAILDF(unittest.TestCase):
             dataset when constructing a PTRAILDataFrame.
         """
         from_pdf = PTRAILDataFrame(data_set=TestPTRAILDF._pdf_data,
-                                   latitude='location',
-                                   longitude='location-long',
-                                   datetime='timestamp',
-                                   traj_id='tag-local-identifier',
+                                   latitude='',
+                                   longitude='lon',
+                                   datetime='DateTime',
+                                   traj_id='traj_id',
                                    rest_of_columns=[])
-
         with self.assertRaises(AttributeError):
-            from_pdf.head()
+            print(from_pdf.head())
 
     # ---------------------------------- DataFrame Properties Testing ----------------------------------- #
     def test_lat(self):
@@ -130,16 +130,6 @@ class TestPTRAILDF(unittest.TestCase):
                              rest_of_columns=[])
         assert np.all(df.reset_index()[['traj_id', 'DateTime']].values ==
                       df.sort_by_traj_id_and_datetime().reset_index()[['traj_id', 'DateTime']].values)
-
-    def test_plot_traj(self):
-        df = PTRAILDataFrame(data_set=TestPTRAILDF._pdf_data,
-                             latitude='location-lat',
-                             longitude='location-long',
-                             datetime='timestamp',
-                             traj_id='tag-local-identifier',
-                             rest_of_columns=[])
-        f_map = df.plot_folium_traj()
-        self.assertIsInstance(f_map, folium.Map)
 
 
 if __name__ == '__main__':

@@ -28,7 +28,7 @@ num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)
 
 
-class SemanticFeatures:
+class ContextualFeatures:
     @staticmethod
     def visited_location(df: PTRAILDataFrame,
                          geo_layers: Union[pd.DataFrame, gpd.GeoDataFrame],
