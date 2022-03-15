@@ -28,7 +28,8 @@ autodoc_mock_imports = ["scipy",
                         'ipywidgets',
                         'plotly',
                         'matplotlib',
-                        'seaborn'
+                        'seaborn',
+                        'PyQt5'
                         ]
 
 # -- Project information -----------------------------------------------------
@@ -38,7 +39,7 @@ copyright = '2021, Yaksh J Haranwala, Salman Haidri'
 author = 'Yaksh J Haranwala, Salman Haidri'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1 Beta'
+release = '0.7 Beta'
 
 # -- General configuration ---------------------------------------------------
 
