@@ -40,7 +40,7 @@ of PTRAIL:
     </tr>
     <tr>
         <td> 3. </td>
-        <td> Semantic Features Examples </td>
+        <td> Contextual Features Examples </td>
         <td> <a href="https://colab.research.google.com/drive/1fMqoNtnl0LJ8aJI7-l6SO5EgCRPbd0bA?usp=sharing" target="_blank"> Click Here </a></td>
     </tr>
     <tr>
