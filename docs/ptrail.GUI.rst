@@ -44,14 +44,6 @@ ptrail.GUI.handler module
    :undoc-members:
    :show-inheritance:
 
-ptrail.GUI.test module
-----------------------
-
-.. automodule:: ptrail.GUI.test
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
