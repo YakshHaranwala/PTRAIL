@@ -42,10 +42,9 @@ of PTRAIL:
         <td> 3. </td>
         <td> Data Filtering Examples </td>
         <td> <a href="https://colab.research.google.com/drive/1u972Y2wWyg2Vggf9ChPdLr2Pl8FTbqB8?usp=sharing" target="_blank"> Click Here </a></td>
-       
     </tr>
     <tr>
-         <td> 4. </td>
+        <td> 4. </td>
         <td> Contextual Features Examples </td>
         <td> <a href="https://colab.research.google.com/drive/1fMqoNtnl0LJ8aJI7-l6SO5EgCRPbd0bA?usp=sharing" target="_blank"> Click Here </a></td>
     </tr>
