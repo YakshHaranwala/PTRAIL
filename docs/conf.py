@@ -29,7 +29,8 @@ autodoc_mock_imports = ["scipy",
                         'plotly',
                         'matplotlib',
                         'seaborn',
-                        'PyQt5'
+                        'PyQt5',
+                        'sklearn'
                         ]
 
 # -- Project information -----------------------------------------------------
