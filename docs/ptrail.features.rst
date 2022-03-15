@@ -4,6 +4,14 @@ ptrail.features package
 Submodules
 ----------
 
+ptrail.features.contextual\_features module
+-------------------------------------------
+
+.. automodule:: ptrail.features.contextual_features
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ptrail.features.helper\_functions module
 ----------------------------------------
 
@@ -24,14 +32,6 @@ ptrail.features.temporal\_features module
 -----------------------------------------
 
 .. automodule:: ptrail.features.temporal_features
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ptrail.features.semantic\_features module
------------------------------------------
-
-.. automodule:: ptrail.features.semantic_features
    :members:
    :undoc-members:
    :show-inheritance:
