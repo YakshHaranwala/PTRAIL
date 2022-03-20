@@ -10,13 +10,13 @@ from ptrail.features.contextual_features import ContextualFeatures
 
 
 class SemanticTests(unittest.TestCase):
-    pdf = pd.read_csv('examples/data/starkey.csv')
+    pdf = pd.read_csv('https://raw.githubusercontent.com/YakshHaranwala/PTRAIL/main/examples/data/starkey.csv')
     starkey_traj = PTRAILDataFrame(data_set=pdf,
                                    latitude='lat',
                                    longitude='lon',
                                    datetime='DateTime',
                                    traj_id='Id')
-    starkey_habitat = pd.read_csv('examples/data/starkey_habitat.csv')
+    starkey_habitat = pd.read_csv('https://raw.githubusercontent.com/YakshHaranwala/PTRAIL/main/examples/data/starkey_habitat.csv')
 
     mini_pasture = starkey_habitat.loc[starkey_habitat['CowPast'] == 'BEAR']
     coords = list(zip(mini_pasture['lon'], (mini_pasture['lat'])))

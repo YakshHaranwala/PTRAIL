@@ -7,7 +7,7 @@ import ptrail.utilities.constants as const
 
 
 class TemporalFeaturesTest(unittest.TestCase):
-    _pdf_data = pd.read_csv('examples/data/seagulls.csv')
+    _pdf_data = pd.read_csv('https://raw.githubusercontent.com/YakshHaranwala/PTRAIL/main/examples/data/seagulls.csv')
     _test_df = PTRAILDataFrame(data_set=_pdf_data,
                                latitude='location-lat',
                                longitude='location-long',

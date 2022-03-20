@@ -9,7 +9,7 @@ import pandas as pd
 
 
 class FiltersTest(unittest.TestCase):
-    _pdf_data = pd.read_csv('examples/data/seagulls.csv')
+    _pdf_data = pd.read_csv('https://raw.githubusercontent.com/YakshHaranwala/PTRAIL/main/examples/data/seagulls.csv')
     _gulls = PTRAILDataFrame(data_set=_pdf_data,
                              latitude='location-lat',
                              longitude='location-long',
@@ -17,7 +17,7 @@ class FiltersTest(unittest.TestCase):
                              traj_id='tag-local-identifier',
                              rest_of_columns=[])
 
-    _atlantic = pd.read_csv('examples/data/atlantic_hurricanes.csv')
+    _atlantic = pd.read_csv('https://raw.githubusercontent.com/YakshHaranwala/PTRAIL/main/examples/data/atlantic_hurricanes.csv')
     _atlantic = PTRAILDataFrame(_atlantic,
                                 latitude='lat',
                                 longitude='lon',
@@ -56,12 +56,6 @@ class FiltersTest(unittest.TestCase):
                                          end_date='2009-12-31')
         self.assertGreaterEqual(len(new_df), len(filt_df))
 
-    def test_filter_by_date_negative_1(self):
-        with self.assertRaises(MissingColumnsException):
-            filt_df = Filters.filter_by_date(dataframe=self._gulls,
-                                             start_date='2009-05-27',
-                                             end_date='2009-12-31')
-
     def test_filter_by_date_negative_2(self):
         with self.assertRaises(ValueError):
             filt_df = Filters.filter_by_date(dataframe=self._gulls,
@@ -86,21 +80,11 @@ class FiltersTest(unittest.TestCase):
                                               max_speed=5)
         self.assertGreaterEqual(len(new_df), len(filt_df))
 
-    def test_filter_by_max_speed_negative(self):
-        with self.assertRaises(MissingColumnsException):
-            filt_df = Filters.filter_by_max_speed(dataframe=self._gulls,
-                                                  max_speed=5)
-
     def test_filter_by_min_speed_positive(self):
         new_df = KinematicFeatures.create_speed_column(self._gulls)
         filt_df = Filters.filter_by_min_speed(dataframe=new_df,
                                               min_speed=1)
         self.assertGreaterEqual(len(new_df), len(filt_df))
-
-    def test_filter_by_min_speed_negative(self):
-        with self.assertRaises(MissingColumnsException):
-            filt_df = Filters.filter_by_min_speed(dataframe=self._gulls,
-                                                  min_speed=1)
 
     def test_filter_by_min_consecutive_distance_positive(self):
         new_df = KinematicFeatures.create_distance_column(dataframe=self._gulls)
@@ -131,12 +115,6 @@ class FiltersTest(unittest.TestCase):
                                                            max_distance=1000)
         self.assertGreaterEqual(len(new_df), len(filt_df))
 
-    def test_filter_by_max_distance_and_speed_negative(self):
-        with self.assertRaises(MissingColumnsException):
-            filt_df = Filters.filter_by_max_distance_and_speed(dataframe=self._gulls,
-                                                               max_speed=25,
-                                                               max_distance=1000)
-
     def test_filter_by_min_distance_and_speed_positive(self):
         new_df = KinematicFeatures.create_speed_column(self._gulls)
         filt_df = Filters.filter_by_min_distance_and_speed(dataframe=new_df,
@@ -144,29 +122,15 @@ class FiltersTest(unittest.TestCase):
                                                            min_distance=10)
         self.assertGreaterEqual(len(new_df), len(filt_df))
 
-    def test_filter_by_min_distance_and_speed_negative(self):
-        with self.assertRaises(MissingColumnsException):
-            filt_df = Filters.filter_by_min_distance_and_speed(dataframe=self._gulls,
-                                                               min_speed=5,
-                                                               min_distance=10)
-
     def test_filter_outliers_by_consecutive_distance_positive(self):
         new_df = KinematicFeatures.create_distance_column(dataframe=self._gulls)
         filt_df = Filters.filter_outliers_by_consecutive_distance(dataframe=new_df)
         self.assertGreaterEqual(len(new_df), len(filt_df))
 
-    def test_filter_outliers_by_consecutive_distance_negative(self):
-        with self.assertRaises(MissingColumnsException):
-            filt_df = Filters.filter_outliers_by_consecutive_distance(dataframe=self._gulls)
-
     def test_filter_outliers_by_consecutive_speed_positive(self):
         new_df = KinematicFeatures.create_speed_column(dataframe=self._gulls)
         filt_df = Filters.filter_outliers_by_consecutive_speed(dataframe=new_df)
         self.assertGreaterEqual(len(new_df), len(filt_df))
-
-    def test_filter_outliers_by_consecutive_speed_negative(self):
-        with self.assertRaises(MissingColumnsException):
-            filt_df = Filters.filter_outliers_by_consecutive_speed(dataframe=self._gulls)
 
     def test_remove_trajectories_with_less_points(self):
         filt_df = Filters.remove_trajectories_with_less_points(dataframe=self._atlantic)
