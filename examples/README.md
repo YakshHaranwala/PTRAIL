@@ -95,7 +95,7 @@ of PTRAIL:
     </tr>
     <tr>
         <td> 11. </td>
-        <td> Visualization </td>
+        <td> Starkey Visualization </td>
         <td> <a href="https://colab.research.google.com/drive/13WVFgrctxgkdL-yrEGFqM9mdOMR2PJaf?usp=sharing" target="_blank"> Click Here </a></td>
     </tr>
     <tr>
