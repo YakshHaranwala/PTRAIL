@@ -76,7 +76,7 @@ of PTRAIL:
     <tr>
         <td> 9.2 </td>
         <td> Ship Type Classification </td>
-        <td> <a href="https://colab.research.google.com/drive/1OAvuHl-yn4c_GcetozOKDXl_dfOkYwPn?usp=sharing" target="_blank"> Click Here </a></td>
+        <td> <a href="https://colab.research.google.com/drive/1GQvwGKUcAUyiBUrPIOVlyPATlTUuHKsS?authuser=1" target="_blank"> Click Here </a></td>
     </tr>
     <tr>
         <td> 9.3 </td>
