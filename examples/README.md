@@ -106,6 +106,6 @@ of PTRAIL:
     <tr>
         <td> 13. </td>    
         <td> BMDA_Trajectory_Classification </td>    
-        <td> <a href="https://colab.research.google.com/drive/1kJSn2umrmP52tuhnsE0hJZNjlncZbhS2?usp=sharing&authuser=1#scrollTo=43uZNrfCF__P" target="_blank"> Click Here </a></td>
+        <td> <a href="https://colab.research.google.com/drive/15lX9LBr0eWHl2NBxcicPRciUDGfQ6LyM?authuser=1" target="_blank"> Click Here </a></td>
     </tr>
 </table>
