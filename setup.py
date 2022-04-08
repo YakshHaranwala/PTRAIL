@@ -31,7 +31,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     maintainer='PTRAIL Developers',
-    maintainer_email='mobilitylab2021@gmail.com',
+    maintainer_email='yjharanwala@mun.ca',
     classifiers=['Intended Audience :: Science/Research',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved',
