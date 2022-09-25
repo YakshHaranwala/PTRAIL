@@ -163,8 +163,8 @@ class PTRAILDataFrame(DataFrame):
                 data[const.TRAJECTORY_ID] = data[const.TRAJECTORY_ID].astype('str')
         except KeyError:
             raise KeyError('dataframe missing one of lat, lon, datetime columns.')
-        #except ParserError:
-        #    raise ParserError('DateTime column cannot be parsed')
+        # except ParserError:
+        #     raise ParserError('DateTime column cannot be parsed')
         except ValueError:
             raise ValueError('dtypes cannot be converted.')
 
