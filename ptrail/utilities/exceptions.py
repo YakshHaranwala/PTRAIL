@@ -29,3 +29,6 @@ class MissingTrajIDException(Exception):
 
 class NotAllowedError(Exception):
     pass
+
+class DateFormatInvalid(Exception):
+    pass

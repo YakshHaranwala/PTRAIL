@@ -6,13 +6,15 @@
 
     | Authors: Yaksh J Haranwala, Salman Haidri
 """
-#from parser import ParserError
+
 from typing import Dict, List, Union, Optional, Text
 
 import numpy as np
 import pandas as pd
 import pandas.core.dtypes.common
+
 from pandas import DataFrame
+
 from pandas._libs import lib
 
 from ptrail.utilities import constants as const
@@ -163,10 +165,10 @@ class PTRAILDataFrame(DataFrame):
                 data[const.TRAJECTORY_ID] = data[const.TRAJECTORY_ID].astype('str')
         except KeyError:
             raise KeyError('dataframe missing one of lat, lon, datetime columns.')
-        # except ParserError:
-        #     raise ParserError('DateTime column cannot be parsed')
         except ValueError:
             raise ValueError('dtypes cannot be converted.')
+        except:
+            raise DateFormatInvalid("The DateTime format provided is invalid and cannot be parsed as pandas DateTime.")
 
     def _validate_columns(self, data: DataFrame) -> bool:
         """
@@ -378,4 +380,3 @@ class PTRAILDataFrame(DataFrame):
                     The sorted dataframe.
         """
         return self.sort_values([const.TRAJECTORY_ID, const.DateTime], ascending=ascending)
-
