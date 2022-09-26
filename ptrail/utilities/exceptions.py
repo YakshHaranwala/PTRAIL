@@ -30,5 +30,5 @@ class MissingTrajIDException(Exception):
 class NotAllowedError(Exception):
     pass
 
-class DateFormatInvalid(Exception):
+class DateTimeFormatInvalid(Exception):
     pass

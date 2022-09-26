@@ -149,10 +149,11 @@ class PTRAILDataFrame(DataFrame):
             ------
                 KeyError:
                     Dataframe has one of the mandatory columns missing.
-                ParserError:
-                    The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
                 ValueError:
                     One of the data-types cannot be converted.
+                DateTimeFormatInvalid:
+                    The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
+
         """
         try:
             if data.dtypes[const.LAT] != 'float64':
@@ -168,7 +169,7 @@ class PTRAILDataFrame(DataFrame):
         except ValueError:
             raise ValueError('dtypes cannot be converted.')
         except:
-            raise DateFormatInvalid("The DateTime format provided is invalid and cannot be parsed as pandas DateTime.")
+            raise DateTimeFormatInvalid("The DateTime format provided is invalid and cannot be parsed as pandas DateTime.")
 
     def _validate_columns(self, data: DataFrame) -> bool:
         """
