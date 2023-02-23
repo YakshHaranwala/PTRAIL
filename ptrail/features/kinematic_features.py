@@ -552,6 +552,12 @@ class KinematicFeatures:
                 dataframe: PTRAILDataFrame
                     The dataframe on which the calculation of jerk is to be done.
 
+            Note
+            ----
+                This function call is sufficient in itself to create distance, speed,
+                acceleration and jerk columns in one column as it will calculate any
+                missing dependencies.
+
             Returns
             -------
                 PTRAILDataFrame:
@@ -720,6 +726,12 @@ class KinematicFeatures:
             ----------
                 dataframe: PTRAILDataFrame
                     The dataframe on which the rate of bearing rate is to be calculated
+
+            Note
+            ----
+                This function call is sufficient in itself to create bearing, rate of bearing,
+                and rate of bearing rate columns in one column as it will calculate any
+                missing dependencies.
 
             Returns
             -------
