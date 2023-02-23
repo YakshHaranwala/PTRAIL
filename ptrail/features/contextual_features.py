@@ -22,7 +22,7 @@ from shapely.geometry import Polygon
 
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.features.helper_functions import Helpers
-from ptrail.utilities.DistanceCalculator import FormulaLog
+from ptrail.utilities.KinematicUtils import FormulaLog
 
 num = os.cpu_count()
 NUM_CPU = ceil((num * 2) / 3)

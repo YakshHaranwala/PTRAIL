@@ -26,7 +26,7 @@ import pandas as pd
 from ptrail.core.TrajectoryDF import PTRAILDataFrame
 from ptrail.features.helper_functions import Helpers as helpers
 from ptrail.utilities import constants as const
-from ptrail.utilities.DistanceCalculator import FormulaLog as calc
+from ptrail.utilities.KinematicUtils import FormulaLog as calc
 from ptrail.utilities.exceptions import *
 
 num = os.cpu_count()

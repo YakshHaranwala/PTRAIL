@@ -14,7 +14,7 @@ from .visualization import InteractiveDonut
 from .utilities import (
     constants,
     conversions,
-    DistanceCalculator,
+    KinematicUtils,
     exceptions,
 )
 

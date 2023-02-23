@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 from ptrail.utilities import constants as const
-from ptrail.utilities.DistanceCalculator import FormulaLog as calc
+from ptrail.utilities.KinematicUtils import FormulaLog as calc
 
 pd.options.mode.chained_assignment = None
 
@@ -352,8 +352,7 @@ class Helpers:
             else:
                 prev_lat = curr_lat.shift(1)
                 prev_lon = curr_lon.shift(1)
-                dataframe.at[val, 'Bearing'] = \
-                    calc.bearing_calculation(prev_lat, prev_lon, curr_lat, curr_lon)
+                dataframe.at[val, 'Bearing'] = calc.bearing_calculator(prev_lat, prev_lon, curr_lat, curr_lon)
 
         return dataframe.reset_index()
 
