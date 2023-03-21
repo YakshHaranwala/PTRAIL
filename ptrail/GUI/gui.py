@@ -319,7 +319,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         # Create a smaller box layout.
         self.dfController = QtWidgets.QHBoxLayout()
 
-        # # Create a trajectory View selector.
+        # Create a trajectory View selector.
         # self.dfView = QtWidgets.QComboBox()
         # self.dfView.addItems(['Point-Based View', 'Segment-Based View'])
         # self.dfController.addWidget(self.dfView)

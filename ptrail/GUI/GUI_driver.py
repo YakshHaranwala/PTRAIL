@@ -8,7 +8,7 @@ import sys
 from ptrail.GUI.gui import Ui_MainWindow
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv + ['--no-sandbox'])
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow(MainWindow)
     MainWindow.showMaximized()
