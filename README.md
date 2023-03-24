@@ -74,13 +74,13 @@ PTRAIL is a state-of-the art Mobility Data Preprocessing Library that mainly dea
 To cite PTRAIL in your academic work, please use the following citation: 
 
 ```bibtex
-@article{haidri2021ptrail,
-      title={PTRAIL -- A python package for parallel trajectory data preprocessing}, 
-      author={Salman Haidri and Yaksh J. Haranwala and Vania Bogorny and Chiara Renso and Vinicius Prado da Fonseca and Amilcar Soares},
-      year={2021},
-      eprint={2108.13202},
-      url={https://arxiv.org/abs/2108.13202},
-      archivePrefix={arXiv},
-      primaryClass={cs.DC}
+@article{haidri2022ptrail,
+  title={PTRAIL—A python package for parallel trajectory data preprocessing},
+  author={Haidri, Salman and Haranwala, Yaksh J and Bogorny, Vania and Renso, Chiara and da Fonseca, Vinicius Prado and Soares, Amilcar},
+  journal={SoftwareX},
+  volume={19},
+  pages={101176},
+  year={2022},
+  publisher={Elsevier}
 }
 ```
