@@ -15,11 +15,13 @@ import pandas as pd
 
 # GUI Imports.
 from PyQt5 import QtWidgets, QtWebEngineWidgets, QtGui, QtCore
+from PyQt5.QtCore import Qt
 from ptrail.GUI.Table import TableModel
 from ptrail.GUI.InputDialog import InputDialog
-from ptrail.core.TrajectoryDF import PTRAILDataFrame
+from ptrail.GUI.SearchableComboBox import SearchableComboBox
 
 # Backend.
+from ptrail.core.TrajectoryDF import PTRAILDataFrame
 import ptrail.utilities.constants as const
 from ptrail.features.kinematic_features import KinematicFeatures
 from ptrail.features.temporal_features import TemporalFeatures
@@ -72,78 +74,84 @@ class GuiHandler:
                     If the user gives incorrect column names, then we ask
                     the user to enter them again.
         """
-        try:
-            self._window.statusBar.showMessage("Loading the Dataset...")
+        # try:
+        self._window.statusBar.showMessage("Loading the Dataset...")
 
-            # First, we clear out the DF pane area.
-            # This is done in order to make sure that 2 dataframes
-            # are not loaded simultaneously making the view cluttered.
-            for i in reversed(range(self._window.DFPane.count())):
-                item = self._window.DFPane.itemAt(i)
-                if isinstance(item, QtWidgets.QTableView):
-                    item.widget().close()
+        # First, we clear out the DF pane area.
+        # This is done in order to make sure that 2 dataframes
+        # are not loaded simultaneously making the view cluttered.
+        for i in reversed(range(self._window.DFPane.count())):
+            item = self._window.DFPane.itemAt(i)
+            if isinstance(item, QtWidgets.QTableView):
+                item.widget().close()
 
-                # remove the item from layout
-                self._window.DFPane.removeItem(item)
+            # remove the item from layout
+            self._window.DFPane.removeItem(item)
 
-            col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
-                                               title="Enter Column Names",
-                                               placeHolder=['Name of Identifier column', 'Name of Timestamp column',
-                                                            'Name of Latitude column', 'Name of Longitude column'])
-            if col_names is not None and col_names[0] != '' and len(col_names) == 4:
-                # Read the data into a PTRAIL dataframe.
-                self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
-                                             traj_id=col_names[0].strip(),
-                                             datetime=col_names[1].strip(),
-                                             latitude=col_names[2].strip(),
-                                             longitude=col_names[3].strip())
-                self._map_data = self._data
+        col_names = self._get_input_params(labels=['Trajectory ID: ', 'DateTime: ', 'Latitude: ', 'Longitude: '],
+                                           title="Enter Column Names",
+                                           placeHolder=['Name of Identifier column', 'Name of Timestamp column',
+                                                        'Name of Latitude column', 'Name of Longitude column'])
+        if col_names is not None and col_names[0] != '' and len(col_names) == 4:
+            # Read the data into a PTRAIL dataframe.
+            self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
+                                         traj_id=col_names[0].strip(),
+                                         datetime=col_names[1].strip(),
+                                         latitude=col_names[2].strip(),
+                                         longitude=col_names[3].strip())
+            self._map_data = self._data
 
-                # Set the table model and display the dataframe.
-                self._table = QtWidgets.QTableView()
+            # Set the table model and display the dataframe.
+            self._table = QtWidgets.QTableView()
 
-                # NOTE: whenever we update DFs, make sure to send the data after resetting
-                #       index and setting inplace as False.
-                self._model = TableModel(self._data.reset_index(inplace=False))
-                self._table.setModel(self._model)
-                self._window.add_df_controller()
-                self._window.DFPane.addWidget(self._table)
-                self._window.statusBar.showMessage("Dataset Loaded Successfully.")
+            # NOTE: whenever we update DFs, make sure to send the data after resetting
+            #       index and setting inplace as False.
+            self._model = TableModel(self._data.reset_index(inplace=False))
+            self._table.setModel(self._model)
+            self._window.add_df_controller()
+            self._window.DFPane.addWidget(self._table)
+            self._window.statusBar.showMessage("Dataset Loaded Successfully.")
 
-                # Get all the unique trajectory ids.
-                ids_ = list(self._data.reset_index()['traj_id'].value_counts().keys())
+            # Get all the unique trajectory ids.
+            ids_ = list(self._data.reset_index()['traj_id'].value_counts().keys())
 
-                # Initiate the map placeholder.
-                self.map = QtWebEngineWidgets.QWebEngineView()
+            # Initiate the map placeholder.
+            self.map = QtWebEngineWidgets.QWebEngineView()
 
-                # Create the drop-down list for ID selection.
-                self.traj_id_list = QtWidgets.QComboBox()
-                self.traj_id_list.setFont(QtGui.QFont('Tahoma', 12))
-                self.traj_id_list.addItems(ids_)
+            # Create the drop-down list for ID selection.
+            self.traj_id_list = QtWidgets.QComboBox()
+            self.traj_id_list.setFont(QtGui.QFont('Tahoma', 12))
+            self.traj_id_list.addItems(ids_)
 
-                # Add the drop-down and the map pane to the area.
-                self._window.MapPane.addWidget(self.traj_id_list)
-                self._window.MapPane.addWidget(self.map)
+            # Add the ability to filter the items in the QComboBox.
+            self.traj_id_list.setEditable(True)
+            self.traj_id_list.setInsertPolicy(QtWidgets.QComboBox.NoInsert)
+            self.traj_id_list.completer().setCaseSensitivity(Qt.CaseInsensitive)
+            self.traj_id_list.completer().setCompletionMode(QtWidgets.QCompleter.PopupCompletion)
 
-                # Actually draw the map.
-                to_plot = self._map_data.reset_index().loc[self._map_data.reset_index()['traj_id']
-                                                           == self.traj_id_list.currentText()]
-                self._window.open_btn.deleteLater()
-                self._draw_map(to_plot)
-                self.draw_stats()
-                self.add_column_drop_widget()
-                self._window.runStatsBtn.setEnabled(True)
-            else:
-                self._window.open_file()
+            # Add the drop-down and the map pane to the area.
+            self._window.MapPane.addWidget(self.traj_id_list)
+            self._window.MapPane.addWidget(self.map)
 
-        except AttributeError or ValueError or TypeError:
-            msg = QtWidgets.QMessageBox()
-            msg.setIcon(QtWidgets.QMessageBox.Critical)
-            msg.setWindowTitle("Incorrect Column names")
-            msg.setText("Incorrect Column names provided.\n"
-                        "Please Enter the names again.")
-            msg.exec()
-            self.__init__(filename, self._window)
+            # Actually draw the map.
+            to_plot = self._map_data.reset_index().loc[self._map_data.reset_index()['traj_id']
+                                                       == self.traj_id_list.currentText()]
+            self._window.open_btn.deleteLater()
+            self._draw_map(to_plot)
+            self.draw_stats()
+            self.add_column_drop_widget()
+            self._window.runStatsBtn.setEnabled(True)
+        else:
+            self._window.open_file()
+
+        # except AttributeError or ValueError or TypeError:
+        #     msg = QtWidgets.QMessageBox()
+        #     msg.setIcon(QtWidgets.QMessageBox.Critical)
+        #     msg.setWindowTitle("Incorrect Column names")
+        #     msg.setText("Incorrect Column names provided.\n"
+        #                 "Please Enter the names again.")
+        #     msg.exec()
+        #     self.__init__(filename, self._window)
 
     def _draw_map(self, to_plot):
         self.map.setHtml('')
