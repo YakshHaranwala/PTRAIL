@@ -53,9 +53,17 @@ PTRAIL is a state-of-the art Mobility Data Preprocessing Library that mainly dea
 <a href='https://PTRAIL.readthedocs.io/en/latest/' target='_blank'> <i> PTRAIL Documentation </i> </a>
 
 <!-------------------- Pip Installation ------------------------->
-<h2> Pip Installation </h2>
+<h2> Installation </h2>
 
-1. `pip install PTRAIL`
+1. Create Virtual Environment:
+  - Using Pip:
+    - `python3 -m venv ptr`
+    - `source ptr/bin/activate`
+    - `pip install PTRAIL`
+  - Using Conda:
+    - `conda create -c conda-forge ptr python=3.10 rtree`
+    - `conda activate ptr`
+    - `pip install PTRAIL`
 
 <!------------------------ Usage Examples ----------------------->
 <h2> Examples </h2>
