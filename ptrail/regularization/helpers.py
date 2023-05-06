@@ -99,7 +99,7 @@ class Helpers:
         d_max, idx, _ = Helpers.calculate_metric_bw_points(trajectory, traj_time, calc_func)
         trajectory['DateTime'] = trajectory['DateTime'].astype(str)
 
-        print(f"\tepsilon: {epsilon}, d_max: {d_max}, index: {idx}, traj_len: {len(trajectory)}")
+        # print(f"\tepsilon: {epsilon}, d_max: {d_max}, index: {idx}, traj_len: {len(trajectory)}")
         if d_max > epsilon:
             traj1 = trajectory.iloc[:idx].copy()
             traj2 = trajectory.iloc[idx:].copy()
@@ -120,18 +120,12 @@ class Helpers:
 
 
         else:
-
             if len(trajectory) > 0:
-
                 new_trajectory = pd.DataFrame(columns=dim_set)
-
                 for dim in dim_set:
-
                     new_trajectory[dim] = np.nan
-
                     new_trajectory.loc[0, dim] = trajectory[dim].iloc[0]
-
                     if len(trajectory) > 1:
-                        new_trajectory.loc[len(new_trajectory) - 1, dim] = trajectory[dim].iloc[-1]
+                        new_trajectory.loc[len(trajectory) - 1, dim] = trajectory[dim].iloc[-1]
 
         return new_trajectory
