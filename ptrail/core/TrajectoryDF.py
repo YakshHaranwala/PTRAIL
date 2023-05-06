@@ -1,7 +1,7 @@
 """
     The TrajectoryDF module is the main module containing the PTRAILDataFrame Dataframe
     for storing the Trajectory Data with PTRAIL Library. The Dataframe has
-    certain restrictions on what type of data is mandatory in order to be stored as a
+    certain restrictions on what type of dataset is mandatory in order to be stored as a
     PTRAILDataFrame which is mentioned in the documentation of the constructor.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
@@ -41,7 +41,7 @@ class PTRAILDataFrame(DataFrame):
             Parameters
             ----------
                 data_set: List, Dictionary or pandas DF.
-                    The data provided by the user that needs to be represented and stored.
+                    The dataset provided by the user that needs to be represented and stored.
                 datetime: str
                     The header of the datetime column.
                 traj_id: str
@@ -53,8 +53,8 @@ class PTRAILDataFrame(DataFrame):
                 rest_of_columns: Optional[list[Text]]
                     A list containing headers of the columns other than the mandatory ones.
         """
-        # Case-1: The data is from a dictionary.
-        # Here, first check whether the data is in dictionary form and if it is so, then convert into
+        # Case-1: The dataset is from a dictionary.
+        # Here, first check whether the dataset is in dictionary form and if it is so, then convert into
         # pandas DataFrame first.
         rest_of_columns = [] if rest_of_columns is None else rest_of_columns
         column_list = [latitude, longitude, datetime, traj_id] + rest_of_columns
@@ -63,14 +63,14 @@ class PTRAILDataFrame(DataFrame):
             data_set = data_set.rename(columns=dict(zip(data_set.columns, [const.LAT, const.LONG,
                                                                            const.DateTime, const.TRAJECTORY_ID])))
 
-        # Case-2: The data is from a list.
-        # Here, first check whether the data is in list form and if it is so, then convert into
+        # Case-2: The dataset is from a list.
+        # Here, first check whether the dataset is in list form and if it is so, then convert into
         # pandas DataFrame first.
         elif isinstance(data_set, list) or isinstance(data_set, np.ndarray):
             data_set = DataFrame(data_set, columns=column_list)
 
-        # Case-3: The data is from a pandas DF.
-        # Here, all we have to do is to rename the column names from the data to default names.
+        # Case-3: The dataset is from a pandas DF.
+        # Here, all we have to do is to rename the column names from the dataset to default names.
         elif isinstance(data_set, DataFrame):
             data_set = self._rename_df_col_headers(data_set, latitude, longitude, datetime, traj_id)
 
@@ -79,7 +79,7 @@ class PTRAILDataFrame(DataFrame):
                                                       latitude=latitude, longitude=longitude)
         data_set.rename(columns=column_names, inplace=True)
 
-        # Now checking whether all the columns are present in the data and then verifying the data types
+        # Now checking whether all the columns are present in the dataset and then verifying the dataset types
         # of all the columns abd then calling the super() to create and return the dataframe.
         if self._validate_columns(data_set):
             self._validate_data_types(data_set)
@@ -91,9 +91,9 @@ class PTRAILDataFrame(DataFrame):
     def _rename_df_col_headers(self, data: DataFrame, lat: Text, lon: Text,
                                datetime: Text, traj_id: Text):
         """
-            Change the column headers of the columns when the user given data is in the
+            Change the column headers of the columns when the user given dataset is in the
             form of a pandas DF while creating the PTRAILDataFrame. This method is mainly
-            used when the user reads in data from a csv because the CSV file might
+            used when the user reads in dataset from a csv because the CSV file might
             contain different names for the columns.
 
             Parameters
@@ -132,8 +132,8 @@ class PTRAILDataFrame(DataFrame):
 
     def _validate_data_types(self, data: DataFrame):
         """
-            Check whether all the data given by the user is of valid type and if it isn't,
-            it converts them to the specified data types.
+            Check whether all the dataset given by the user is of valid type and if it isn't,
+            it converts them to the specified dataset types.
                 1. Trajectory_ID: Any -> str
                 2. LAT: Any -> float64
                 3. LONG: Any -> float64
@@ -142,15 +142,15 @@ class PTRAILDataFrame(DataFrame):
             Parameters
             ----------
                 data: pd.DataFrame
-                    This is the dataframe that contains the data that was passed in by the user.
-                    The data is converted to pandas DF eventually in the import_data function anyway.
+                    This is the dataframe that contains the dataset that was passed in by the user.
+                    The dataset is converted to pandas DF eventually in the import_data function anyway.
 
             Raises
             ------
                 KeyError:
                     Dataframe has one of the mandatory columns missing.
                 ValueError:
-                    One of the data-types cannot be converted.
+                    One of the dataset-types cannot be converted.
                 DateTimeFormatInvalid:
                     The DateTime format provided is invalid and cannot be parsed as pandas DateTime.
 
@@ -178,7 +178,7 @@ class PTRAILDataFrame(DataFrame):
             Parameters
             ----------
                 data
-                    The DataFrame containing all the data passed in by the user.
+                    The DataFrame containing all the dataset passed in by the user.
 
             Returns
             -------
@@ -190,7 +190,7 @@ class PTRAILDataFrame(DataFrame):
             ------
                 MissingColumnsException
                     One or more of the mandatory columns (Latitude, Longitude, DateTime, Traj_ID)
-                    are missing in the data.
+                    are missing in the dataset.
         """
         try:
             if np.isin(const.LAT, data.columns) and \
@@ -199,7 +199,7 @@ class PTRAILDataFrame(DataFrame):
                     np.isin(const.DateTime, data.columns):
                 return True
         except KeyError:
-            raise MissingColumnsException("One of the columns are missing. Please check your data and try again.")
+            raise MissingColumnsException("One of the columns are missing. Please check your dataset and try again.")
 
     def _get_default_column_names(self, DateTime, traj_id, latitude, longitude) -> dict:
         """
@@ -262,7 +262,7 @@ class PTRAILDataFrame(DataFrame):
             Raises
             ------
                 MissingColumnsException
-                    Latitude column is missing from the data.
+                    Latitude column is missing from the dataset.
         """
         try:
             return self[const.LAT]
@@ -282,7 +282,7 @@ class PTRAILDataFrame(DataFrame):
             Raises
             ------
                 MissingColumnsException
-                    Longitude column is missing from the data
+                    Longitude column is missing from the dataset
         """
         try:
             return self[const.LONG]
@@ -302,7 +302,7 @@ class PTRAILDataFrame(DataFrame):
             Raises
             ------
                 MissingColumnsException
-                    DateTime column is missing from the data.
+                    DateTime column is missing from the dataset.
         """
         try:
             return self.index.get_level_values(const.DateTime).to_series()
@@ -322,7 +322,7 @@ class PTRAILDataFrame(DataFrame):
             Raises
             ------
                 MissingColumnsException
-                    traj_id column is missing from the data.
+                    traj_id column is missing from the dataset.
         """
         try:
             return self.index.get_level_values(const.TRAJECTORY_ID).to_series()
@@ -332,8 +332,8 @@ class PTRAILDataFrame(DataFrame):
 
     def __str__(self):
         return f"------------------------ Dataset Facts ------------------------------\n\n" \
-               f"Number of unique Trajectories in the data: {self.traj_id.nunique()}\n" \
-               f"Number of points in the data: {len(self)}\n" \
+               f"Number of unique Trajectories in the dataset: {self.traj_id.nunique()}\n" \
+               f"Number of points in the dataset: {len(self)}\n" \
                f"Dataset time range: {self.datetime.max() - self.datetime.min()}\n" \
                f"Datatype of the DataFrame: {type(self)}\n" \
                f"Dataset Bounding Box:" \
@@ -346,7 +346,7 @@ class PTRAILDataFrame(DataFrame):
         """
             Convert the DataFrame to a NumPy array.By default, the dtype of the returned array will
             be the common dtype of all types in the DataFrame. For example, if the dtypes are float16
-            and float32, the results dtype will be float32. This may require copying data and coercing
+            and float32, the results dtype will be float32. This may require copying dataset and coercing
             values, which may be expensive
 
             Parameters

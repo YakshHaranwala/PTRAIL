@@ -29,13 +29,13 @@ class Statistics:
     @staticmethod
     def segment_traj_by_days(dataframe: PTRAILDataFrame, num_days):
         """
-            Given a dataframe containing trajectory data, segment all
+            Given a dataframe containing trajectory dataset, segment all
             the trajectories by each week.
 
             Parameters
             ----------
                 df: PTRAILDataFrame
-                    The dataframe containing trajectory data.
+                    The dataframe containing trajectory dataset.
                 num_days: int
                     The number of days that each segment is supposed to have.
 
@@ -70,7 +70,7 @@ class Statistics:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing the trajectory data.
+                    The dataframe containing the trajectory dataset.
                 target_col_name: str
                     This is the 'y' value that is used for ML tasks, this is
                     asked to append the target_col back at the end.
@@ -86,7 +86,7 @@ class Statistics:
         # Generate kinematic features on the entire dataframe.
         ptdf = KinematicFeatures.generate_kinematic_features(dataframe)
 
-        # Then, lets break down the entire dataframe into pieces containing data of
+        # Then, lets break down the entire dataframe into pieces containing dataset of
         # 1 trajectory in each piece.
         ids_ = list(dataframe.reset_index().traj_id.value_counts().keys())
         df_chunks = []
@@ -151,7 +151,7 @@ class Statistics:
         final_chunks = []
         if not segmented:
             for val in ids_:
-                # separated the data for each trajectory id.
+                # separated the dataset for each trajectory id.
                 small = dataframe.loc[dataframe.index.get_level_values('traj_id') == val].reset_index().set_index(
                     'traj_id')
 

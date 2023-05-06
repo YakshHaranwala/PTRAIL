@@ -1,7 +1,7 @@
 """
     The spatial_features module contains several functions of the library
     that calculates kinematic features based on the coordinates of points
-    provided in the data. This module mostly extracts and modifies data
+    provided in the dataset. This module mostly extracts and modifies dataset
     collected from some existing dataframe and appends these information
     to them. Inspiration of lots of functions in this module is taken from
     the PyMove library.
@@ -37,14 +37,14 @@ class KinematicFeatures:
     @staticmethod
     def get_bounding_box(dataframe: PTRAILDataFrame):
         """
-            Return the bounding box of the Trajectory data. Essentially, the bounding box is of
+            Return the bounding box of the Trajectory dataset. Essentially, the bounding box is of
             the following format:
                 (min Latitude, min Longitude, max Latitude, max Longitude).
 
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing the trajectory data.
+                    The dataframe containing the trajectory dataset.
 
             Returns
             -------
@@ -61,18 +61,18 @@ class KinematicFeatures:
     @staticmethod
     def get_start_location(dataframe: PTRAILDataFrame, traj_id=None):
         """
-            Get the starting location of an object's trajectory in the data.
+            Get the starting location of an object's trajectory in the dataset.
 
             Note
             ----
                 If the user does not give in any traj_id, then the library,
                 by default gives out the start locations of all the unique
-                trajectory ids present in the data.
+                trajectory ids present in the dataset.
 
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The PTRAILDataFrame storing the trajectory data.
+                    The PTRAILDataFrame storing the trajectory dataset.
                 traj_id:
                     The ID of the object whose start location is to be found.
 
@@ -83,7 +83,7 @@ class KinematicFeatures:
                 pandas.core.dataframe.DataFrame:
                     The dataframe containing start locations of all trajectory IDs.
         """
-        # If traj_id is None, find the start times of all the unique trajectories present in the data.
+        # If traj_id is None, find the start times of all the unique trajectories present in the dataset.
         # Else first filter out a dataframe containing the given traj_id and then return the start
         # location of that point.
         dataframe = dataframe.copy().reset_index()
@@ -118,18 +118,18 @@ class KinematicFeatures:
     @staticmethod
     def get_end_location(dataframe: PTRAILDataFrame, traj_id: Optional[Text] = None):
         """
-            Get the ending location of an object's trajectory in the data.
+            Get the ending location of an object's trajectory in the dataset.
 
             Note
             ----
                 If the user does not give in any traj_id, then the library,
                 by default gives out the end locations of all the unique
-                trajectory ids present in the data.
+                trajectory ids present in the dataset.
 
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The PTRAILDataFrame storing the trajectory data.
+                    The PTRAILDataFrame storing the trajectory dataset.
                 traj_id
                     The ID of the trajectory whose end location is to be found.
 
@@ -140,7 +140,7 @@ class KinematicFeatures:
                 pandas.core.dataframe.DataFrame:
                     The dataframe containing start locations of all trajectory IDs.
         """
-        # If traj_id is None, find the end times of all the unique trajectories present in the data.
+        # If traj_id is None, find the end times of all the unique trajectories present in the dataset.
         # Else first filter out a dataframe containing the given traj_id and then return the end
         # location of that point.
         dataframe = dataframe.copy().reset_index()
@@ -179,7 +179,7 @@ class KinematicFeatures:
 
             Note
             ----
-                When the trajectory ID changes in the data, then the distance calculation again starts
+                When the trajectory ID changes in the dataset, then the distance calculation again starts
                 from the first point of the new trajectory ID and the distance-value of the first point
                 of the new Trajectory ID will be set to 0.
 
@@ -191,7 +191,7 @@ class KinematicFeatures:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The data where distance is to be calculated.
+                    The dataset where distance is to be calculated.
 
             Returns
             -------
@@ -229,7 +229,7 @@ class KinematicFeatures:
 
             Note
             ----
-                When the trajectory ID changes in the data, then the distance calculation again
+                When the trajectory ID changes in the dataset, then the distance calculation again
                 starts from the first point of the new trajectory ID and the first distance of the
                 new trajectory ID will be set to 0.
 
@@ -241,7 +241,7 @@ class KinematicFeatures:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The data where distance is to be calculated.
+                    The dataset where distance is to be calculated.
 
             Returns
             -------
@@ -285,7 +285,7 @@ class KinematicFeatures:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe in which teh actual data is stored.
+                    The dataframe in which teh actual dataset is stored.
                 date: Text
                     The Date on which the distance covered is to be calculated.
                 traj_id: Text
@@ -420,7 +420,7 @@ class KinematicFeatures:
 
             Note
             ----
-                When the trajectory ID changes in the data, then the speed calculation again
+                When the trajectory ID changes in the dataset, then the speed calculation again
                 starts from the first point of the new trajectory ID and the speed of the
                 first point of the new trajectory ID will be set to 0.
 
@@ -503,7 +503,7 @@ class KinematicFeatures:
         """
         # Try catch is used to check if speed column is present or not
         try:
-            # When Speed column is present extract the data from there and then take calculate the time delta
+            # When Speed column is present extract the dataset from there and then take calculate the time delta
             # And use that to calculate acceleration by dividing speed by time delta and then add the column to
             # the dataframe
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
@@ -565,7 +565,7 @@ class KinematicFeatures:
         """
         # Try catch is used to check if acceleration column is present or not
         try:
-            # When acceleration column is present extract the data from there and then take calculate the time delta
+            # When acceleration column is present extract the dataset from there and then take calculate the time delta
             # And use that to calculate acceleration by dividing speed_delta by time delta and then add the column to
             # the dataframe
             # WARNING!!!! Use dt.total_seconds() as dt.seconds gives false values and as it
@@ -810,7 +810,7 @@ class KinematicFeatures:
                 'Distance'].to_numpy()
             return np.nansum(distances)
         else:
-            raise MissingTrajIDException(f"The Trajectory ID '{traj_id}' is not present in the data."
+            raise MissingTrajIDException(f"The Trajectory ID '{traj_id}' is not present in the dataset."
                                          f"Please check the Trajectory ID and try again.")
 
     @staticmethod

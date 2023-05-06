@@ -1,7 +1,7 @@
 """
     | 1. The temporal_features module contains all the features of the library
          that calculates several features based on the DateTime provided in
-         the data.
+         the dataset.
     | 2. It is to be noted that most of the functions in this module
          calculate the features and then add the results to an entirely new
          column with a new column header.
@@ -31,7 +31,7 @@ class TemporalFeatures:
     @staticmethod
     def create_date_column(dataframe: PTRAILDataFrame):
         """
-            From the DateTime column already present in the data, extract only the date
+            From the DateTime column already present in the dataset, extract only the date
             and then add another column containing just the date.
 
             Parameters
@@ -57,7 +57,7 @@ class TemporalFeatures:
     @staticmethod
     def create_time_column(dataframe: PTRAILDataFrame):
         """
-            From the DateTime column already present in the data, extract only the time
+            From the DateTime column already present in the dataset, extract only the time
             and then add another column containing just the time.
 
             Parameters
@@ -84,12 +84,12 @@ class TemporalFeatures:
         """
             Create a column called Day_Of_Week which contains the day of the week
             on which the trajectory point is recorded. This is calculated on the basis
-            of timestamp recorded in the data.
+            of timestamp recorded in the dataset.
 
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing the entire data on which the operation is to be performed
+                    The dataframe containing the entire dataset on which the operation is to be performed
 
             Returns
             -------
@@ -107,7 +107,7 @@ class TemporalFeatures:
     @staticmethod
     def create_weekend_indicator_column(dataframe: PTRAILDataFrame):
         """
-            Create a column called Weekend which indicates whether the point data is collected
+            Create a column called Weekend which indicates whether the point dataset is collected
             on either a Saturday or a Sunday.
 
             Parameters
@@ -162,7 +162,7 @@ class TemporalFeatures:
     def create_time_of_day_column(dataframe: PTRAILDataFrame):
         """
             Create a Time_Of_Day column in the dataframe using parallelization which indicates at what time of the
-            day was the point data captured.
+            day was the point dataset captured.
             Note: The divisions of the day based on the time are provided in the utilities.constants module.
 
             Parameters
@@ -239,7 +239,7 @@ class TemporalFeatures:
         else:
             small = dataframe.loc[dataframe[const.TRAJECTORY_ID] == traj_id, [const.DateTime]]
             if len(small) == 0:
-                return f"No {traj_id} exists in the given data. Please try again."
+                return f"No {traj_id} exists in the given dataset. Please try again."
             else:
                 return small.max() - small.min()
 
@@ -251,7 +251,7 @@ class TemporalFeatures:
             Note
             ----
                 If the trajectory ID is not specified by the user, then by default,
-                the starting times of all the trajectory IDs in the data are
+                the starting times of all the trajectory IDs in the dataset are
                 returned.
 
             Parameters
@@ -267,12 +267,12 @@ class TemporalFeatures:
                     The start time of a single trajectory.
                 pandas.core.dataframe.DataFrame
                     Pandas dataframe containing the start time of all the trajectories
-                    present in the data when the user hasn't asked for a particular
+                    present in the dataset when the user hasn't asked for a particular
                     trajectory's start time.
         """
         dataframe = dataframe.reset_index()
         if traj_id is None:
-            # First, create a list containing all the ids of the data and then further divide that
+            # First, create a list containing all the ids of the dataset and then further divide that
             # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 
@@ -303,7 +303,7 @@ class TemporalFeatures:
             Note
             ----
                 If the trajectory ID is not specified by the user, then by default,
-                the ending times of all the trajectory IDs in the data are
+                the ending times of all the trajectory IDs in the dataset are
                 returned.
 
             Parameters
@@ -319,12 +319,12 @@ class TemporalFeatures:
                     The end time of a single trajectory.
                 pandas.core.dataframe.DataFrame
                     Pandas dataframe containing the end time of all the trajectories
-                    present in the data when the user hasn't asked for a particular
+                    present in the dataset when the user hasn't asked for a particular
                     trajectory's end time.
         """
         dataframe = dataframe.reset_index()
         if traj_id is None:
-            # First, create a list containing all the ids of the data and then further divide that
+            # First, create a list containing all the ids of the dataset and then further divide that
             # list items and split it into sub-lists of 100 ids each if there are more than 100 ids.
             ids_ = dataframe[const.TRAJECTORY_ID].value_counts(ascending=True).keys().to_list()
 

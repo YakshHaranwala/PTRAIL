@@ -6,7 +6,7 @@
     Warning
     -------
         The visualizations in this module are currently developed with a focus around the
-        starkey.csv data as it has been developed as a side project by the developers. It
+        starkey.csv dataset as it has been developed as a side project by the developers. It
         will further be integrated into the library as a general class of visualizers in
         the time to come.
 
@@ -86,7 +86,7 @@ class TrajectoryPlotter:
             Parameters
             ----------
                 dataset: PTRAILDataFrame
-                    The dataset from which the data is to be filtered.
+                    The dataset from which the dataset is to be filtered.
                 _id: tuple
                     The tuple containing the IDs that are required.
 
@@ -136,7 +136,7 @@ class TrajectoryPlotter:
             small_df = dataset.reset_index().loc[dataset.reset_index()[const.TRAJECTORY_ID] == ids_[i],
                                                  [const.LAT, const.LONG]]
 
-            # Then, create (lat, lon) pairs for the data points.
+            # Then, create (lat, lon) pairs for the dataset points.
             locations = []
             for j in range(len(small_df)):
                 locations.append((small_df['lat'].iloc[j], small_df['lon'].iloc[j]))

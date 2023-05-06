@@ -1,15 +1,15 @@
 """
     Warning
     -------
-        | 1. None of the methods in this module should be used directly while performing operations on data.
+        | 1. None of the methods in this module should be used directly while performing operations on dataset.
         | 2. These methods are helpers for the interpolation methods in the interpolation.py
              module and hence run linearly and not in parallel which will result in slower execution time.
         | 3. All the methods in this module perform calculation on a single Trajectory ID due to which
-             it will wrong results on data with multiple trajectories. Instead, use the interpolation.py
+             it will wrong results on dataset with multiple trajectories. Instead, use the interpolation.py
              methods for faster and reliable calculations.
 
     The helpers class has the functionalities that interpolate a point based
-    on the given data by the user. The class contains the following 4
+    on the given dataset by the user. The class contains the following 4
     interpolation calculators:
 
         1. Linear Interpolation
@@ -56,7 +56,7 @@ class Helpers:
             Parameters
             ----------
                 dataframe: Union[pd.DataFrame, NumTrajDF]
-                     The dataframe containing the original trajectory data.
+                     The dataframe containing the original trajectory dataset.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
                 sampling_rate: float
@@ -117,7 +117,7 @@ class Helpers:
             Parameters
             ----------
                 df: Union[pd.DataFrame, NumTrajDF]
-                     The dataframe containing the original trajectory data.
+                     The dataframe containing the original trajectory dataset.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
                 sampling_rate: float
@@ -183,7 +183,7 @@ class Helpers:
             Parameters
             ----------
                 dataframe: Union[pd.DataFrame, NumTrajDF]
-                     The dataframe containing the original trajectory data.
+                     The dataframe containing the original trajectory dataset.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
                 sampling_rate: float
@@ -289,7 +289,7 @@ class Helpers:
             Parameters
             ----------
                 dataframe: Union[pd.DataFrame, NumTrajDF]
-                     The dataframe containing the original trajectory data.
+                     The dataframe containing the original trajectory dataset.
                 id_: Text
                     The Trajectory ID of the points in the dataframe.
                 sampling_rate: float
@@ -518,7 +518,7 @@ class Helpers:
             Parameters
             ----------
                 df: pandas.core.dataframe.DataFrame
-                    The dataframe containing the trajectory data and their features.
+                    The dataframe containing the trajectory dataset and their features.
                 target_col_name: str
                     This is the 'y' value that is used for ML tasks, this is
                     asked to append the species back at the end.
@@ -622,7 +622,7 @@ class Helpers:
                 list:
                     The list containing smaller dataframe chunks.
         """
-        # First, create a list containing all the ids of the data and then further divide that
+        # First, create a list containing all the ids of the dataset and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
         ids_ = list(dataframe.reset_index().traj_id.value_counts().keys())
 
@@ -631,7 +631,7 @@ class Helpers:
         ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
         # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
+        # As of now, each smaller chunk is supposed to have dataset of 100
         # trajectory IDs max
         df_chunks = [dataframe.loc[dataframe[const.TRAJECTORY_ID].isin(ids_[i])]
                      for i in range(len(ids_))]

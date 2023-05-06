@@ -35,7 +35,7 @@ class Helpers:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing all the original data.
+                    The dataframe containing all the original dataset.
                 ids_: list
                     A list containing all the Trajectory IDs present in the dataset.
 
@@ -74,7 +74,7 @@ class Helpers:
             Parameter
             ---------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing the original data.
+                    The dataframe containing the original dataset.
                 ids_: list
                     List of trajectory ids for which the start times are to be calculated
 
@@ -88,7 +88,7 @@ class Helpers:
 
         # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
         # and then further filter that dataframe according to the earliest(minimum) time.
-        # And then append the data of that earliest time into a list.
+        # And then append the dataset of that earliest time into a list.
         for i in range(len(ids_)):
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
                                   [const.DateTime, const.LAT, const.LONG]])
@@ -113,7 +113,7 @@ class Helpers:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing the original data.
+                    The dataframe containing the original dataset.
                 ids_: list
                     List of trajectory ids for which the end times are to be calculated
 
@@ -126,7 +126,7 @@ class Helpers:
 
         # Loops over the length of trajectory ids. Filter the dataframe according to each of the ids
         # and then further filter that dataframe according to the latest(maximum) time.
-        # And then append the data of that latest time into a list.
+        # And then append the dataset of that latest time into a list.
         for i in range(len(ids_)):
             filt = (dataframe.loc[dataframe[const.TRAJECTORY_ID] == ids_[i],
                                   [const.DateTime, const.LAT, const.LONG]])
@@ -451,7 +451,7 @@ class Helpers:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing all the original data.
+                    The dataframe containing all the original dataset.
                 ids_: list
                     The list of ids for which the number of unique locations visited
                     is to be calculated.
@@ -485,15 +485,15 @@ class Helpers:
     @staticmethod
     def visited_poi_helper(df, surrounding_data, dist_column_label, nearby_threshold):
         """
-            Given a Trajectory dataframe and another dataset with the surrounding data,
+            Given a Trajectory dataframe and another dataset with the surrounding dataset,
             find whether the given object is nearby a point of interest or not.
 
             Parameters
             ----------
                 df:
-                    The dataframe containing the trajectory data.
+                    The dataframe containing the trajectory dataset.
                 surrounding_data:
-                    The dataframe containing the data of the surroundings.
+                    The dataframe containing the dataset of the surroundings.
                 dist_column_label: Text
                     The label of the column containing the distance of the coords from
                     the nearest POI.
@@ -512,7 +512,7 @@ class Helpers:
 
         try:
             # Loop for every point in the dataframe and create a distance column with distance from every point in the
-            # surrounding data. Then use this distance column and the distance of POI column and compare each value.
+            # surrounding dataset. Then use this distance column and the distance of POI column and compare each value.
             # Store the comparison in an array True if they lie within the threshold else false. And if any of the
             # value in it is true then that point in the dataframe was near a POI.
             for i in range(len(df)):
@@ -588,7 +588,7 @@ class Helpers:
                 list:
                     The list containing smaller dataframe chunks.
         """
-        # First, create a list containing all the ids of the data and then further divide that
+        # First, create a list containing all the ids of the dataset and then further divide that
         # list items and split it into sub-lists of ids equal to split_factor.
         ids_ = list(dataframe.reset_index().traj_id.value_counts().keys())
 
@@ -597,7 +597,7 @@ class Helpers:
         ids_ = [ids_[i: i + split_factor] for i in range(0, len(ids_), split_factor)]
 
         # Now split the dataframes based on set of Trajectory ids.
-        # As of now, each smaller chunk is supposed to have data of 100
+        # As of now, each smaller chunk is supposed to have dataset of 100
         # trajectory IDs max
         df_chunks = [dataframe.reset_index().loc[dataframe.reset_index()[const.TRAJECTORY_ID].isin(ids_[i])]
                      for i in range(len(ids_))]

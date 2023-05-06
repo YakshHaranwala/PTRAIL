@@ -43,7 +43,7 @@ class Interpolation:
             Warning
             -------
                 The Interpolation methods will only return the 4 mandatory library columns
-                because it is not possible to interpolate other data that may or may not be
+                because it is not possible to interpolate other dataset that may or may not be
                 present in the dataset apart from latitude, longitude and datetime. As a
                 result, other columns are dropped.
 
@@ -144,7 +144,7 @@ class Interpolation:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe containing the original data.
+                    The dataframe containing the original dataset.
                 sampling_rate: float
                     The maximum time difference between 2 points. If the time difference between
                     2 consecutive points is greater than the time jump, then another point will

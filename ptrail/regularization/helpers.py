@@ -1,7 +1,7 @@
 """
     Warning
     -------
-        | 1. None of the methods in this module should be used directly while performing operations on data.
+        | 1. None of the methods in this module should be used directly while performing operations on dataset.
         | 2. These methods are helpers for the regularization methods in the regularization.py
              module and hence run linearly and not in parallel which will result in slower execution time.
 
@@ -20,7 +20,7 @@ from ptrail.core.TrajectoryDF import PTRAILDataFrame
 
 class Helpers:
     @staticmethod
-    def calculate_metric_bw_points(traj: Union[pd.DataFrame, PTRAILDataFrame], metric: function):
+    def calculate_metric_bw_points(traj, traj_time, metric):
         """
             Given a trajectory and the metric, calculate the metric
             for all the points in the trajectory.
@@ -30,6 +30,8 @@ class Helpers:
                 traj:
                     The trajectory object for which the metric is to be
                     calculated.
+                traj_time: np.array
+                    Array with seconds of each point.
                 metric: function object
                     The metric that is to be calculated.
 
@@ -47,21 +49,22 @@ class Helpers:
         d_max = 0
         idx = 0
         distances = np.array([])
+        traj_len = len(traj)
 
         # Get the first and the last points.
-        start = traj['lat'][0], traj['lon'][0], traj['DateTime'][0]
-        end = traj['lat'][-1], traj['lon'][-1], traj['DateTime'][-1]
+        start = traj['lat'].iloc[0], traj['lon'].iloc[0], traj_time[0]
+        end = traj['lat'].iloc[traj_len - 1], traj['lon'].iloc[traj_len - 1], traj_time[-1]
 
         # Find the max distance and index and return it.
-        for i in range(1, len(traj) - 1):
+        for i in range(1, traj_len - 1):
             # Get the mid-point at index i.
-            middle = traj['lat'][i], traj['lon'][i], traj['DateTime'][i]
+            middle = traj['lat'].iloc[i], traj['lon'].iloc[i], traj_time[i]
 
             # Calculate the distance and append it to the distances array.
             dist = metric(start, middle, end)
             distances = np.append(distances, dist)
-            if dist > dist_max:
-                d_max = d_max
+            if dist > d_max:
+                d_max = dist
                 idx = i
 
         # Return the required values.
@@ -90,41 +93,45 @@ class Helpers:
                 trajectory:
                     The compressed trajectory object.
         """
-        new_trajectory = {}
-        for dim in dim_set:
-            new_trajectory[dim] = np.array([])
+        new_trajectory = pd.DataFrame(columns=dim_set)
 
         # Get the time in seconds
-        d_max, idx, _ = Helpers.calculate_metric_bw_points(trajectory, calc_func)
+        d_max, idx, _ = Helpers.calculate_metric_bw_points(trajectory, traj_time, calc_func)
         trajectory['DateTime'] = trajectory['DateTime'].astype(str)
 
         print(f"\tepsilon: {epsilon}, d_max: {d_max}, index: {idx}, traj_len: {len(trajectory)}")
         if d_max > epsilon:
-            traj1 = {}
-            traj2 = {}
-
+            traj1 = trajectory.iloc[:idx].copy()
+            traj2 = trajectory.iloc[idx:].copy()
             for dim in dim_set:
-                traj1[dim] = trajectory[dim][0:idx]
-                traj2[dim] = trajectory[dim][idx:]
+                traj1[dim] = trajectory[dim][:idx].copy()
+                traj2[dim] = trajectory[dim][idx:].copy()
 
-                # Compress the parts created above
-                recResults1 = traj1
-                if len(traj1['lat']) > 2:
-                    recResults1 = Helpers.compress_individual(traj1, dim_set, traj_time[0:idx], calc_func, epsilon)
+            # Compress the parts created above
+            recResults1 = traj1
+            if len(traj1) > 2:
+                recResults1 = Helpers.compress_individual(traj1, dim_set, traj_time[:idx], calc_func, epsilon)
 
-                recResults2 = traj2
-                if len(traj2['lat']) > 2:
-                    recResults2 = Helpers.compress_individual(traj2, dim_set, traj_time[idx:], calc_func, epsilon)
+            recResults2 = traj2
+            if len(traj2) > 2:
+                recResults2 = Helpers.compress_individual(traj2, dim_set, traj_time[idx:], calc_func, epsilon)
 
-                for dim in dim_set:
-                    new_trajectory[dim] = np.append(new_trajectory[dim], recResults1[dim])
-                    new_trajectory[dim] = np.append(new_trajectory[dim], recResults2[dim])
+            new_trajectory = pd.concat([new_trajectory, recResults1, recResults2])
+
 
         else:
-            trajectory['DateTime'] = trajectory['DateTime'].astype(str)
-            for dim in dim_set:
-                new_trajectory[dim] = np.append(new_trajectory[dim], trajectory[dim][0])
-                if len(trajectory) > 1:
-                    new_trajectory[dim] = np.append(new_trajectory[dim], trajectory[dim][-1])
+
+            if len(trajectory) > 0:
+
+                new_trajectory = pd.DataFrame(columns=dim_set)
+
+                for dim in dim_set:
+
+                    new_trajectory[dim] = np.nan
+
+                    new_trajectory.loc[0, dim] = trajectory[dim].iloc[0]
+
+                    if len(trajectory) > 1:
+                        new_trajectory.loc[len(new_trajectory) - 1, dim] = trajectory[dim].iloc[-1]
 
         return new_trajectory

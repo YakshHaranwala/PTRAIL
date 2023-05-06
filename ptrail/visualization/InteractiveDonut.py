@@ -6,7 +6,7 @@
     Warning
     -------
         The visualizations in this module are currently developed with a focus around the
-        starkey.csv data as it has been developed as a side project by the developers. It
+        starkey.csv dataset as it has been developed as a side project by the developers. It
         will further be integrated into the library as a general class of visualizers in
         the time to come. Some of the visualization types may or may not work with other
         datasets.
@@ -38,9 +38,9 @@ class InteractiveDonut:
             Parameters
             ----------
                 trajectories: PTRAILDataFrame
-                    The dataframe that contains trajectory data.
+                    The dataframe that contains trajectory dataset.
                 habitat: pd.DataFrame
-                    The dataframe that contains habitat data.
+                    The dataframe that contains habitat dataset.
 
             Returns
             -------
@@ -94,7 +94,7 @@ class InteractiveDonut:
             else:
                 cattle += 1
 
-        # Convert the data created above to a dict.
+        # Convert the dataset created above to a dict.
         data = {'Deer': deer, 'Elk': elk, 'Cattle': cattle}
 
         # Sort the above dictionary by values.
@@ -171,9 +171,9 @@ class InteractiveDonut:
             Parameters
             ----------
                 habitat: gpd.GeoDataFrame
-                    The dataframe containing the habitat data.
+                    The dataframe containing the habitat dataset.
                 trajectories: PTRAILDataFrame
-                    The dataframe containing the Trajectory data.
+                    The dataframe containing the Trajectory dataset.
 
             Returns
             -------
@@ -206,13 +206,13 @@ class InteractiveDonut:
             Parameters
             ----------
                 habitat: pd.core.dataframe.DataFrame
-                    The dataset containing the habitat data.
+                    The dataset containing the habitat dataset.
 
             Returns
             -------
                 None
         """
-        # Get the area data for the habitat.
+        # Get the area dataset for the habitat.
         areas = InteractiveDonut._get_pasture_area(habitat)
         areas = areas.sort_values(by='area')
 
@@ -241,16 +241,16 @@ class InteractiveDonut:
     @staticmethod
     def _get_pasture_area(dataset: pd.DataFrame):
         """
-            Given the dataset containing the habitat data, return a dataframe
+            Given the dataset containing the habitat dataset, return a dataframe
             containing the name of the pasture and the area of the pasture.
 
             Note
             ----
                 It was noted that the starkey dataset had a pasture that did not have
                 any name, hence it was renamed to STARK and if a pasture has less than
-                3 points of data, then it is dropped since it does not have enough data
+                3 points of dataset, then it is dropped since it does not have enough dataset
                 to calculate its area. Moreover, if a pasture has an area of 0, it is
-                dropped furthermore to clean the data.
+                dropped furthermore to clean the dataset.
 
             Note
             ----
@@ -259,7 +259,7 @@ class InteractiveDonut:
             Parameters
             ----------
                 dataset: PTRAILDataFrame
-                    The dataframe containing habitat data.
+                    The dataframe containing habitat dataset.
 
             Returns
             -------

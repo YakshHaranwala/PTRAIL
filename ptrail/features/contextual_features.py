@@ -2,7 +2,7 @@
     The semantic features module contains several semantic features like
     intersection of trajectories, stop and stay point detection. Moreover,
     features like distance from Point of Interests, water bodies and other
-    demographic features related to the trajectory data are calculated. The
+    demographic features related to the trajectory dataset are calculated. The
     demographic features are extracted with the help of the python osmnx
     library.
 
@@ -48,16 +48,16 @@ class ContextualFeatures:
             Note
             ----
                 It is to be noted that depending on the size of the dataset and the surrounding
-                data passed in, this function will take longer time to execute if either of the
+                dataset passed in, this function will take longer time to execute if either of the
                 datasets is very large. It has been parallelized to make it faster, however, it
-                can still take a longer time depending on the size of the data being analyzed.
+                can still take a longer time depending on the size of the dataset being analyzed.
 
             Parameters
             ----------
                 df: PTRAILDataFrame
                     The dataframe containing the dataset.
                 geo_layers: Union[pd.DataFrame, gpd.GeoDataFrame]
-                    The Dataframe containing the geographical layers near the trajectory data.
+                    The Dataframe containing the geographical layers near the trajectory dataset.
                     It is to be noted
                 visited_location_name: Text
                     The location for which it is to be checked whether the objected visited it
@@ -129,8 +129,8 @@ class ContextualFeatures:
                     dist_column_label: Text,
                     nearby_threshold: int):
         """
-            Given a surrounding data with information about the distance to the nearest POI source
-            from a given coordinate, check whether the objects in the given trajectory data have
+            Given a surrounding dataset with information about the distance to the nearest POI source
+            from a given coordinate, check whether the objects in the given trajectory dataset have
             visited/crossed those POIs or not
 
             Warning
@@ -143,9 +143,9 @@ class ContextualFeatures:
             Parameters
             ----------
                 df: PTRAILDataFrame
-                    The dataframe containing the trajectory data.
+                    The dataframe containing the trajectory dataset.
                 surrounding_data: Union[gpd.GeoDataFrame, pd.DataFrame]
-                    The surrounding data that needs to contain the information of distance
+                    The surrounding dataset that needs to contain the information of distance
                     to the nearest water body.
                 dist_column_label: Text
                     The name of the column containing the distance information.
@@ -198,7 +198,7 @@ class ContextualFeatures:
             Parameters
             ----------
                 df: PTRAILDataFrame
-                    The dataframe containing the trajectory data.
+                    The dataframe containing the trajectory dataset.
                 polygon: Polygon
                     The polygon inside which the points are to be found.
 
@@ -232,7 +232,7 @@ class ContextualFeatures:
                                       df2: PTRAILDataFrame,
                                       polygon: Polygon):
         """
-            Given a df1 and df2 containing trajectory data along with  polygon,
+            Given a df1 and df2 containing trajectory dataset along with  polygon,
             check whether the trajectory/trajectories are inside the polygon
             and if they are, whether the intersect at any point or not.
 
@@ -245,7 +245,7 @@ class ContextualFeatures:
             Note
             ----
                 It is to be noted that df1 and df2 should only contain trajectory
-                data of only one trajectory each. If they contain more than one
+                dataset of only one trajectory each. If they contain more than one
                 trajectories, then the results might be unexpected.
 
             Parameters
@@ -383,7 +383,7 @@ class ContextualFeatures:
     #                 surroundings: Union[pd.DataFrame, gpd.GeoDataFrame],
     #                 time_threshold: int):
     #     """
-    #         Given a Trajectory Dataframe and another dataframe containing surrounding data,
+    #         Given a Trajectory Dataframe and another dataframe containing surrounding dataset,
     #         detect a herd behaviour in a particular region of the surroundings.
     #
     #         Note
@@ -395,7 +395,7 @@ class ContextualFeatures:
     #             df: PTRAILDataFrame
     #                 The dataframe containing Trajectory Data.
     #             surroundings: Union[pd.DataFrame, gpd.GeoDataFrame]
-    #                 The dataframe containing surrounding data.
+    #                 The dataframe containing surrounding dataset.
     #             time_threshold: int
     #                 The maximum time between 2 points of intersection lesser than which
     #                 the objects are considered to be in herd.
@@ -409,7 +409,7 @@ class ContextualFeatures:
     #     # return inside_polygon
     #
     #     # First split the dataframes based on set of Trajectory ids.
-    #     # As of now, each smaller chunk is supposed to have data of 100
+    #     # As of now, each smaller chunk is supposed to have dataset of 100
     #     # trajectory IDs max
     #     ids_ = list(df.traj_id.value_counts().keys())
     #

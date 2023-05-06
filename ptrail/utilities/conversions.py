@@ -1,6 +1,6 @@
 """
     The conversions modules contains various available methods
-    that can be used to convert given data into another format.
+    that can be used to convert given dataset into another format.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
 """

@@ -58,11 +58,9 @@ class Compression:
         calc_func = METRICS[metric]
 
         # Get the list of trajectory Ids.
-        traj_ids = dataframe.reset_index().traj_id
+        dataframe = dataframe.reset_index()
+        traj_ids = dataframe['traj_id'].unique()
         compression_rate = np.array([])
-
-        # Get the columns in the dataset.
-        df = dataframe.reset_index().set_index('traj_id')
 
         # Start the compression procedure.
         if verbose:
@@ -74,32 +72,24 @@ class Compression:
                 print(f"\tCompressing {i+1} of {len(traj_ids)}")
 
             # Get the current trajectory.
-            curr_traj = df.loc[[traj_ids[i]]]
+            curr_traj = dataframe.loc[dataframe['traj_id'] == traj_ids[i]]
 
             # Get the time in seconds.
-            traj_time = curr_traj['DateTime'].astype('datetime64[s]')
+            traj_time = curr_traj['DateTime'].astype('datetime64[ns]')
             traj_time = np.hstack((0, np.diff(traj_time).cumsum().astype('float')))
             traj_time /= traj_time.max()
 
             # Now do the actual compression procedure.
-            compressed = curr_traj
-
-            try:
-                max_epsilon, idx, epsilon = Helpers.calculate_metric_bw_points(curr_traj, calc_func)
-                # Now that the metric is calculated, and we have the epsilon convert the trajectory to a
-                # dictionary to compress it. This is only a temporary measure for the time being, we have
-                # to find a way to use dataframes only instead of this back and forth conversion.
-                # TODO: Phase out the usage of dict in compression.
-                curr_traj = Conversions.pandas_to_dict(curr_traj)
-                dim_set = curr_traj[traj_ids[i]].keys()
-                compressed = Conversions.dict_to_pandas(
-                    Helpers.compress_individual(curr_traj, dim_set, traj_time, calc_func, epsilon*alpha)
-                )
-            except:
-                print(f"\t\tIt was not possible to compress the trajectory {traj_ids[i]} of length {len(curr_traj)}")
+            # try:
+            max_epsilon, idx, epsilon = Helpers.calculate_metric_bw_points(curr_traj, traj_time, calc_func)
+            dim_set = curr_traj.columns
+            compressed = Helpers.compress_individual(curr_traj, dim_set, traj_time,
+                                                     calc_func, epsilon*alpha)
+            # except:
+            #     print(f"\t\tIt was not possible to compress the trajectory {traj_ids[i]} of length {len(curr_traj)}")
 
             # Calculate compression rate.
-            compressed['DateTime'] = compressed['DateTime'].astype('datetime64[s]')
+            compressed['DateTime'] = compressed['DateTime'].astype('datetime64[ns]')
             result.append(compressed)
 
             if verbose:
@@ -108,4 +98,5 @@ class Compression:
 
             compression_rate = np.append(compression_rate, 1 - (len(compressed) / len(curr_traj)))
 
-        return pd.concat(result), compression_rate
+        return PTRAILDataFrame(data_set=pd.concat(result, axis=0, ignore_index=True), latitude='lat', longitude='lon',
+                               datetime='DateTime', traj_id='traj_id'), compression_rate

@@ -1,6 +1,6 @@
 """
-    The filters module contains several data filtering functions like
-    filtering the data based on time, date, proximity to a point and
+    The filters module contains several dataset filtering functions like
+    filtering the dataset based on time, date, proximity to a point and
     several others.
 
     | Authors: Yaksh J Haranwala, Salman Haidri
@@ -133,12 +133,12 @@ class Filters:
             Parameters
             ----------
                 dataframe: PTRAILDataFrame
-                    The dataframe from which the data is to be filtered out.
+                    The dataframe from which the dataset is to be filtered out.
                 bounding_box: tuple
-                    The bounding box which is to be used to filter the data.
+                    The bounding box which is to be used to filter the dataset.
                 inside: bool
-                    Indicate whether the data outside the bounding box is required
-                    or the data inside it.
+                    Indicate whether the dataset outside the bounding box is required
+                    or the dataset inside it.
 
             Returns
             -------
@@ -161,14 +161,14 @@ class Filters:
 
             Note
             ----
-            | The following options are to be noted for filtering the data:
+            | The following options are to be noted for filtering the dataset:
             |    1. If the start_date and end_date both are not given, then entire
                     dataset itself is returned.
-            |    2. If only start_date is given, then the trajectory data after
+            |    2. If only start_date is given, then the trajectory dataset after
                     (including the start date) the start date is returned.
-            |    3. If only end_date is given, then the trajectory data before
+            |    3. If only end_date is given, then the trajectory dataset before
                     (including the end date) the end date is returned.
-            |    4. If start_date and end_date both are given then the data between
+            |    4. If start_date and end_date both are given then the dataset between
                     the start_date and end_date (included) are returned.
 
             Parameters
@@ -183,7 +183,7 @@ class Filters:
             Returns
             -------
                 PTRAILDataFrame
-                    The filtered dataframe containing the resultant data.
+                    The filtered dataframe containing the resultant dataset.
 
             Raises
             ------
@@ -244,14 +244,14 @@ class Filters:
 
             Note
             ----
-            | The following options are to be noted for filtering the data.
+            | The following options are to be noted for filtering the dataset.
             |    1. If the start_dateTime and end_dateTime both are not given, then entire
                     dataset itself is returned.
-            |    2. If only start_dateTime is given, then the trajectory data after
+            |    2. If only start_dateTime is given, then the trajectory dataset after
                     (including the start datetime) the start date is returned.
-            |    3. If only end_dateTime is given, then the trajectory data before
+            |    3. If only end_dateTime is given, then the trajectory dataset before
                     (including the end datetime) the end date is returned.
-            |    4. If start_dateTime and end_dateTime both are given then the data between
+            |    4. If start_dateTime and end_dateTime both are given then the dataset between
                     the start_dateTime and end_dateTime (included) are returned.
 
             Parameters
@@ -266,7 +266,7 @@ class Filters:
             Returns
             -------
                 PTRAILDataFrame
-                    The filtered dataframe containing the resultant data.
+                    The filtered dataframe containing the resultant dataset.
 
             Raises
             ------
@@ -313,7 +313,7 @@ class Filters:
     @staticmethod
     def filter_by_max_speed(dataframe: PTRAILDataFrame, max_speed: float):
         """
-            Remove the data points which have speed more than a user given speed.
+            Remove the dataset points which have speed more than a user given speed.
 
             Note
             ----
@@ -335,7 +335,7 @@ class Filters:
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values lesser than the max speed
-            # The NaNs are filled with max_speed+1 to avoid data loss as well as
+            # The NaNs are filled with max_speed+1 to avoid dataset loss as well as
             # to avoid false positives in calculation and comparison.
             filt = dataframe['Speed'].fillna(max_speed + 1) <= max_speed
             filtered_df = dataframe.loc[filt].reset_index(drop=True)
@@ -353,7 +353,7 @@ class Filters:
     @staticmethod
     def filter_by_min_speed(dataframe, min_speed: float):
         """
-            Remove the data points which have speed less than a user given speed.
+            Remove the dataset points which have speed less than a user given speed.
 
             Note
             ----
@@ -375,7 +375,7 @@ class Filters:
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values lesser than the max speed
-            # The NaNs are filled with min_speed-1 to avoid data loss as well as
+            # The NaNs are filled with min_speed-1 to avoid dataset loss as well as
             # to avoid false positives in calculation and comparison.
             filt = dataframe['Speed'].fillna(min_speed - 1) >= min_speed
             filtered_df = dataframe.loc[filt].reset_index()
@@ -413,7 +413,7 @@ class Filters:
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values lesser than the minimum consecutive distance.
-            # The NaNs are filled with min_distance-1 to avoid data loss as well as
+            # The NaNs are filled with min_distance-1 to avoid dataset loss as well as
             # to avoid false positives in calculation and comparison.
             filt = dataframe['Distance'].fillna(min_distance - 1) >= min_distance
             filtered_df = dataframe.loc[filt].reset_index(drop=True)
@@ -452,7 +452,7 @@ class Filters:
         try:
             dataframe = dataframe.reset_index()
             # Filter out all the values greater than the maximum consecutive distance.
-            # The NaNs are filled with max_distance+1 to avoid data loss as well as
+            # The NaNs are filled with max_distance+1 to avoid dataset loss as well as
             # to avoid false positives in calculation and comparison.
             filt = dataframe['Distance'].fillna(max_distance + 1) <= max_distance
             filtered_df = dataframe.loc[filt]
@@ -584,7 +584,7 @@ class Filters:
             iqr = q_high - q_low
             cut_off = iqr * 1.5  # Cut off value.
 
-            # Now, find the upper limit and the lower limit for the data.
+            # Now, find the upper limit and the lower limit for the dataset.
             lower = q_low - cut_off
             higher = q_high + cut_off
 

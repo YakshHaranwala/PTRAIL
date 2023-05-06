@@ -315,8 +315,8 @@ def compression(dataset, metric='TR', verbose=True, alpha=1):
         compress_traj['time'] = compress_traj['time'].astype('datetime64[s]')
         new_dataset[mmsis[id_mmsi]] = compress_traj
         t1 = time.time() - t0
-        # if verbose:
-        #     print(f"\tlength before: {len(curr_traj['lat'])}, length now: {len(compress_traj['lat'])}, reduction of {1 - len(compress_traj['lat'])/len(curr_traj['lat'])}")
+        if verbose:
+            print(f"\tlength before: {len(curr_traj['lat'])}, length now: {len(compress_traj['lat'])}, reduction of {1 - len(compress_traj['lat'])/len(curr_traj['lat'])}")
         compression_rate = np.append(compression_rate, 1 - (len(compress_traj['lat']) / len(curr_traj['lat'])))
         processing_time = np.append(processing_time, t1)
 
@@ -338,6 +338,5 @@ if __name__ == '__main__':
         for col in trajectory.columns:
             new_dataset[id][col] = np.array(trajectory[col])
 
-    # print(new_dataset[316002721])
     # Compression
-    new_dataset, compression_rate, processing_time = compression(new_dataset)
+    new_dataset, compression_rate, processing_time = compression(new_dataset, verbose=True)

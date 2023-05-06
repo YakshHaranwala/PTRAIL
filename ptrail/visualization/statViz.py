@@ -5,7 +5,7 @@
     Warning
     -------
         The visualizations in this module are currently developed with a focus around the
-        starkey.csv data as it has been developed as a side project by the developers. It
+        starkey.csv dataset as it has been developed as a side project by the developers. It
         will further be integrated into the library as a general class of visualizers in
         the time to come. Some of the visualization types may or may not work with other
         datasets.
@@ -31,7 +31,7 @@ class StatViz:
             Parameters
             ----------
                 dataset: PTRAILDataFrame
-                    The dataframe containing all the trajectory data.
+                    The dataframe containing all the trajectory dataset.
                 map_date: str
                     The date for which the TreeMap is to be plotted.
                 path: list

@@ -7,7 +7,7 @@
     Warning
     -------
         The visualizations in this module are currently developed with a focus around the
-        starkey.csv data as it has been developed as a side project by the developers. It
+        starkey.csv dataset as it has been developed as a side project by the developers. It
         will further be integrated into the library as a general class of visualizers in
         the time to come. Some of the visualization types may or may not work with other
         datasets.
@@ -52,9 +52,9 @@ class HydrationTrends:
             Parameters
             ----------
                 trajectories: PTRAILDataFrame
-                    The dataframe containing the trajectory data.
+                    The dataframe containing the trajectory dataset.
                 habitat: pd.DataFrame
-                    The dataframe containing the habitat data.
+                    The dataframe containing the habitat dataset.
                 dist_from_water: int
                     The maximum distance from the water water body that the animal should
                     be in.
@@ -84,7 +84,7 @@ class HydrationTrends:
 
         water_bodies['bbox'] = bboxes
 
-        # Name all the water bodies and store their respective data rows in a dictionary.
+        # Name all the water bodies and store their respective dataset rows in a dictionary.
         point_dict = dict()
         for i in range(len(water_bodies)):
             point_dict[f'WaterBody #{i + 1}'] = water_bodies.iloc[i]
@@ -113,7 +113,7 @@ class HydrationTrends:
 
     @staticmethod
     def __plot_radar(body_name):
-        # Get the water body data by its name.
+        # Get the water body dataset by its name.
         point = HydrationTrends.__point_dict[body_name]
 
         # Filter the trajectory dataset by the water body.
@@ -158,7 +158,7 @@ class HydrationTrends:
 
     @staticmethod
     def __plot_bar(body_name):
-        # Get the water body data by its name.
+        # Get the water body dataset by its name.
         point = HydrationTrends.__point_dict[body_name]
 
         # Filter the trajectory dataset by the water body.
@@ -183,7 +183,7 @@ class HydrationTrends:
                                                  ordered=True)
         small_df = small_df.sort_values(by='Time_Of_Day', ascending=True)
 
-        # Plot the barplot from the data above.
+        # Plot the barplot from the dataset above.
         fig, ax = plt.subplots(figsize=(7, 5))
         sns.barplot(x='Time_Of_Day', y='lat', hue='Species', hue_order=['Deer', 'Elk', 'Cattle'], data=small_df, ax=ax)
 

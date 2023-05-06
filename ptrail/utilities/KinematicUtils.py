@@ -111,8 +111,8 @@ class FormulaLog:
         lat = i_lat + (f_lat - i_lat) * time_ratio
         lon = i_lon + (f_lon - i_lon) * time_ratio
 
-        lat_diff = lat - i_lat
-        lon_diff = lon - i_lon
+        lat_diff = lat - m_lat
+        lon_diff = lon - m_lon
         return np.sqrt(np.power(lat_diff, 2) + np.power(lon_diff, 2))
 
     @staticmethod

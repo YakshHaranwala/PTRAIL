@@ -18,7 +18,7 @@ REQUIRED_PKGS = ['numpy >= 1.20',
                  'matplotlib >= 3.3.4',
                  'seaborn >= 0.11.2',
                  'PyQt5',
-                 'sklearn'
+                 'scikit-learn'
                  ]
 
 setup(
@@ -27,7 +27,7 @@ setup(
     version='0.7.1 Beta',
     license='new BSD',
     python_requires='>=3.6',
-    description='PTRAIL: A Mobility-data Preprocessing Library using parallel computation.',
+    description='PTRAIL: A Mobility-dataset Preprocessing Library using parallel computation.',
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     maintainer='PTRAIL Developers',

@@ -93,7 +93,7 @@ class GuiHandler:
                                            placeHolder=['Name of Identifier column', 'Name of Timestamp column',
                                                         'Name of Latitude column', 'Name of Longitude column'])
         if col_names is not None and col_names[0] != '' and len(col_names) == 4:
-            # Read the data into a PTRAIL dataframe.
+            # Read the dataset into a PTRAIL dataframe.
             self._data = PTRAILDataFrame(data_set=pd.read_csv(filename),
                                          traj_id=col_names[0].strip(),
                                          datetime=col_names[1].strip(),
@@ -104,7 +104,7 @@ class GuiHandler:
             # Set the table model and display the dataframe.
             self._table = QtWidgets.QTableView()
 
-            # NOTE: whenever we update DFs, make sure to send the data after resetting
+            # NOTE: whenever we update DFs, make sure to send the dataset after resetting
             #       index and setting inplace as False.
             self._model = TableModel(self._data.reset_index(inplace=False))
             self._table.setModel(self._model)
@@ -167,7 +167,7 @@ class GuiHandler:
         map_ = folium.Map(location=(to_plot[const.LAT].iloc[0], to_plot[const.LONG].iloc[0]),
                           zoom_start=13, tiles='CartoDB positron')
 
-        # Then, create (lat, lon) pairs for the data points.
+        # Then, create (lat, lon) pairs for the dataset points.
         locations = []
         for j in range(len(to_plot)):
             locations.append((to_plot['lat'].iloc[j], to_plot['lon'].iloc[j]))
@@ -271,8 +271,8 @@ class GuiHandler:
                                                        'True/False'])
             if args:
                 feat, importance = None, None
-                # If the user wants mutual info for point-based data, use the if-block.
-                # For segment-based data, the else block is used.
+                # If the user wants mutual info for point-based dataset, use the if-block.
+                # For segment-based dataset, the else block is used.
                 if not bool(util.strtobool(args[2].strip())):
                     # Generate the features and drop duplicate cols.
                     df = KinematicFeatures.generate_kinematic_features(self._data).dropna()
