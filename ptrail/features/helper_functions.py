@@ -602,34 +602,3 @@ class Helpers:
         df_chunks = [dataframe.reset_index().loc[dataframe.reset_index()[const.TRAJECTORY_ID].isin(ids_[i])]
                      for i in range(len(ids_))]
         return df_chunks
-
-    # @staticmethod
-    # def _partition_size(size, cpu_count):
-    #     """
-    #         Takes number of ids and makes use of a formula that gives a factor to makes set of ids
-    #         according to the number of processors available to work with.
-    #
-    #         Parameters
-    #         ----------
-    #             size: int
-    #                 The total number of trajectory IDs in the dataset.
-    #
-    #         Returns
-    #         -------
-    #             int
-    #                The factor by which the datasets are to be split.
-    #     """
-    #     # Based on the Operating system, get the number of CPUs available for
-    #     # multiprocessing.
-    #     available_cpus = len(os.sched_getaffinity(0)) if os.name == 'posix' \
-    #         else psutil.cpu_count()  # Number of available CPUs.
-    #
-    #     # Integer divide the total number of Trajectory IDs by the number of available CPUs
-    #     # and square the number because if too many partitions are made, then it does more
-    #     # harm than good for the execution speed. The factor of 1 is added to avoid errors
-    #     # when the integer division yields a 0.
-    #     factor = ((size // cpu_count)) + 1
-    #
-    #     # Return the factor if it is less than 100 otherwise return 100.
-    #     # This factor hence is capped at 100.
-    #     return factor if factor < 100 else 100
